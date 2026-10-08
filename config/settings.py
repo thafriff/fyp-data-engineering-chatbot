@@ -63,6 +63,10 @@ SOURCES = {
         # Chapter 2 (Collecting and preparing data: cleaning, databases).
         # Chapters 3-10 (statistics, ML, visualisation...) are out of scope.
         "page_ranges": [(19, 112)],
+        # OpenStax prints this running footer on about half of the pages.
+        "strip_line_patterns": [
+            r"^\s*Access for free at openstax\.org\s*$",
+        ],
         "notes": "Chapters 1-2 only. Chapter 2 has most of the database and data-cleaning content.",
     },
     "S03": {
@@ -99,6 +103,10 @@ SOURCES = {
         # Chapter 8 (Data Management) only. The rest of the 939-page book
         # (hardware, OS, web development, ...) is off-topic for this chatbot.
         "page_ranges": [(369, 438)],
+        # OpenStax prints this running footer on about half of the pages.
+        "strip_line_patterns": [
+            r"^\s*Access for free at openstax\.org\s*$",
+        ],
         "notes": "Data management chapter only.",
     },
     "S05": {
@@ -114,10 +122,13 @@ SOURCES = {
         # Cleaning rules applied to the Markdown text.
         "strip_frontmatter": True,       # the --- ... --- block at the top of each page
         "resolve_wiki_links": True,      # [[Target|Alias]] -> Alias, [[Target]] -> Target
-        # Multi-line regexes applied to the whole file text. This one removes the wiki
-        # footer (GitHub edit/copy links, feedback links) from its marker to the end of the file.
+        # Multi-line regexes applied to the whole file text. They remove the wiki footer
+        # (GitHub edit/copy links, feedback links) from its start to the end of the file.
+        # Most files mark it with a "%% wiki footer ... %%" line; a few (for example
+        # Concepts/Data Processing/Message Broker.md) only have the "## This note in GitHub" heading.
         "strip_text_patterns": [
             r"(?ms)^%% wiki footer: Please don't edit anything below this line %%.*\Z",
+            r"(?ms)^## This note in GitHub\s*$.*\Z",
         ],
         "notes": "76 small Markdown files, already well structured.",
     },
@@ -140,9 +151,14 @@ SOURCES = {
             "07-streaming",
         ],
         "exclude_folders": ["cohorts", ".tmp", ".github", "projects", "scripts"],
-        # Path prefixes (relative to the ZIP's top folder) to skip. 07-streaming/extras/ is
-        # duplicate/example material with few comments; 07-streaming/code/ is kept.
-        "exclude_paths": ["07-streaming/extras/"],
+        # Path prefixes (relative to the ZIP's top folder) to skip.
+        # - 07-streaming/extras/ : duplicate/example material with few comments.
+        # - 07-streaming/code/live/ : a snapshot of the live workshop. Its files are exact copies
+        #   (producer_realtime.py, models.py) or older variants (aggregation_job.py,
+        #   pass_through_job.py) of the files in 07-streaming/code/src/, which is kept as the
+        #   single maintained copy. Its only other files are a 22-character README and a
+        #   102-character main.py.
+        "exclude_paths": ["07-streaming/extras/", "07-streaming/code/live/"],
         "include_extensions": [".md", ".sql", ".py"],
         # Code files are labelled so retrieval and evaluation can tell them apart.
         "source_type_by_extension": {
@@ -152,7 +168,7 @@ SOURCES = {
         },
         "exclude_extensions": [".jpg", ".jpeg", ".png", ".svg", ".gif"],
         "strip_frontmatter": True,
-        "notes": "07-streaming/extras/ is excluded (duplicate/example files); 07-streaming/code/ is kept.",
+        "notes": "07-streaming/extras/ and 07-streaming/code/live/ are excluded (duplicates); 07-streaming/code/src/ is kept.",
     },
     "S07": {
         "name": "Luna Reyes et al. - Data Analytics for Public Policy, section 1.4",
@@ -173,6 +189,10 @@ SOURCES = {
         "strip_line_patterns": [
             r"^\s*\d{1,2}/\d{1,2}/\d{2,4},\s*\d{1,2}:\d{2}\s*[AP]M\b.*$",
             r"^\s*https://pressbooks\.pub/\S+\s+\d+/\d+\s*$",
+            # Pressbooks platform lines at the end of the last page. The copyright / CC BY-NC-SA
+            # attribution sentence just above them is kept on purpose (it is the book's licence text).
+            r"^\s*Powered by Pressbooks\s*$",
+            r"^\s*Pressbooks User Guide \| Pressbooks Directory \| Contact\s*$",
         ],
         "notes": "Short (9 pages) with 10 tables; table handling should be checked.",
     },
