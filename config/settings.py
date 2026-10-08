@@ -73,16 +73,21 @@ SOURCES = {
         # duplicate chunks. Change this path to switch to the full lectures.
         "path": "S03/S03_Heljanko_BigDataPlatforms-2026_FILTERED.pdf",
         "format": "pdf",
-        # PROBLEM SOURCE: lecture slides. pdfplumber merges words together
-        # ("whichshouldbe,e.g.,atleast2-10xthenumber") and leaves "▶" bullets.
-        # Test PyMuPDF first and compare against pdfplumber before choosing.
+        # Lecture slides. DECISION MADE: PyMuPDF. pdfplumber merges words together
+        # ("Cloudcomputingisamodelforenabling...": about 17 suspicious words per 1000
+        # versus about 2 for PyMuPDF; see notebook 01, section 5). The two extractors
+        # that were compared are listed below so the notebook can reproduce the comparison.
         "extractor": "pymupdf",
-        "fallback_extractor": "pdfplumber",
+        "extractors_compared": ["pymupdf", "pdfplumber"],
         "source_type": "lecture_slides",
         "page_ranges": None,
-        "problem_source": True,
         "strip_characters": ["▶"],  # slide bullet marker
-        "notes": "Slides have ~490 characters per page; check word spacing after extraction.",
+        # Every slide repeats a running header and a "slide/total" counter on its own line.
+        "strip_line_patterns": [
+            r"^\s*Big Data Platforms \(5 ECTS\)\s*$",   # running header
+            r"^\s*\d{1,3}/\d{1,3}\s*$",                   # slide counter such as "12/44"
+        ],
+        "notes": "Slides have ~490 characters per page; PyMuPDF keeps word spacing intact.",
     },
     "S04": {
         "name": "OpenStax - Introduction to Computer Science",
@@ -109,7 +114,12 @@ SOURCES = {
         # Cleaning rules applied to the Markdown text.
         "strip_frontmatter": True,       # the --- ... --- block at the top of each page
         "resolve_wiki_links": True,      # [[Target|Alias]] -> Alias, [[Target]] -> Target
-        "notes": "77 small Markdown files, already well structured.",
+        # Multi-line regexes applied to the whole file text. This one removes the wiki
+        # footer (GitHub edit/copy links, feedback links) from its marker to the end of the file.
+        "strip_text_patterns": [
+            r"(?ms)^%% wiki footer: Please don't edit anything below this line %%.*\Z",
+        ],
+        "notes": "76 small Markdown files, already well structured.",
     },
     "S06": {
         "name": "DataTalksClub - Data Engineering Zoomcamp",
@@ -130,6 +140,9 @@ SOURCES = {
             "07-streaming",
         ],
         "exclude_folders": ["cohorts", ".tmp", ".github", "projects", "scripts"],
+        # Path prefixes (relative to the ZIP's top folder) to skip. 07-streaming/extras/ is
+        # duplicate/example material with few comments; 07-streaming/code/ is kept.
+        "exclude_paths": ["07-streaming/extras/"],
         "include_extensions": [".md", ".sql", ".py"],
         # Code files are labelled so retrieval and evaluation can tell them apart.
         "source_type_by_extension": {
@@ -139,7 +152,7 @@ SOURCES = {
         },
         "exclude_extensions": [".jpg", ".jpeg", ".png", ".svg", ".gif"],
         "strip_frontmatter": True,
-        "notes": "07-streaming holds many .py files (about 46); review how much code noise they add.",
+        "notes": "07-streaming/extras/ is excluded (duplicate/example files); 07-streaming/code/ is kept.",
     },
     "S07": {
         "name": "Luna Reyes et al. - Data Analytics for Public Policy, section 1.4",
@@ -149,10 +162,17 @@ SOURCES = {
         "extractor": "pdfplumber",
         "source_type": "textbook",
         "page_ranges": None,
-        # The PDF is a browser printout: every page starts with a line like
-        # "10/6/26, 2:20 PM 1.4 Data Quality and Data Types - ..." that must be removed.
+        # The PDF is a browser printout, so web-page chrome must be removed.
+        # Whole-text pattern (may span lines): the Pressbooks navigation / promo block.
+        "strip_text_patterns": [
+            r"(?s)Home Read Sign.*?supports open publishing practices\.[ \t]*\n?",
+        ],
+        # Line patterns (one line each): the browser print header with date and time
+        # ("10/6/26, 2:20 PM 1.4 Data Quality ...") and the footer URL with its page counter
+        # ("https://pressbooks.pub/... 1/9").
         "strip_line_patterns": [
             r"^\s*\d{1,2}/\d{1,2}/\d{2,4},\s*\d{1,2}:\d{2}\s*[AP]M\b.*$",
+            r"^\s*https://pressbooks\.pub/\S+\s+\d+/\d+\s*$",
         ],
         "notes": "Short (9 pages) with 10 tables; table handling should be checked.",
     },
