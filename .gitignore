@@ -6,9 +6,10 @@ venv/
 
 # Raw source files - too large for GitHub (161MB)
 # Kept in Google Drive instead
+# ignore data cleaned also
 data/raw/*
 !data/raw/README.md
-
+data/cleaned/
 # Python cache
 __pycache__/
 *.pyc
