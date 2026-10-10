@@ -312,7 +312,9 @@ CHUNK_METADATA_FIELDS = [
 # TOPIC_MIN_SIMILARITY the chunk is labelled TOPIC_OTHER_LABEL (e.g. Docker setup notes).
 # Relational database design (ER modelling, normalization, keys) is described under "SQL",
 # because the proposal's eight topics have no separate database-design topic.
-# Keywords: TF-IDF over all chunks; the highest-scoring terms of each chunk are kept.
+# Keywords: TF-IDF over all chunks; the highest-scoring terms of each chunk are kept. A two-word
+# phrase is only formed from two words that stand next to each other inside ONE sentence/clause
+# and are both not stop words, so phrases never stitch fragments across a sentence or clause break.
 # ---------------------------------------------------------------------------
 TOPIC_DESCRIPTIONS = {
     "SQL": "SQL and relational databases: SELECT queries, joins, GROUP BY and aggregation, subqueries, "
@@ -334,15 +336,24 @@ TOPIC_DESCRIPTIONS = {
     "Big Data": "Big data platforms: volume, velocity and variety, distributed storage and file systems such as "
                 "HDFS, cloud computing, data centres, NoSQL databases, scaling across clusters of machines",
 }
-TOPIC_MIN_SIMILARITY = 0.20      # below this the chunk is labelled TOPIC_OTHER_LABEL
+TOPIC_MIN_SIMILARITY = 0.25      # below this the chunk is labelled TOPIC_OTHER_LABEL
+                                 # (raised from 0.20: chunks scoring 0.20-0.25 were mostly generic
+                                 # Python/pandas/statistics material force-fitted into a topic)
 TOPIC_OTHER_LABEL = "Other"
 
 KEYWORDS_PER_CHUNK = 5
 KEYWORD_NGRAM_RANGE = (1, 2)     # single words and two-word phrases
 KEYWORD_MIN_DF = 2               # a term must appear in at least 2 chunks
 KEYWORD_MAX_DF = 0.30            # a term in more than 30% of chunks is too common to describe one
-KEYWORD_EXTRA_STOP_WORDS = ["https", "http", "www", "com", "org", "html", "figure", "table",
-                            "example", "use", "used", "using", "like", "just", "let", "need"]
+KEYWORD_EXTRA_STOP_WORDS = [
+    # web / markup leftovers
+    "https", "http", "www", "com", "org", "html", "png", "jpg", "svg", "gif", "img", "src", "alt",
+    "div", "span", "br", "td", "tr", "stroke", "youtu", "youtube", "watch", "github", "md",
+    # pieces of contractions ("we'll" -> "ll")
+    "ll", "ve", "re", "don", "didn", "doesn", "isn", "aren", "won", "wasn",
+    # generic words that describe no topic
+    "figure", "table", "example", "use", "used", "using", "like", "just", "let", "need",
+]
 
 # ---------------------------------------------------------------------------
 # Embedding and vector store
