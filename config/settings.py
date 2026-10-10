@@ -50,6 +50,15 @@ SOURCES = {
         # Chapters only: skips cover, contents and versioning history.
         # Pages 144-150 are Appendix C (SQL lab) and are kept on purpose.
         "page_ranges": [(8, 150)],
+        # Running page header: "19 | Chapter 5 Data Modelling" (even pages) or
+        # "Chapter 5 Data Modelling | 20" (odd pages). The page number changes on every page.
+        "strip_line_patterns": [
+            r"^\s*\d+\s*\|\s*Chapter \d+ .+$",
+            r"^\s*Chapter \d+ .+\|\s*\d+\s*$",
+            # Front matter pages use roman numerals: "viii | About the Book", "Acknowledgements | ix".
+            r"^\s*[ivxlcdm]+\s*\|\s*\S.*$",
+            r"^\s*\S.*\|\s*[ivxlcdm]+\s*$",
+        ],
         "notes": "An EPUB copy of the same book exists in S01; it is ignored to avoid duplicate chunks.",
     },
     "S02": {
@@ -63,9 +72,13 @@ SOURCES = {
         # Chapter 2 (Collecting and preparing data: cleaning, databases).
         # Chapters 3-10 (statistics, ML, visualisation...) are out of scope.
         "page_ranges": [(19, 112)],
-        # OpenStax prints this running footer on about half of the pages.
+        # OpenStax running footer (about half of the pages) and running page header:
+        # "30 1 • What Are Data and Data Science?" (even pages) or
+        # "1.5 • Data Science with Python 31" (odd pages).
         "strip_line_patterns": [
             r"^\s*Access for free at openstax\.org\s*$",
+            r"^\s*\d+\s+\d+\s+•\s+.+$",
+            r"^\s*\d+(?:\.\d+)?\s+•\s+.+\s+\d+\s*$",
         ],
         "notes": "Chapters 1-2 only. Chapter 2 has most of the database and data-cleaning content.",
     },
@@ -86,6 +99,8 @@ SOURCES = {
         "source_type": "lecture_slides",
         "page_ranges": None,
         "strip_characters": ["▶"],  # slide bullet marker
+        # PyMuPDF prints some slide titles twice in a row; keep only one copy.
+        "collapse_repeated_lines": True,
         # Every slide repeats a running header and a "slide/total" counter on its own line.
         "strip_line_patterns": [
             r"^\s*Big Data Platforms \(5 ECTS\)\s*$",   # running header
@@ -103,9 +118,13 @@ SOURCES = {
         # Chapter 8 (Data Management) only. The rest of the 939-page book
         # (hardware, OS, web development, ...) is off-topic for this chatbot.
         "page_ranges": [(369, 438)],
-        # OpenStax prints this running footer on about half of the pages.
+        # OpenStax running footer (about half of the pages) and running page header:
+        # "380 8 • Data Management" (even pages) or
+        # "8.3 • Relational Database Management Systems 381" (odd pages).
         "strip_line_patterns": [
             r"^\s*Access for free at openstax\.org\s*$",
+            r"^\s*\d+\s+\d+\s+•\s+.+$",
+            r"^\s*\d+(?:\.\d+)?\s+•\s+.+\s+\d+\s*$",
         ],
         "notes": "Data management chapter only.",
     },
@@ -206,7 +225,7 @@ IGNORED_RAW_FILES = [
 
 # ---------------------------------------------------------------------------
 # Knowledge base topics (the eight topics from the proposal, Section 1.5)
-# Used later to label each chunk with a topic.
+# Used in notebook 02 to label each chunk with a topic (see TOPIC_DESCRIPTIONS).
 # ---------------------------------------------------------------------------
 TOPICS = [
     "SQL",
@@ -226,9 +245,48 @@ MIN_PAGE_CHARACTERS = 50   # pages with fewer characters are treated as empty an
 
 # ---------------------------------------------------------------------------
 # Chunking (PROVISIONAL: tune in notebook 02 after looking at real chunks)
+#
+# Strategy: split by headings/sections first. Only a section that is still longer than
+# CHUNK_SIZE is split again with fixed-size chunks (CHUNK_SIZE / CHUNK_OVERLAP) that
+# prefer paragraph, then sentence, then word boundaries. Sections shorter than
+# MIN_CHUNK_CHARACTERS are merged into the next section of the same file.
+# Finally, neighbouring prose chunks that belong to the SAME section (same file, same
+# heading) are merged while the result stays within CHUNK_SIZE. Chunks of different
+# sections are never merged just to reach a size target.
+# Code files (.py, .sql) are chunked separately by structure, never by paragraph.
 # ---------------------------------------------------------------------------
-CHUNK_SIZE = 800           # characters per chunk
-CHUNK_OVERLAP = 100        # characters shared between neighbouring chunks
+CHUNK_SIZE = 800           # maximum characters per prose chunk
+CHUNK_OVERLAP = 100        # characters shared between neighbouring chunks of one long section
+MIN_CHUNK_CHARACTERS = 150  # smaller sections are merged into a neighbour
+DROP_CHUNKS_BELOW = 50      # a finished chunk shorter than this has no retrievable content (e.g. an index page) and is dropped
+MARKDOWN_HEADING_MAX_LEVEL = 3   # '#', '##', '###' start a new section; deeper headings stay inside it
+TEXT_SPLIT_SEPARATORS = ["\n\n", ".\n", ". ", "\n", " ", ""]   # preferred split points, best first
+
+CODE_CHUNK_SIZE = 1500     # maximum characters per code chunk (code is split on definitions / statements)
+
+# PDF textbooks have no Markdown headings, so section headings are found with these
+# regexes (each must match a whole line). Sources not listed here are handled as follows:
+# S03 = one slide per chunk (a slide title is its section), S05/S06 = Markdown headings.
+PDF_HEADING_PATTERNS = {
+    "S01": [r"^Chapter \d+ [A-Z].{2,90}$"],                    # "Chapter 5 Data Modelling"
+    "S02": [r"^\d{1,2}\.\d{1,2} [A-Z][^.]{2,80}$"],           # "1.2 Data Science in Practice"
+    "S04": [r"^\d{1,2}\.\d{1,2} [A-Z][^.]{2,80}$"],           # "8.3 Relational Database Management Systems"
+    "S07": [r"^\d{1,2}\.\d{1,2} [A-Z][^.]{2,80}$"],           # "1.4 Data Quality and Data Types"
+}
+
+# Difficulty label per source, taken from the level of the material (a heuristic, to be
+# reviewed): textbooks for beginners = beginner, university lectures/practical courses = intermediate/advanced.
+DIFFICULTY_BY_SOURCE = {
+    "S01": "intermediate",
+    "S02": "beginner",
+    "S03": "advanced",
+    "S04": "beginner",
+    "S05": "intermediate",
+    "S06": "intermediate",
+    "S07": "beginner",
+}
+
+CHUNKS_FILE = CHUNKS_DIR / "chunks.json"     # output of notebook 02
 
 # Metadata fields written for every chunk (see proposal Table 3.10)
 CHUNK_METADATA_FIELDS = [
@@ -237,12 +295,54 @@ CHUNK_METADATA_FIELDS = [
     "source_name",
     "licence",
     "source_type",   # textbook | lecture_slides | wiki | course_notes | code
-    "section",       # nearest heading
-    "page",          # page number for PDFs, file path for Markdown/code
-    "topic",
-    "keywords",
+    "section",       # nearest heading (chapter / section / slide title / function name)
+    "page",          # first PDF page of the chunk (None for Markdown and code)
+    "file",          # cleaned text file for PDFs; original relative path for Markdown and code
+    "topic",         # one of TOPICS, or TOPIC_OTHER_LABEL (embedding similarity, see below)
+    "topic_score",   # cosine similarity between the chunk and its topic description (0-1)
+    "keywords",      # KEYWORDS_PER_CHUNK terms with the highest TF-IDF score in the chunk
     "difficulty",
 ]
+
+# ---------------------------------------------------------------------------
+# Topic and keyword labelling (notebook 02)
+#
+# Topic: each chunk ("section + text") and each topic description below are embedded with
+# EMBEDDING_MODEL; the chunk gets the most similar topic. If even the best similarity is below
+# TOPIC_MIN_SIMILARITY the chunk is labelled TOPIC_OTHER_LABEL (e.g. Docker setup notes).
+# Relational database design (ER modelling, normalization, keys) is described under "SQL",
+# because the proposal's eight topics have no separate database-design topic.
+# Keywords: TF-IDF over all chunks; the highest-scoring terms of each chunk are kept.
+# ---------------------------------------------------------------------------
+TOPIC_DESCRIPTIONS = {
+    "SQL": "SQL and relational databases: SELECT queries, joins, GROUP BY and aggregation, subqueries, "
+           "creating and altering tables, primary and foreign keys, constraints, relational database design, "
+           "entity relationship modelling and normalization",
+    "ETL/ELT": "ETL and ELT processes: extracting data from source systems, transforming it and loading it into a "
+               "data warehouse or data lake, data ingestion and data integration",
+    "Data Pipelines": "Data pipelines and workflow orchestration: automating and scheduling data flows, DAGs, "
+                      "orchestration tools such as Airflow or Kestra, running pipelines in Docker containers, "
+                      "infrastructure as code with Terraform",
+    "Data Cleaning": "Data cleaning and preprocessing: handling missing values, duplicates, outliers and "
+                     "inconsistent formats, preparing and transforming raw data before analysis",
+    "Data Processing": "Data processing: batch processing and stream processing, distributed computation with "
+                       "Spark, MapReduce and Flink, Kafka message streams, processing large datasets in parallel",
+    "Data Quality": "Data quality: accuracy, completeness, consistency, validity and timeliness of data, data "
+                    "validation and testing, data governance, metadata and data types",
+    "Data Warehousing": "Data warehousing and analytics engineering: data warehouses and data lakes, dimensional "
+                        "modelling, star schema, fact and dimension tables, BigQuery, dbt models, business intelligence",
+    "Big Data": "Big data platforms: volume, velocity and variety, distributed storage and file systems such as "
+                "HDFS, cloud computing, data centres, NoSQL databases, scaling across clusters of machines",
+}
+TOPIC_MIN_SIMILARITY = 0.20      # below this the chunk is labelled TOPIC_OTHER_LABEL
+TOPIC_OTHER_LABEL = "Other"
+
+KEYWORDS_PER_CHUNK = 5
+KEYWORD_NGRAM_RANGE = (1, 2)     # single words and two-word phrases
+KEYWORD_MIN_DF = 2               # a term must appear in at least 2 chunks
+KEYWORD_MAX_DF = 0.30            # a term in more than 30% of chunks is too common to describe one
+KEYWORD_EXTRA_STOP_WORDS = ["https", "http", "www", "com", "org", "html", "figure", "table",
+                            "example", "use", "used", "using", "like", "just", "let", "need"]
 
 # ---------------------------------------------------------------------------
 # Embedding and vector store
