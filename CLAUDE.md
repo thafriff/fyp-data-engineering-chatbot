@@ -20,11 +20,19 @@ Gemini generates a course-aligned answer.
 - config/settings.py finalized for extraction (per-source include/exclude and cleaning rules)
 - notebooks/01_extraction.ipynb DONE, run, pushed. Output in data/cleaned/ (Git ignored)
   with extraction_manifest.json. Every cleaning rule has a "0 matches remain" check.
-- notebooks/02_chunking.ipynb IN PROGRESS: chunk shape APPROVED (heading-first, same-section
-  merge, ~2,500 chunks in data/chunks/chunks.json, Git ignored). Next: topic + keyword labelling,
-  show the user a labelled sample before finalizing.
-- Documented limitations (accepted, do not "fix"): S01 labels are chapter-level only (no
-  sub-heading heuristic); S07 keeps line-break hyphenation (no automatic de-hyphenation).
+- notebooks/02_chunking.ipynb DONE: chunk shape approved (heading-first, same-section merge),
+  topic + keyword labelling FINALIZED and approved. 2,515 chunks written to
+  data/chunks/chunks.json (Git ignored). Topic = embedding similarity to TOPIC_DESCRIPTIONS,
+  "Other" below TOPIC_MIN_SIMILARITY = 0.25 (266 chunks); keywords = TF-IDF with a
+  sentence-boundary guard (phrases only from adjacent non-stop words in one clause).
+- Next: notebooks/03_embedding.ipynb - ONLY when the user says go.
+- Documented limitations (accepted, do not "fix"):
+  - S01 labels are chapter-level only (no sub-heading heuristic).
+  - S07 keeps line-break hyphenation (no automatic de-hyphenation).
+  - Mid-confidence topic scores (0.40-0.50) can still assign a plausible-but-debatable topic
+    when a chunk's content is generic (e.g. some S02 Python/pandas chunks land in
+    "Data Warehousing" at ~0.43-0.46). Accepted limitation of using 8 broad topic categories
+    with no general-computing bucket, not a bug.
 - Not started: 03-05 notebooks, src/core, src/app, evaluation questions, docs/ licence log, .env
 
 ## Tech Stack
