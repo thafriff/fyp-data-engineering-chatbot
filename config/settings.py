@@ -22,6 +22,7 @@ FAISS_INDEX_DIR = DATA_DIR / "faiss_index"  # vector index, Git ignored
 
 NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
 EVALUATION_DIR = PROJECT_ROOT / "evaluation"
+TEST_QUESTIONS_FILE = EVALUATION_DIR / "test_questions.json"   # approved retrieval benchmark questions (n=28)
 DOCS_DIR = PROJECT_ROOT / "docs"
 
 # ---------------------------------------------------------------------------
