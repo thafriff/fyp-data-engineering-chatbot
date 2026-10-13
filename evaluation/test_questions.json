@@ -1,0 +1,368 @@
+{
+  "meta": {
+    "purpose": "Embedding/retrieval benchmark (notebook 03). A retrieval is correct if ANY relevant_chunk_id appears in the top-k results.",
+    "chunks_file": "data/chunks/chunks.json",
+    "chunk_count": 2515,
+    "note": "chunk ids refer to the current chunks.json; if the chunking changes, re-validate the ids.",
+    "status": "APPROVED 2026-10-13 - question set frozen",
+    "limitations": "see evaluation/test_questions_limitations.md (n=28 is directional only; Q06 and Q11 lean on literal identifier matching)",
+    "literal_identifier_questions": [
+      "Q06",
+      "Q11"
+    ]
+  },
+  "questions": [
+    {
+      "id": "Q01",
+      "question": "What is the difference between OLTP and OLAP databases?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0204",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0204",
+        "S06-0205",
+        "S06-0206",
+        "S04-0067",
+        "S05-0138",
+        "S05-0139"
+      ]
+    },
+    {
+      "id": "Q02",
+      "question": "How is a data lake different from a data warehouse?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S04-0204",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0203",
+        "S04-0204",
+        "S04-0207",
+        "S05-0005"
+      ]
+    },
+    {
+      "id": "Q03",
+      "question": "What are fact tables and dimension tables?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0324",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0324",
+        "S05-0094",
+        "S04-0192"
+      ]
+    },
+    {
+      "id": "Q04",
+      "question": "Why is BigQuery called serverless, and why does that matter?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0209",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0209"
+      ]
+    },
+    {
+      "id": "Q05",
+      "question": "What is dbt used for in a data warehouse?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0328",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0328",
+        "S06-0327"
+      ]
+    },
+    {
+      "id": "Q06",
+      "question": "How is the fct_trips dbt model configured to load data incrementally?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0547",
+      "seed_source_type": "code",
+      "relevant_chunk_ids": [
+        "S06-0547"
+      ]
+    },
+    {
+      "id": "Q07",
+      "question": "Why was Apache Spark created when MapReduce already existed?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S03-0040",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0040",
+        "S03-0026",
+        "S03-0041",
+        "S04-0248"
+      ]
+    },
+    {
+      "id": "Q08",
+      "question": "When should I use batch processing instead of stream processing?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0656",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0656",
+        "S06-0655",
+        "S06-0649",
+        "S05-0160",
+        "S05-0119",
+        "S05-0120"
+      ]
+    },
+    {
+      "id": "Q09",
+      "question": "Which libraries are built on top of Apache Spark?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S03-0062",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0062",
+        "S03-0061",
+        "S03-0080"
+      ]
+    },
+    {
+      "id": "Q10",
+      "question": "What does Flink handle for you that a plain Kafka consumer does not?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0919",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0919",
+        "S06-0969",
+        "S06-0937"
+      ]
+    },
+    {
+      "id": "Q11",
+      "question": "How do you turn on checkpointing in a PyFlink job?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0990",
+      "seed_source_type": "code",
+      "relevant_chunk_ids": [
+        "S06-0933",
+        "S06-0935",
+        "S06-0947",
+        "S06-0985",
+        "S06-0988",
+        "S06-0990"
+      ]
+    },
+    {
+      "id": "Q12",
+      "question": "What is a foreign key and how does it relate to a primary key?",
+      "topic": "SQL",
+      "seed_chunk_id": "S01-0098",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S01-0098",
+        "S01-0120",
+        "S05-0101",
+        "S05-0197"
+      ]
+    },
+    {
+      "id": "Q13",
+      "question": "What do the ACID properties of a database transaction mean?",
+      "topic": "SQL",
+      "seed_chunk_id": "S03-0087",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0087",
+        "S04-0071",
+        "S04-0136",
+        "S04-0168"
+      ]
+    },
+    {
+      "id": "Q14",
+      "question": "What is a common table expression (CTE) in SQL?",
+      "topic": "SQL",
+      "seed_chunk_id": "S06-0481",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0481",
+        "S05-0287"
+      ]
+    },
+    {
+      "id": "Q15",
+      "question": "In what order does SQL execute the clauses of a query?",
+      "topic": "SQL",
+      "seed_chunk_id": "S05-0280",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0280"
+      ]
+    },
+    {
+      "id": "Q16",
+      "question": "When is a table in Boyce-Codd normal form?",
+      "topic": "SQL",
+      "seed_chunk_id": "S01-0179",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S01-0179",
+        "S01-0182",
+        "S01-0184",
+        "S04-0103",
+        "S02-0355"
+      ]
+    },
+    {
+      "id": "Q17",
+      "question": "What is a data pipeline?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S05-0103",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0103",
+        "S05-0104",
+        "S06-0009"
+      ]
+    },
+    {
+      "id": "Q18",
+      "question": "What are the advantages of using Docker in data engineering?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S06-0002",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0002",
+        "S06-0001"
+      ]
+    },
+    {
+      "id": "Q19",
+      "question": "What is Terraform used for?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S06-0088",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0088"
+      ]
+    },
+    {
+      "id": "Q20",
+      "question": "What does a workflow orchestration tool do?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S05-0161",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0161",
+        "S05-0162",
+        "S06-0131",
+        "S06-0132"
+      ]
+    },
+    {
+      "id": "Q21",
+      "question": "What are some common reasons why data goes missing in a dataset?",
+      "topic": "Data Cleaning",
+      "seed_chunk_id": "S02-0267",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S02-0266",
+        "S02-0267",
+        "S02-0273"
+      ]
+    },
+    {
+      "id": "Q22",
+      "question": "What are the main steps of data cleaning and preprocessing?",
+      "topic": "Data Cleaning",
+      "seed_chunk_id": "S02-0264",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S02-0263",
+        "S02-0264",
+        "S02-0265"
+      ]
+    },
+    {
+      "id": "Q23",
+      "question": "What is denormalization and why do analytical systems use it?",
+      "topic": "Data Cleaning",
+      "seed_chunk_id": "S05-0092",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0092",
+        "S05-0093",
+        "S04-0126",
+        "S06-0205",
+        "S06-0245"
+      ]
+    },
+    {
+      "id": "Q24",
+      "question": "How does HDFS keep data available when a machine fails?",
+      "topic": "Big Data",
+      "seed_chunk_id": "S03-0078",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0078",
+        "S03-0079"
+      ]
+    },
+    {
+      "id": "Q25",
+      "question": "How does BigQuery separate storage and compute internally?",
+      "topic": "Big Data",
+      "seed_chunk_id": "S06-0251",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0210",
+        "S06-0250",
+        "S06-0251",
+        "S06-0252"
+      ]
+    },
+    {
+      "id": "Q26",
+      "question": "Besides accuracy, what other dimensions describe data quality?",
+      "topic": "Data Quality",
+      "seed_chunk_id": "S07-0011",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S07-0011",
+        "S07-0012",
+        "S04-0017",
+        "S04-0219",
+        "S05-0068"
+      ]
+    },
+    {
+      "id": "Q27",
+      "question": "What kinds of tests can you write in dbt to check your data?",
+      "topic": "Data Quality",
+      "seed_chunk_id": "S06-0413",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0413",
+        "S06-0414",
+        "S06-0415",
+        "S06-0417",
+        "S06-0418",
+        "S06-0450"
+      ]
+    },
+    {
+      "id": "Q28",
+      "question": "What is the difference between ETL and ELT?",
+      "topic": "ETL/ELT",
+      "seed_chunk_id": "S06-0322",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0322",
+        "S06-0155",
+        "S06-0156",
+        "S06-0157",
+        "S05-0042",
+        "S05-0043",
+        "S05-0114"
+      ]
+    }
+  ]
+}
