@@ -25,7 +25,14 @@ Gemini generates a course-aligned answer.
   data/chunks/chunks.json (Git ignored). Topic = embedding similarity to TOPIC_DESCRIPTIONS,
   "Other" below TOPIC_MIN_SIMILARITY = 0.25 (266 chunks); keywords = TF-IDF with a
   sentence-boundary guard (phrases only from adjacent non-stop words in one clause).
-- Next: notebooks/03_embedding.ipynb - ONLY when the user says go.
+- evaluation/test_questions.json: 28 APPROVED retrieval questions (frozen), each with all relevant
+  chunk ids; limitations in evaluation/test_questions_limitations.md (n=28 directional; Q06/Q11 literal).
+- notebooks/03_embedding.ipynb DONE: benchmark of all-MiniLM-L6-v2 vs bge-small-en-v1.5 (+/- query
+  prefix). DECIDED: bge-small-en-v1.5, NO query prefix (hit@1 0.750 vs 0.643, hit@5 1.000 vs 0.964,
+  MRR 0.858 vs 0.772; truncates 3 chunks vs 116). FAISS IndexFlatIP (normalized = cosine) saved to
+  data/faiss_index/course_index.faiss + course_index_chunk_ids.json (row i = chunk_ids[i]; Git ignored).
+- Topic labels (notebook 02) stay on TOPIC_EMBEDDING_MODEL = all-MiniLM-L6-v2 (threshold calibrated on it).
+- Next: notebooks/04_model_comparison.ipynb - plan under review; start ONLY when the user says go.
 - Documented limitations (accepted, do not "fix"):
   - S01 labels are chapter-level only (no sub-heading heuristic).
   - S07 keeps line-break hyphenation (no automatic de-hyphenation).
@@ -33,11 +40,11 @@ Gemini generates a course-aligned answer.
     when a chunk's content is generic (e.g. some S02 Python/pandas chunks land in
     "Data Warehousing" at ~0.43-0.46). Accepted limitation of using 8 broad topic categories
     with no general-computing bucket, not a bug.
-- Not started: 03-05 notebooks, src/core, src/app, evaluation questions, docs/ licence log, .env
+- Not started: 04-05 notebooks, src/core, src/app, docs/ licence log, .env (real API keys)
 
 ## Tech Stack
 - Language: Python
-- Embedding model: all-MiniLM-L6-v2 (sentence-transformers)
+- Embedding model: BAAI/bge-small-en-v1.5 (sentence-transformers), chosen by benchmark in notebook 03
 - Vector store: FAISS
 - Orchestration: LangChain
 - LLM: Gemini API (to be confirmed after model comparison)
@@ -89,7 +96,9 @@ Gemini generates a course-aligned answer.
   A public syllabus may be used as a topic map only.
 - Vector store: FAISS only (ChromaDB dropped). Orchestration: LangChain, used thinly;
   core retrieve/prompt/answer logic stays plain Python in src/core/.
-- Embeddings: default all-MiniLM-L6-v2; benchmark against BAAI/bge-small-en-v1.5 in notebook 03.
+- Embeddings: DECIDED bge-small-en-v1.5 without query prefix (notebook 03 benchmark). REPORT TODO: the
+  proposal names Sentence-BERT / all-MiniLM-L6-v2 (Table 2.3 and Table 3.9); the final report must add the
+  notebook 03 benchmark as the justification for switching to bge-small-en-v1.5.
 - Metadata schema (lean, mostly automatic): chunk_id, source_id, source_name, licence,
   source_type, section, page, topic, keywords, difficulty. Topic via embedding similarity
   to the 8 topics (spot-check by hand), keywords via TF-IDF/YAKE, difficulty from source level.
