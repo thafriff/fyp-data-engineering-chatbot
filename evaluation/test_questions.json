@@ -4,12 +4,16 @@
     "chunks_file": "data/chunks/chunks.json",
     "chunk_count": 2515,
     "note": "chunk ids refer to the current chunks.json; if the chunking changes, re-validate the ids.",
-    "status": "APPROVED 2026-10-13 - question set frozen",
-    "limitations": "see evaluation/test_questions_limitations.md (n=28 is directional only; Q06 and Q11 lean on literal identifier matching)",
+    "status": "APPROVED - all 100 questions frozen (Q01-Q28 approved 2026-10-13, Q29-Q100 approved 2026-10-19)",
+    "limitations": "see evaluation/test_questions_limitations.md (n=100; Q06, Q11, Q59, Q77 lean on literal identifier matching)",
     "literal_identifier_questions": [
       "Q06",
-      "Q11"
-    ]
+      "Q11",
+      "Q59",
+      "Q77"
+    ],
+    "question_count": 100,
+    "expansion_note": "Q29-Q100 added 2026-10-19 with the same method: seeded from a real chunk, paraphrased as a student would ask, relevant chunks found by keyword search over the whole corpus (no embedding model used to find them). Topic = topic label of the seed chunk; topic counts proportional to chunk counts per topic across all 100 questions."
   },
   "questions": [
     {
@@ -362,6 +366,883 @@
         "S05-0042",
         "S05-0043",
         "S05-0114"
+      ]
+    },
+    {
+      "id": "Q29",
+      "question": "What is a data mart and how does it relate to a data warehouse?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S05-0009",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0009",
+        "S04-0196",
+        "S04-0316"
+      ]
+    },
+    {
+      "id": "Q30",
+      "question": "How does a snowflake schema differ from a star schema?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S04-0193",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0193",
+        "S04-0192"
+      ]
+    },
+    {
+      "id": "Q31",
+      "question": "Why does partitioning a BigQuery table by date make queries cheaper?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0220",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0218",
+        "S06-0220",
+        "S06-0221"
+      ]
+    },
+    {
+      "id": "Q32",
+      "question": "When should I choose clustering instead of partitioning in BigQuery?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0235",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0234",
+        "S06-0235",
+        "S06-0236"
+      ]
+    },
+    {
+      "id": "Q33",
+      "question": "How can I reduce the cost of my BigQuery queries?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0241",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0241",
+        "S06-0242"
+      ]
+    },
+    {
+      "id": "Q34",
+      "question": "How does Kimball's restaurant analogy describe the areas of a data warehouse?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0325",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0325"
+      ]
+    },
+    {
+      "id": "Q35",
+      "question": "How should models be organised into staging, intermediate and marts folders in a dbt project?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0356",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0355",
+        "S06-0356",
+        "S06-0357"
+      ]
+    },
+    {
+      "id": "Q36",
+      "question": "What is the difference between dbt Core and dbt Cloud?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0333",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0333",
+        "S06-0334",
+        "S06-0338",
+        "S06-0339"
+      ]
+    },
+    {
+      "id": "Q37",
+      "question": "Why are column-oriented databases a good fit for analytics?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S05-0171",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0171",
+        "S05-0173",
+        "S05-0174",
+        "S06-0253",
+        "S06-0254"
+      ]
+    },
+    {
+      "id": "Q38",
+      "question": "What is the One Big Table approach to data modelling?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S05-0099",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0099",
+        "S05-0100"
+      ]
+    },
+    {
+      "id": "Q39",
+      "question": "What is an external table in BigQuery and why does it show zero rows?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0214",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0214",
+        "S06-0216"
+      ]
+    },
+    {
+      "id": "Q40",
+      "question": "What is an operational data store?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S04-0199",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0199",
+        "S04-0296",
+        "S04-0317"
+      ]
+    },
+    {
+      "id": "Q41",
+      "question": "What is business intelligence and how does it use the data warehouse?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S04-0209",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0209",
+        "S04-0207",
+        "S04-0275",
+        "S04-0317"
+      ]
+    },
+    {
+      "id": "Q42",
+      "question": "What are seeds in dbt and when should you use them?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0389",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0352",
+        "S06-0389",
+        "S06-0444"
+      ]
+    },
+    {
+      "id": "Q43",
+      "question": "Which dbt model calculates monthly revenue per pickup zone, and what does it group by?",
+      "topic": "Data Warehousing",
+      "seed_chunk_id": "S06-0549",
+      "seed_source_type": "code",
+      "relevant_chunk_ids": [
+        "S06-0549"
+      ]
+    },
+    {
+      "id": "Q44",
+      "question": "What is an RDD in Spark?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S03-0042",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0042",
+        "S06-0785"
+      ]
+    },
+    {
+      "id": "Q45",
+      "question": "What is the difference between narrow and wide dependencies in Spark?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S03-0059",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0059"
+      ]
+    },
+    {
+      "id": "Q46",
+      "question": "Why did Spark introduce DataFrames when it already had RDDs?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S03-0067",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0067",
+        "S06-0785"
+      ]
+    },
+    {
+      "id": "Q47",
+      "question": "How does the classic MapReduce word count example work?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S03-0039",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0038",
+        "S03-0039"
+      ]
+    },
+    {
+      "id": "Q48",
+      "question": "What is the difference between transformations and actions in Spark?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0704",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0704",
+        "S06-0703",
+        "S03-0051"
+      ]
+    },
+    {
+      "id": "Q49",
+      "question": "What do the driver, master and executors do in a Spark cluster?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0747",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0745",
+        "S06-0747",
+        "S06-0748",
+        "S06-0752"
+      ]
+    },
+    {
+      "id": "Q50",
+      "question": "How does a Kafka consumer group keep track of which messages it has already read?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0915",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0915",
+        "S06-0911",
+        "S06-0909",
+        "S05-0147"
+      ]
+    },
+    {
+      "id": "Q51",
+      "question": "What is the difference between tumbling, sliding and session windows?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0961",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0961",
+        "S06-0962",
+        "S06-0963",
+        "S06-0965"
+      ]
+    },
+    {
+      "id": "Q52",
+      "question": "What does a watermark do in Flink stream processing?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0950",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0949",
+        "S06-0950",
+        "S06-0951",
+        "S06-0955"
+      ]
+    },
+    {
+      "id": "Q53",
+      "question": "What is the Lambda architecture for data processing?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S05-0025",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0025",
+        "S05-0026",
+        "S06-0942"
+      ]
+    },
+    {
+      "id": "Q54",
+      "question": "What is the difference between concurrent and parallel batch processing?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S05-0124",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0123",
+        "S05-0124"
+      ]
+    },
+    {
+      "id": "Q55",
+      "question": "What is Dataproc and how do you submit a Spark job to it?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0843",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0843",
+        "S06-0847",
+        "S06-0849"
+      ]
+    },
+    {
+      "id": "Q56",
+      "question": "How does the Spark SQL job script get its input and output paths?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0867",
+      "seed_source_type": "code",
+      "relevant_chunk_ids": [
+        "S06-0867",
+        "S06-0869",
+        "S06-0838"
+      ]
+    },
+    {
+      "id": "Q57",
+      "question": "How does Spark join a large table with a small table efficiently?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0781",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0781",
+        "S06-0782"
+      ]
+    },
+    {
+      "id": "Q58",
+      "question": "How does the Flink aggregation job count trips per pickup location for each hour?",
+      "topic": "Data Processing",
+      "seed_chunk_id": "S06-0985",
+      "seed_source_type": "code",
+      "relevant_chunk_ids": [
+        "S06-0985",
+        "S06-0948",
+        "S06-0956"
+      ]
+    },
+    {
+      "id": "Q59",
+      "question": "What does the ROW_NUMBER window function do, and how does PARTITION BY change it?",
+      "topic": "SQL",
+      "seed_chunk_id": "S06-0471",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0471",
+        "S06-0470",
+        "S06-0473"
+      ]
+    },
+    {
+      "id": "Q60",
+      "question": "When is a table in first normal form?",
+      "topic": "SQL",
+      "seed_chunk_id": "S01-0172",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S01-0172",
+        "S01-0173",
+        "S01-0184",
+        "S04-0103"
+      ]
+    },
+    {
+      "id": "Q61",
+      "question": "What is the difference between second normal form and third normal form?",
+      "topic": "SQL",
+      "seed_chunk_id": "S01-0175",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S01-0175",
+        "S01-0177",
+        "S01-0184",
+        "S04-0103"
+      ]
+    },
+    {
+      "id": "Q62",
+      "question": "What is a functional dependency between attributes?",
+      "topic": "SQL",
+      "seed_chunk_id": "S01-0147",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S01-0147",
+        "S01-0158",
+        "S01-0155",
+        "S04-0101"
+      ]
+    },
+    {
+      "id": "Q63",
+      "question": "What is a weak entity in an entity relationship model?",
+      "topic": "SQL",
+      "seed_chunk_id": "S04-0110",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0110",
+        "S01-0086",
+        "S04-0305"
+      ]
+    },
+    {
+      "id": "Q64",
+      "question": "How is a many-to-many relationship implemented in a relational database?",
+      "topic": "SQL",
+      "seed_chunk_id": "S01-0104",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S01-0104",
+        "S01-0105",
+        "S01-0089",
+        "S04-0113"
+      ]
+    },
+    {
+      "id": "Q65",
+      "question": "What is the difference between DDL and DML in SQL?",
+      "topic": "SQL",
+      "seed_chunk_id": "S01-0224",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S01-0224",
+        "S01-0244",
+        "S01-0248",
+        "S04-0051"
+      ]
+    },
+    {
+      "id": "Q66",
+      "question": "What is the difference between WHERE and HAVING in a query?",
+      "topic": "SQL",
+      "seed_chunk_id": "S05-0286",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0286",
+        "S01-0260"
+      ]
+    },
+    {
+      "id": "Q67",
+      "question": "What is the difference between an INNER JOIN and a LEFT OUTER JOIN?",
+      "topic": "SQL",
+      "seed_chunk_id": "S05-0282",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0282",
+        "S01-0277",
+        "S01-0280",
+        "S01-0283"
+      ]
+    },
+    {
+      "id": "Q68",
+      "question": "How do indexes make database queries faster?",
+      "topic": "SQL",
+      "seed_chunk_id": "S04-0124",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0124",
+        "S04-0125",
+        "S04-0123"
+      ]
+    },
+    {
+      "id": "Q69",
+      "question": "What is the difference between a view and a materialized view?",
+      "topic": "SQL",
+      "seed_chunk_id": "S05-0288",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0288",
+        "S05-0289"
+      ]
+    },
+    {
+      "id": "Q70",
+      "question": "What is the difference between logical and physical data independence?",
+      "topic": "SQL",
+      "seed_chunk_id": "S01-0056",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S01-0055",
+        "S01-0056",
+        "S01-0057",
+        "S01-0059",
+        "S01-0060",
+        "S04-0053"
+      ]
+    },
+    {
+      "id": "Q71",
+      "question": "What is a candidate key?",
+      "topic": "SQL",
+      "seed_chunk_id": "S01-0095",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S01-0095",
+        "S01-0109",
+        "S04-0076",
+        "S04-0077"
+      ]
+    },
+    {
+      "id": "Q72",
+      "question": "What is Docker Compose and why use it instead of starting containers one by one?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S06-0061",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0061",
+        "S06-0063",
+        "S06-0067"
+      ]
+    },
+    {
+      "id": "Q73",
+      "question": "What is Kestra?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S06-0133",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0133"
+      ]
+    },
+    {
+      "id": "Q74",
+      "question": "How do you backfill historical data with a scheduled workflow?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S06-0154",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0154",
+        "S06-0164"
+      ]
+    },
+    {
+      "id": "Q75",
+      "question": "How can a simple data pipeline be scheduled with cron?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S05-0108",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0108",
+        "S05-0104"
+      ]
+    },
+    {
+      "id": "Q76",
+      "question": "What does it mean for a data pipeline to be idempotent?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S05-0229",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0229",
+        "S05-0271"
+      ]
+    },
+    {
+      "id": "Q77",
+      "question": "What do the terraform init, plan and apply commands do?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S06-0092",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0092",
+        "S06-0123"
+      ]
+    },
+    {
+      "id": "Q78",
+      "question": "How does the upload script send a local file to a Google Cloud Storage bucket?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S06-0302",
+      "seed_source_type": "code",
+      "relevant_chunk_ids": [
+        "S06-0302",
+        "S06-0309",
+        "S06-0314"
+      ]
+    },
+    {
+      "id": "Q79",
+      "question": "How do you load a large CSV file into Postgres in chunks with pandas?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S06-0040",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0039",
+        "S06-0040",
+        "S06-0041",
+        "S06-0042"
+      ]
+    },
+    {
+      "id": "Q80",
+      "question": "What is Bruin and what problem does it solve?",
+      "topic": "Data Pipelines",
+      "seed_chunk_id": "S06-0555",
+      "seed_source_type": "course_notes",
+      "relevant_chunk_ids": [
+        "S06-0554",
+        "S06-0555"
+      ]
+    },
+    {
+      "id": "Q81",
+      "question": "What is the difference between MCAR, MAR and MNAR missing data?",
+      "topic": "Data Cleaning",
+      "seed_chunk_id": "S02-0270",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S02-0270",
+        "S02-0271",
+        "S02-0272",
+        "S02-0361",
+        "S02-0362"
+      ]
+    },
+    {
+      "id": "Q82",
+      "question": "How should outliers in a dataset be handled?",
+      "topic": "Data Cleaning",
+      "seed_chunk_id": "S02-0274",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S02-0274",
+        "S02-0275",
+        "S02-0278"
+      ]
+    },
+    {
+      "id": "Q83",
+      "question": "What does data standardization mean when preparing data for analysis?",
+      "topic": "Data Cleaning",
+      "seed_chunk_id": "S02-0284",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S02-0280",
+        "S02-0284",
+        "S02-0287",
+        "S02-0358",
+        "S02-0367"
+      ]
+    },
+    {
+      "id": "Q84",
+      "question": "What is binning, or data discretization?",
+      "topic": "Data Cleaning",
+      "seed_chunk_id": "S02-0357",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S02-0357",
+        "S02-0265",
+        "S02-0298",
+        "S07-0003"
+      ]
+    },
+    {
+      "id": "Q85",
+      "question": "What is database normalization trying to achieve?",
+      "topic": "Data Cleaning",
+      "seed_chunk_id": "S05-0097",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0097",
+        "S01-0171",
+        "S04-0310",
+        "S02-0285"
+      ]
+    },
+    {
+      "id": "Q86",
+      "question": "What is change data capture and when is it used?",
+      "topic": "Data Cleaning",
+      "seed_chunk_id": "S05-0039",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0036",
+        "S05-0039",
+        "S04-0194",
+        "S04-0276",
+        "S05-0110"
+      ]
+    },
+    {
+      "id": "Q87",
+      "question": "What are the five Vs of big data?",
+      "topic": "Big Data",
+      "seed_chunk_id": "S04-0214",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0214",
+        "S04-0318",
+        "S07-0007",
+        "S02-0324"
+      ]
+    },
+    {
+      "id": "Q88",
+      "question": "What does the CAP theorem say about distributed databases?",
+      "topic": "Big Data",
+      "seed_chunk_id": "S03-0090",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0089",
+        "S03-0090",
+        "S04-0182",
+        "S04-0276",
+        "S05-0212"
+      ]
+    },
+    {
+      "id": "Q89",
+      "question": "What does eventual consistency mean in NoSQL databases?",
+      "topic": "Big Data",
+      "seed_chunk_id": "S04-0173",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0173",
+        "S04-0182",
+        "S03-0114"
+      ]
+    },
+    {
+      "id": "Q90",
+      "question": "What are the main types of NoSQL databases?",
+      "topic": "Big Data",
+      "seed_chunk_id": "S04-0062",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0062",
+        "S05-0177",
+        "S04-0314"
+      ]
+    },
+    {
+      "id": "Q91",
+      "question": "How do shared-memory, shared-disk and shared-nothing database architectures differ?",
+      "topic": "Big Data",
+      "seed_chunk_id": "S04-0144",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0143",
+        "S04-0144",
+        "S04-0145"
+      ]
+    },
+    {
+      "id": "Q92",
+      "question": "What is a key-value store, and what are some examples?",
+      "topic": "Big Data",
+      "seed_chunk_id": "S03-0109",
+      "seed_source_type": "lecture_slides",
+      "relevant_chunk_ids": [
+        "S03-0109",
+        "S03-0110",
+        "S04-0174",
+        "S05-0190"
+      ]
+    },
+    {
+      "id": "Q93",
+      "question": "How does the dbt intermediate trips model remove duplicate trips?",
+      "topic": "Data Quality",
+      "seed_chunk_id": "S06-0542",
+      "seed_source_type": "code",
+      "relevant_chunk_ids": [
+        "S06-0542",
+        "S06-0543"
+      ]
+    },
+    {
+      "id": "Q94",
+      "question": "What is data governance?",
+      "topic": "Data Quality",
+      "seed_chunk_id": "S05-0258",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0258",
+        "S05-0065",
+        "S05-0067",
+        "S04-0028",
+        "S04-0306",
+        "S04-0280"
+      ]
+    },
+    {
+      "id": "Q95",
+      "question": "What is a data contract between data producers and consumers?",
+      "topic": "Data Quality",
+      "seed_chunk_id": "S05-0060",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0060",
+        "S05-0069",
+        "S06-0427"
+      ]
+    },
+    {
+      "id": "Q96",
+      "question": "What is the difference between discrete and continuous data?",
+      "topic": "Data Quality",
+      "seed_chunk_id": "S07-0003",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S07-0003",
+        "S02-0054",
+        "S02-0055"
+      ]
+    },
+    {
+      "id": "Q97",
+      "question": "What is the difference between structured and unstructured data?",
+      "topic": "Data Quality",
+      "seed_chunk_id": "S07-0006",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S07-0006",
+        "S02-0062",
+        "S04-0054",
+        "S04-0171"
+      ]
+    },
+    {
+      "id": "Q98",
+      "question": "What are the bronze, silver and gold layers of a medallion architecture?",
+      "topic": "ETL/ELT",
+      "seed_chunk_id": "S05-0028",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0028",
+        "S05-0029",
+        "S05-0030",
+        "S05-0031"
+      ]
+    },
+    {
+      "id": "Q99",
+      "question": "What is data ingestion, and how does batch ingestion differ from streaming ingestion?",
+      "topic": "ETL/ELT",
+      "seed_chunk_id": "S05-0040",
+      "seed_source_type": "wiki",
+      "relevant_chunk_ids": [
+        "S05-0040",
+        "S05-0044",
+        "S05-0045"
+      ]
+    },
+    {
+      "id": "Q100",
+      "question": "What is data integration and why do organisations need it?",
+      "topic": "ETL/ELT",
+      "seed_chunk_id": "S04-0216",
+      "seed_source_type": "textbook",
+      "relevant_chunk_ids": [
+        "S04-0212",
+        "S04-0216",
+        "S04-0318",
+        "S04-0280",
+        "S02-0358"
       ]
     }
   ]

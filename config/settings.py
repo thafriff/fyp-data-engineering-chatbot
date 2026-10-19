@@ -359,9 +359,9 @@ KEYWORD_EXTRA_STOP_WORDS = [
 # ---------------------------------------------------------------------------
 # Embedding and vector store
 # ---------------------------------------------------------------------------
-# DECIDED in notebook 03 (benchmark on the 28 approved test questions): bge-small-en-v1.5,
-# used WITHOUT a query prefix. It beat all-MiniLM-L6-v2 on every measure (hit@1 0.750 vs 0.643,
-# hit@5 1.000 vs 0.964, MRR 0.858 vs 0.772) and truncates 3 chunks instead of 116.
+# DECIDED in notebook 03 (benchmark on the 100 approved test questions): bge-small-en-v1.5,
+# used WITHOUT a query prefix. Against all-MiniLM-L6-v2: hit@1 0.830 vs 0.710, MRR 0.892 vs 0.815,
+# hit@5 tied at 0.970, head to head 19 vs 7 (p = 0.03); truncates 3 chunks instead of 116.
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 EMBEDDING_QUERY_PREFIX_IN_USE = ""      # no instruction in front of questions (it scored slightly worse)
 
