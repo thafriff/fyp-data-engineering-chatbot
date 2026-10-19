@@ -25,11 +25,14 @@ Gemini generates a course-aligned answer.
   data/chunks/chunks.json (Git ignored). Topic = embedding similarity to TOPIC_DESCRIPTIONS,
   "Other" below TOPIC_MIN_SIMILARITY = 0.25 (266 chunks); keywords = TF-IDF with a
   sentence-boundary guard (phrases only from adjacent non-stop words in one clause).
-- evaluation/test_questions.json: 28 APPROVED retrieval questions (frozen), each with all relevant
-  chunk ids; limitations in evaluation/test_questions_limitations.md (n=28 directional; Q06/Q11 literal).
+- evaluation/test_questions.json: 100 APPROVED retrieval questions (frozen; Q01-Q28 + Q29-Q100 added at the
+  supervisor's request), each with all relevant chunk ids found by keyword search (no embedding model);
+  topics proportional to chunk counts. Limitations in evaluation/test_questions_limitations.md
+  (n=100 ~ +/-8.5 pp; Q06, Q11, Q59, Q77 lean on literal identifier matching).
 - notebooks/03_embedding.ipynb DONE: benchmark of all-MiniLM-L6-v2 vs bge-small-en-v1.5 (+/- query
-  prefix). DECIDED: bge-small-en-v1.5, NO query prefix (hit@1 0.750 vs 0.643, hit@5 1.000 vs 0.964,
-  MRR 0.858 vs 0.772; truncates 3 chunks vs 116). FAISS IndexFlatIP (normalized = cosine) saved to
+  prefix) on all 100 questions. DECIDED: bge-small-en-v1.5, NO query prefix (hit@1 0.830 vs 0.710,
+  MRR 0.892 vs 0.815, hit@5 tied 0.970, head to head 19 vs 7, sign test p=0.03; truncates 3 chunks vs 116).
+  Same direction as the first n=28 run. FAISS IndexFlatIP (normalized = cosine) saved to
   data/faiss_index/course_index.faiss + course_index_chunk_ids.json (row i = chunk_ids[i]; Git ignored).
 - Topic labels (notebook 02) stay on TOPIC_EMBEDDING_MODEL = all-MiniLM-L6-v2 (threshold calibrated on it).
 - Next: notebooks/04_model_comparison.ipynb - plan under review; start ONLY when the user says go.

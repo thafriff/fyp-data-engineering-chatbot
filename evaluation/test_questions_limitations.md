@@ -1,25 +1,51 @@
 # Test questions: known limitations
 
-Applies to `evaluation/test_questions.json` (28 retrieval benchmark questions, approved 2026-10-13),
-used in `notebooks/03_embedding.ipynb` to compare embedding models.
+Applies to `evaluation/test_questions.json`: 100 retrieval benchmark questions, **all approved and frozen**.
+Q01-Q28 were approved on 2026-10-13; Q29-Q100 were added at the supervisor's request using the same method and
+approved on 2026-10-19. The set is used in `notebooks/03_embedding.ipynb` to compare embedding models.
 
-## 1. Small sample (n = 28)
-28 questions give a **directional signal** between embedding models, not a statistically
-bulletproof result. One question is worth about 3.6 percentage points of hit@k, so a few
-close-call results flipping between models would not be surprising from noise alone. A
-difference of only one or two questions should not be read as a real difference between models.
+## 1. Sample size (n = 100)
+With 100 questions the benchmark is **considerably more robust** than the original 28:
+- one question is now worth 1 percentage point of hit@k (it was about 3.6 points with n = 28);
+- the uncertainty of a hit rate around 0.75 is roughly ±8.5 percentage points (95% interval), compared with
+  roughly ±16 points at n = 28.
 
-## 2. Two questions lean on literal identifier matching
+It is still a sample, not a census. Differences of only a few questions between two models remain within
+noise, and the head-to-head count (on how many questions one model ranks a correct chunk higher than the
+other) is a more sensitive comparison than the difference between two hit rates.
+
+## 2. Questions that lean on literal identifier matching
 - **Q06** ("How is the fct_trips dbt model configured to load data incrementally?")
 - **Q11** ("How do you turn on checkpointing in a PyFlink job?")
+- **Q59** ("What does the ROW_NUMBER window function do, and how does PARTITION BY change it?")
+- **Q77** ("What do the terraform init, plan and apply commands do?")
 
-The exact identifier (`fct_trips`, PyFlink / checkpointing code) appears both in the question and
-in the answer chunk, so these two test literal term matching more than pure semantic retrieval.
-They stay in the set because students do ask about specific course code, but they should **not
-dominate the interpretation** of the results: the notebook also reports the scores without them.
+In these questions the exact identifier (a model name, a function or command name) appears both in the
+question and in the answer chunk, so they test literal term matching more than pure semantic retrieval.
+They stay in the set because students do ask about specific course code and commands, but they should
+**not dominate the interpretation** of the results: the notebook also reports the scores without them.
+(Q59 and Q77 were added in the expansion; Q06 and Q11 were already flagged at n = 28.)
 
-## How relevance is judged
-Each question lists every chunk in the knowledge base that answers it (`relevant_chunk_ids`,
-100 in total). A retrieval counts as correct if **any** of them appears in the top-k results.
-The chunk ids refer to the current `data/chunks/chunks.json` (2,515 chunks); if the chunking
-changes, the ids must be re-validated.
+## 3. How relevance was judged
+Each question lists every chunk that answers it (`relevant_chunk_ids`). A retrieval counts as correct if
+**any** of them appears in the top-k results. Relevant chunks were found by keyword search over the whole
+corpus and by reading the hits, **not** with either embedding model, so the labels do not favour one model.
+Because one person labelled them by keyword search, a chunk that answers a question in completely different
+words may have been missed; such a miss can only make a model's score look lower than it is, and it affects
+both models in the same way.
+
+## 4. What the set does not test
+- Every question is answerable from the knowledge base; out-of-scope questions (for the fallback answer)
+  are not part of this retrieval benchmark.
+- Four questions have a single relevant chunk (Q04, Q06, Q15, Q19 in the first 28; Q34, Q43, Q45, Q73 in
+  the expansion). They are the strictest test and make individual results noisier.
+- Questions were written by the project author from seed chunks, in English; real student phrasing may be
+  more varied.
+
+## 5. Composition
+Topics are proportional to the number of chunks per topic (Data Warehousing 21, Data Processing 20, SQL 18,
+Data Pipelines 13, Data Cleaning 9, Big Data 8, Data Quality 7, ETL/ELT 4). Seed source types: course notes
+34, textbook 29, wiki 20, lecture slides 10, code 7.
+
+The chunk ids refer to the current `data/chunks/chunks.json` (2,515 chunks); if the chunking changes, the
+ids must be re-validated.
