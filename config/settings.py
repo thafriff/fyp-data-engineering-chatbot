@@ -359,10 +359,33 @@ KEYWORD_EXTRA_STOP_WORDS = [
 # ---------------------------------------------------------------------------
 # Embedding and vector store
 # ---------------------------------------------------------------------------
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-# Candidate to benchmark against the default in notebook 03 (free, local).
-EMBEDDING_MODEL_CANDIDATE = "BAAI/bge-small-en-v1.5"
+# DECIDED in notebook 03 (benchmark on the 28 approved test questions): bge-small-en-v1.5,
+# used WITHOUT a query prefix. It beat all-MiniLM-L6-v2 on every measure (hit@1 0.750 vs 0.643,
+# hit@5 1.000 vs 0.964, MRR 0.858 vs 0.772) and truncates 3 chunks instead of 116.
+EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+EMBEDDING_QUERY_PREFIX_IN_USE = ""      # no instruction in front of questions (it scored slightly worse)
+
+# Topic labelling in notebook 02 stays on the model it was calibrated with (TOPIC_MIN_SIMILARITY = 0.25
+# was tuned on its scores), so re-running notebook 02 reproduces the approved labels.
+TOPIC_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
+# Saved search index (written by notebook 03, read by src/core/retriever.py; Git ignored)
 FAISS_INDEX_NAME = "course_index"
+FAISS_INDEX_FILE = FAISS_INDEX_DIR / f"{FAISS_INDEX_NAME}.faiss"
+FAISS_ID_MAP_FILE = FAISS_INDEX_DIR / f"{FAISS_INDEX_NAME}_chunk_ids.json"   # row i of the index = chunk id i
+
+# Benchmark (notebook 03): the models that were compared
+EMBEDDING_CANDIDATES = ["sentence-transformers/all-MiniLM-L6-v2", "BAAI/bge-small-en-v1.5"]
+# What is embedded for each chunk: its section label plus its text (same as the topic labelling).
+EMBED_TEXT_TEMPLATE = "{section}\n{text}"
+# Some models are trained to expect an instruction in front of a search QUERY (never in front of
+# the chunks). bge-small-en-v1.5 recommends this one for short retrieval queries; the notebook
+# also measures bge without it, so the effect of the prefix is visible.
+EMBEDDING_QUERY_PREFIX = {
+    "BAAI/bge-small-en-v1.5": "Represent this sentence for searching relevant passages: ",
+}
+EMBEDDING_BATCH_SIZE = 64
+BENCHMARK_TOP_K = [1, 3, 5, 10]   # hit@k cut-offs; MRR is computed over the top 10
 
 # ---------------------------------------------------------------------------
 # Retrieval (PROVISIONAL: tune on the evaluation questions)
