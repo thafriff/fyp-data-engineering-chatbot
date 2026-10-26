@@ -143,6 +143,7 @@ pydeck==0.9.3
 Pygments==2.21.0
 pymupdf==1.28.2
 pypdfium2==5.14.0
+pyspellchecker==0.9.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.4
 python-json-logger==4.2.0

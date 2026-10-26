@@ -484,6 +484,20 @@ INTENT_CLASSIFIER_EXAMPLES = [
     ("im tired of my pipeline failing, how do i add retries", "REAL_QUESTION"),
     ("star schema vs snowflake schema", "REAL_QUESTION"),
 ]
+# Spelling correction (src/core/spelling.py) of the RETRIEVAL QUERY only: runs after intent routing has sent a message
+# to retrieval and before the embedding search. The original message is still what is shown, stored and sent to the
+# LLM. Offline (pyspellchecker's English word list) plus every word in the course chunks, so domain terms that occur
+# in the course material (dbt, OLAP, BigQuery, Terraform...) are never "corrected" and typos of them are corrected
+# towards the course term.
+SPELL_CORRECTION_ENABLED = True
+SPELL_MIN_WORD_LENGTH = 3            # shorter tokens ("is", "a", "of") are left alone
+SPELL_MAX_EDIT_DISTANCE = 2          # pyspellchecker distance: 1 = one typo; 2 also fixes two-typo words
+SPELL_COURSE_WORD_WEIGHT = 1000      # course-vocabulary counts are multiplied by this so course terms win ties
+# Extra terms treated as correct even if they are not in the chunks (students may type them).
+SPELL_PROTECTED_TERMS = ["dbt", "elt", "etl", "olap", "oltp", "bigquery", "gcp", "aws", "kafka", "spark", "pyspark",
+                         "hdfs", "parquet", "airflow", "kestra", "terraform", "docker", "postgres", "sql", "nosql",
+                         "json", "csv", "api", "cdc", "mcar", "mnar", "duckdb", "snowflake"]
+
 # Course-content override: an EMOTIONAL_* label is accepted ONLY if the message's top-1 similarity to the course
 # index is below this value; otherwise it is treated as REAL_QUESTION (the small classifier sometimes labels
 # course fragments such as "star schema" as emotional). Same value as the retrieval threshold.
