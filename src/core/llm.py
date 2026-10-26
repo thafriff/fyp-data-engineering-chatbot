@@ -51,18 +51,37 @@ def generate(question: str, chunks: list[RetrievedChunk], model: str | None = No
 
 
 def stream_generate(question: str, chunks: list[RetrievedChunk], model: str | None = None) -> Iterator[str]:
-    """Yield the answer piece by piece as the model writes it, so the interface can show it immediately."""
-    with requests.post(f"{settings.OLLAMA_BASE_URL}/api/chat",
-                       json=_request_body(build_messages(question, chunks), stream=True, model=model),
+    """Yield the answer piece by piece as the model writes it, so the interface can show it immediately.
+    Stops at settings.DEV_LLM_MAX_ANSWER_TOKENS, or as soon as the model writes the same line (of at least
+    settings.DEV_LLM_REPEAT_MIN_CHARS characters) settings.DEV_LLM_REPEAT_LINE_LIMIT times, and then adds a
+    short note saying why it stopped."""
+    body = _request_body(build_messages(question, chunks), stream=True, model=model)
+    body["options"]["num_predict"] = settings.DEV_LLM_MAX_ANSWER_TOKENS
+    line_counts: dict[str, int] = {}
+    current_line = ""
+    with requests.post(f"{settings.OLLAMA_BASE_URL}/api/chat", json=body,
                        stream=True, timeout=settings.DEV_LLM_TIMEOUT_SECONDS) as response:
         response.raise_for_status()
         for line in response.iter_lines():
             if not line:
                 continue
             part = json.loads(line)
-            if part.get("message", {}).get("content"):
-                yield part["message"]["content"]
+            text = part.get("message", {}).get("content", "")
+            if text:
+                yield text
+                # Repetition guard: count every finished, long-enough line (whitespace-insensitive).
+                current_line += text
+                *finished, current_line = current_line.split("\n")
+                for done_line in finished:
+                    key = " ".join(done_line.split())
+                    if len(key) >= settings.DEV_LLM_REPEAT_MIN_CHARS:
+                        line_counts[key] = line_counts.get(key, 0) + 1
+                        if line_counts[key] >= settings.DEV_LLM_REPEAT_LINE_LIMIT:
+                            yield settings.ANSWER_REPEAT_NOTE
+                            return            # closing the request makes Ollama stop generating
             if part.get("done"):
+                if part.get("done_reason") == "length":
+                    yield settings.ANSWER_CUT_NOTE
                 break
 
 

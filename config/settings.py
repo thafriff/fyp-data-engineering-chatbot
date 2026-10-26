@@ -556,3 +556,11 @@ DEV_LLM_MODEL_OPTIONS = ["llama3.2:3b", "phi3:mini"]
 DEV_LLM_NUM_CTX = 4096            # prompt (instructions + 5 chunks + question) is ~1,500-2,000 tokens
 DEV_LLM_KEEP_ALIVE = "30m"        # keep the model loaded between questions so answers start quickly
 DEV_LLM_TIMEOUT_SECONDS = 300
+# Runaway-answer guards for the final answer generation. Without a cap Ollama generates until the model stops by
+# itself; small models (seen with phi3:mini) can loop on one paragraph, and once the context window is full
+# Ollama slides it and the loop never ends.
+DEV_LLM_MAX_ANSWER_TOKENS = 800   # hard cap; normal answers here are ~100-450 tokens
+DEV_LLM_REPEAT_LINE_LIMIT = 3     # stop when the same line has been written this many times ...
+DEV_LLM_REPEAT_MIN_CHARS = 25     # ... counting only lines this long (short lines like "|", "```" repeat legitimately)
+ANSWER_CUT_NOTE = "\n\n*[Answer cut off at the length limit.]*"
+ANSWER_REPEAT_NOTE = "\n\n*[Answer stopped: the model started repeating itself.]*"
