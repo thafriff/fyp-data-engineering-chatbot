@@ -21,6 +21,7 @@ class RagResult:
     used_fallback: bool               # True if nothing relevant was found and the LLM was not called
     intent: str = "question"          # "small_talk", "unclear", "emotional" or "question" (src/core/intent.py)
     routing: Intent | None = None     # full routing decision (path taken, raw classifier label)
+    model: str | None = None          # local model that generated the answer; None if no LLM answer was made
 
 
 class RagPipeline:
@@ -35,10 +36,11 @@ class RagPipeline:
         chunks = self.retriever.retrieve(message, top_k=1)
         return chunks[0].score if chunks else 0.0
 
-    def answer(self, question: str) -> RagResult:
+    def answer(self, question: str, model: str | None = None) -> RagResult:
         """Small talk, unclear and emotional input get a fixed reply without retrieval. Real questions (on- or
         off-topic) retrieve the top chunks; if the best one is not similar enough, return the fallback message
-        without calling the LLM, otherwise stream the LLM's answer grounded in those chunks."""
+        without calling the LLM, otherwise stream the LLM's answer grounded in those chunks.
+        model only changes the final answer generation (default settings.DEV_LLM_MODEL); routing is unaffected."""
         routed = intent.route(question, top_score=self._top_score)
         if routed.kind != "question":
             return RagResult(chunks=[], answer_stream=iter([routed.reply]), used_fallback=False,
@@ -48,5 +50,6 @@ class RagPipeline:
         if not chunks or chunks[0].score < settings.SIMILARITY_THRESHOLD:
             return RagResult(chunks=chunks, answer_stream=iter([settings.FALLBACK_MESSAGE]), used_fallback=True,
                              routing=routed)
-        return RagResult(chunks=chunks, answer_stream=llm.stream_generate(question, chunks), used_fallback=False,
-                         routing=routed)
+        model = model or settings.DEV_LLM_MODEL
+        return RagResult(chunks=chunks, answer_stream=llm.stream_generate(question, chunks, model=model),
+                         used_fallback=False, routing=routed, model=model)

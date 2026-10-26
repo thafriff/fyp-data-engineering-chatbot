@@ -29,10 +29,11 @@ def build_messages(question: str, chunks: list[RetrievedChunk]) -> list[dict]:
             {"role": "user", "content": user_message}]
 
 
-def _request_body(messages: list[dict], stream: bool) -> dict:
-    """Ollama /api/chat request body with the generation settings from settings.py."""
+def _request_body(messages: list[dict], stream: bool, model: str | None = None) -> dict:
+    """Ollama /api/chat request body with the generation settings from settings.py.
+    model defaults to settings.DEV_LLM_MODEL."""
     return {
-        "model": settings.DEV_LLM_MODEL,
+        "model": model or settings.DEV_LLM_MODEL,
         "messages": messages,
         "stream": stream,
         "keep_alive": settings.DEV_LLM_KEEP_ALIVE,
@@ -40,19 +41,19 @@ def _request_body(messages: list[dict], stream: bool) -> dict:
     }
 
 
-def generate(question: str, chunks: list[RetrievedChunk]) -> str:
+def generate(question: str, chunks: list[RetrievedChunk], model: str | None = None) -> str:
     """Return the full answer in one piece (used for scripted tests)."""
     response = requests.post(f"{settings.OLLAMA_BASE_URL}/api/chat",
-                             json=_request_body(build_messages(question, chunks), stream=False),
+                             json=_request_body(build_messages(question, chunks), stream=False, model=model),
                              timeout=settings.DEV_LLM_TIMEOUT_SECONDS)
     response.raise_for_status()
     return response.json()["message"]["content"]
 
 
-def stream_generate(question: str, chunks: list[RetrievedChunk]) -> Iterator[str]:
+def stream_generate(question: str, chunks: list[RetrievedChunk], model: str | None = None) -> Iterator[str]:
     """Yield the answer piece by piece as the model writes it, so the interface can show it immediately."""
     with requests.post(f"{settings.OLLAMA_BASE_URL}/api/chat",
-                       json=_request_body(build_messages(question, chunks), stream=True),
+                       json=_request_body(build_messages(question, chunks), stream=True, model=model),
                        stream=True, timeout=settings.DEV_LLM_TIMEOUT_SECONDS) as response:
         response.raise_for_status()
         for line in response.iter_lines():
@@ -75,13 +76,16 @@ def complete(messages: list[dict], max_tokens: int, timeout: float, temperature:
     return response.json()["message"]["content"]
 
 
-def check_backend() -> tuple[bool, str]:
-    """Check that the Ollama server is running and the configured model is downloaded."""
+def check_backend(model: str | None = None) -> tuple[bool, str]:
+    """Check that the Ollama server is running and that both the answer model (default
+    settings.DEV_LLM_MODEL) and the intent classifier's model (settings.DEV_LLM_MODEL) are downloaded."""
+    model = model or settings.DEV_LLM_MODEL
     try:
         tags = requests.get(f"{settings.OLLAMA_BASE_URL}/api/tags", timeout=5).json()
     except requests.RequestException:
         return False, f"Ollama is not running at {settings.OLLAMA_BASE_URL}. Start the Ollama app and reload."
     names = {m["name"] for m in tags.get("models", [])}
-    if settings.DEV_LLM_MODEL not in names:
-        return False, f"Model {settings.DEV_LLM_MODEL} is not downloaded. Run: ollama pull {settings.DEV_LLM_MODEL}"
-    return True, f"Ollama is running with {settings.DEV_LLM_MODEL}."
+    for needed in dict.fromkeys([model, settings.DEV_LLM_MODEL]):
+        if needed not in names:
+            return False, f"Model {needed} is not downloaded. Run: ollama pull {needed}"
+    return True, f"Ollama is running with {model}."
