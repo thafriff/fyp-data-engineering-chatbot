@@ -1,0 +1,9 @@
+# Streamlit settings for the dev chat interface (src/app/app.py)
+[server]
+# The file watcher tries to inspect PyTorch's internal modules (used by the embedding model) and fills the
+# terminal with harmless errors; turning it off avoids that. Restart the app after editing code.
+fileWatcherType = "none"
+headless = true
+
+[browser]
+gatherUsageStats = false

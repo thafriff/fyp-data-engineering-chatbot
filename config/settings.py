@@ -391,7 +391,10 @@ BENCHMARK_TOP_K = [1, 3, 5, 10]   # hit@k cut-offs; MRR is computed over the top
 # Retrieval (PROVISIONAL: tune on the evaluation questions)
 # ---------------------------------------------------------------------------
 TOP_K = 5
-SIMILARITY_THRESHOLD = 0.35   # below this, the chatbot uses the fallback answer
+# Below this top-1 cosine score the chatbot gives the fallback answer instead of calling the LLM.
+# Provisional value for bge-small-en-v1.5: on the 100 approved questions the lowest top-1 score was
+# 0.764; on 15 clearly off-topic questions the highest was 0.731 (median 0.551). To be tuned formally later.
+SIMILARITY_THRESHOLD = 0.70
 
 # ---------------------------------------------------------------------------
 # LLM
@@ -412,3 +415,76 @@ FALLBACK_MESSAGE = (
     "I could not find this in the course materials. "
     "Please check your lecture notes or ask your lecturer."
 )
+
+# ---------------------------------------------------------------------------
+# Intent routing (src/core/intent.py), checked BEFORE retrieval.
+# Rule-based, no LLM: only a message that is ENTIRELY a greeting / small-talk phrase, or that is unclear
+# (gibberish, a stray character), skips retrieval and gets a fixed reply. Everything else, including
+# off-topic questions, goes through retrieval and the SIMILARITY_THRESHOLD fallback unchanged.
+# ---------------------------------------------------------------------------
+# Patterns are matched against the WHOLE normalised message (lower case, punctuation removed, single spaces),
+# so "hi, what is OLAP?" is NOT small talk and still goes to retrieval.
+SMALL_TALK_PATTERNS = {
+    "greeting": r"(hi+|hello+|hey+|hiya|helo|yo|greetings|salam|assalamualaikum|good (morning|afternoon|evening|day)"
+                r"|how are you( doing)?( today)?|how r u|whats up|sup)( there| chatbot| bot| assistant)?",
+    "thanks": r"(thanks?|thank you|thank you so much|thanks a lot|thx|ty|cheers|ok thanks|okay thanks)"
+              r"( chatbot| bot| assistant)?",
+    "goodbye": r"(bye+|goodbye|see you|see ya|good night)( chatbot| bot| assistant)?",
+    "acknowledgement": r"(ok|okay|k|cool)",
+}
+SMALL_TALK_RESPONSES = {
+    "greeting": ("Hello! I'm the course assistant for Data Engineering. What would you like help with today? "
+                 "You can ask me about SQL, ETL/ELT, data pipelines, data cleaning, data processing, "
+                 "data quality, data warehousing or big data."),
+    "thanks": "You're welcome! Is there anything else from the course material you'd like me to explain?",
+    "goodbye": "Goodbye, and good luck with your studies! Come back any time you have a question about the course.",
+    "acknowledgement": "Great! Let me know if there's anything else from the course material you'd like me to explain.",
+}
+UNCLEAR_RESPONSE = ("Sorry, I'm not sure what you meant. Could you rephrase your question or add a bit more detail? "
+                    "For example: \"What is the difference between ETL and ELT?\"")
+# A message is "unclear" if, after normalisation, it has fewer than this many letters/digits in total ...
+UNCLEAR_MIN_ALNUM_CHARS = 2
+# ... or it is one word that is a keyboard mash: a run along one keyboard row (e.g. "asdf", "qwerty") of at least
+# this length, or one character repeated (e.g. "aaaa", "zzzz"). Real short terms like "SQL", "ETL", "dbt" pass.
+KEYBOARD_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"]
+KEYBOARD_MASH_MIN_LENGTH = 4
+
+# Prompt used to generate answers from retrieved chunks. Follows proposal Section 3.9: course-assistant persona,
+# simple academic English, knowledge base only, steps for complex questions, "do not answer questions directly"
+# (scaffolding guardrail, read with Sections 2.4.2-2.4.3: explain concepts, but give hints/steps/pseudo-code
+# instead of finished solutions to tasks), and a polite fallback.
+SYSTEM_PROMPT = (
+    "You are a friendly teaching assistant for an undergraduate Data Engineering course. "
+    "Answer the student's question using ONLY the course material excerpts provided in the context. "
+    "Explain in simple academic English suitable for undergraduate students; use short steps for 'how' questions. "
+    "Act as a coach, not an answer machine: if the student asks you to solve an exercise or assignment, or to "
+    "write a complete query, program or solution for their task, do NOT give the finished answer. Instead explain "
+    "the relevant concept from the excerpts, give hints, list the steps they should follow, or show short "
+    "pseudo-code, and encourage them to try it themselves. Questions about what a concept is, why it is used or "
+    "how two concepts differ should still be explained clearly. "
+    "After each statement taken from an excerpt, cite its chunk ID in square brackets, for example [S06-0322]. "
+    "Do not use outside knowledge and do not invent chunk IDs. "
+    "If the excerpts do not contain the answer, reply with exactly this sentence and nothing else: "
+    + FALLBACK_MESSAGE
+)
+# How each retrieved chunk is shown to the model inside the prompt.
+CONTEXT_CHUNK_TEMPLATE = "[{chunk_id}] (source: {source_name}; section: {section})\n{text}"
+# Repeated after the question: small models follow rules better when they are restated at the end.
+ANSWER_REMINDER = (
+    "Answer using only the excerpts above. Put the chunk ID in square brackets after every statement you "
+    "take from an excerpt, for example [S06-0322]. If the student asks for a full solution to a task, give hints "
+    "and steps instead of the finished answer. If the excerpts do not answer the question, reply only: "
+    + FALLBACK_MESSAGE
+)
+
+# ---------------------------------------------------------------------------
+# DEV PROTOTYPE ONLY (src/app chat interface)
+# A small local model served by Ollama, used to see the chatbot working end to end before the formal
+# LLM comparison in notebook 04. This is NOT part of the methodology, the model comparison or the
+# evaluation criteria, and is not reported as a chosen model.
+# ---------------------------------------------------------------------------
+OLLAMA_BASE_URL = "http://localhost:11434"
+DEV_LLM_MODEL = "llama3.2:3b"     # ~2 GB, fits a 4 GB laptop GPU (GTX 1650) almost entirely
+DEV_LLM_NUM_CTX = 4096            # prompt (instructions + 5 chunks + question) is ~1,500-2,000 tokens
+DEV_LLM_KEEP_ALIVE = "30m"        # keep the model loaded between questions so answers start quickly
+DEV_LLM_TIMEOUT_SECONDS = 300
