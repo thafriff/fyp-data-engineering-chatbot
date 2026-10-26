@@ -449,6 +449,52 @@ UNCLEAR_MIN_ALNUM_CHARS = 2
 KEYBOARD_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"]
 KEYBOARD_MASH_MIN_LENGTH = 4
 
+# LLM label classifier for emotional / personal statements ("im exhausted", "rough day") that the patterns above
+# miss. Runs ONLY for messages that are not small talk, not unclear, and not an obvious question. The model may
+# output ONLY one label from INTENT_LABELS; the reply is a canned text chosen by code from EMOTIONAL_RESPONSES,
+# never generated. Any other output, an error or a timeout falls back to "REAL_QUESTION" (normal retrieval).
+INTENT_CLASSIFIER_ENABLED = True
+# A message is an "obvious question" (skips the classifier, goes straight to retrieval) if it ends with "?" or
+# its first word is one of these.
+QUESTION_START_WORDS = {
+    "what", "whats", "how", "why", "when", "where", "which", "who", "whom", "whose", "is", "are", "was", "were",
+    "do", "does", "did", "can", "could", "should", "would", "will", "may", "explain", "define", "describe",
+    "compare", "list", "give", "show", "tell", "help", "difference", "differences", "example", "examples",
+}
+INTENT_LABELS = ["EMOTIONAL_SICK", "EMOTIONAL_TIRED", "EMOTIONAL_STRESSED", "EMOTIONAL_OTHER", "REAL_QUESTION"]
+INTENT_FALLBACK_LABEL = "REAL_QUESTION"
+INTENT_CLASSIFIER_PROMPT = (
+    "You are a message classifier for a Data Engineering course chatbot. You never answer or reply to the "
+    "message. You output exactly one label from this list and nothing else:\n"
+    "EMOTIONAL_SICK - the student says they are ill, sick or unwell.\n"
+    "EMOTIONAL_TIRED - the student says they are tired, exhausted, sleepy or need a break or rest.\n"
+    "EMOTIONAL_STRESSED - the student says they are stressed, anxious, overwhelmed, frustrated or having a bad day.\n"
+    "EMOTIONAL_OTHER - any other personal or emotional statement that does not ask for information or help.\n"
+    "REAL_QUESTION - the message asks for information, an explanation or help on ANY topic, even if it also "
+    "mentions feelings, or it is anything else.\n"
+    "Output only the label, in capital letters, with no punctuation, explanation or other words."
+)
+# Few-shot examples (message, label) shown to the classifier as earlier turns. Deliberately different from the
+# test messages used to check the feature.
+INTENT_CLASSIFIER_EXAMPLES = [
+    ("i have a fever today", "EMOTIONAL_SICK"),
+    ("so sleepy rn", "EMOTIONAL_TIRED"),
+    ("this assignment is stressing me out", "EMOTIONAL_STRESSED"),
+    ("my cat died this morning", "EMOTIONAL_OTHER"),
+    ("im tired of my pipeline failing, how do i add retries", "REAL_QUESTION"),
+    ("star schema vs snowflake schema", "REAL_QUESTION"),
+]
+INTENT_CLASSIFIER_MAX_TOKENS = 8         # a label is at most ~6 tokens; stops any free-form text early
+INTENT_CLASSIFIER_TIMEOUT_SECONDS = 20    # on timeout -> REAL_QUESTION (retrieval)
+EMOTIONAL_RESPONSES = {
+    "EMOTIONAL_SICK": "Sorry to hear you're not feeling well. Get well soon! Come back whenever you're ready.",
+    "EMOTIONAL_TIRED": "No worries, take your time and get some rest. I'll be here when you're ready to continue.",
+    "EMOTIONAL_STRESSED": ("That sounds tough. Take a short break if you need one. When you're ready, I can help "
+                           "you work through any course topic step by step."),
+    "EMOTIONAL_OTHER": ("Thanks for sharing that with me. Whenever you're ready, I'm here to help with any "
+                        "Data Engineering topic from the course."),
+}
+
 # Prompt used to generate answers from retrieved chunks. Follows proposal Section 3.9: course-assistant persona,
 # simple academic English, knowledge base only, steps for complex questions, "do not answer questions directly"
 # (scaffolding guardrail, read with Sections 2.4.2-2.4.3: explain concepts, but give hints/steps/pseudo-code

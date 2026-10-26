@@ -65,6 +65,16 @@ def stream_generate(question: str, chunks: list[RetrievedChunk]) -> Iterator[str
                 break
 
 
+def complete(messages: list[dict], max_tokens: int, timeout: float, temperature: float = 0.0) -> str:
+    """Send arbitrary chat messages and return the reply text (used by the intent classifier).
+    max_tokens caps the length of the output; errors are raised to the caller."""
+    body = _request_body(messages, stream=False)
+    body["options"].update({"temperature": temperature, "num_predict": max_tokens})
+    response = requests.post(f"{settings.OLLAMA_BASE_URL}/api/chat", json=body, timeout=timeout)
+    response.raise_for_status()
+    return response.json()["message"]["content"]
+
+
 def check_backend() -> tuple[bool, str]:
     """Check that the Ollama server is running and the configured model is downloaded."""
     try:
