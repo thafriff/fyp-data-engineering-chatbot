@@ -30,11 +30,16 @@ class RagPipeline:
         """Create the pipeline; loading the retriever takes a few seconds (embedding model + index)."""
         self.retriever = retriever or Retriever()
 
+    def _top_score(self, message: str) -> float:
+        """Top-1 course similarity of a message (embedding search only, no LLM); used by the intent router."""
+        chunks = self.retriever.retrieve(message, top_k=1)
+        return chunks[0].score if chunks else 0.0
+
     def answer(self, question: str) -> RagResult:
         """Small talk, unclear and emotional input get a fixed reply without retrieval. Real questions (on- or
         off-topic) retrieve the top chunks; if the best one is not similar enough, return the fallback message
         without calling the LLM, otherwise stream the LLM's answer grounded in those chunks."""
-        routed = intent.route(question)
+        routed = intent.route(question, top_score=self._top_score)
         if routed.kind != "question":
             return RagResult(chunks=[], answer_stream=iter([routed.reply]), used_fallback=False,
                              intent=routed.kind, routing=routed)

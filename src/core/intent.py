@@ -5,14 +5,17 @@ Order (cheapest first):
 1. Rule-based small talk (whole message is a greeting / thanks / goodbye / acknowledgement) -> fixed reply.
 2. Rule-based unclear input (gibberish, a stray character) -> fixed "please rephrase" reply.
 3. Obvious question (ends with "?" or starts with a question word) -> retrieval, no LLM call.
-4. LLM label classifier for what is left. The model may only output one label from settings.INTENT_LABELS;
-   an EMOTIONAL_* label gets a canned reply chosen here from settings.EMOTIONAL_RESPONSES. Any other output,
-   an error or a timeout is treated as REAL_QUESTION.
+4. LLM label classifier for what is left. The model may only output one label from settings.INTENT_LABELS.
+   Any other output, an error or a timeout is treated as REAL_QUESTION.
+5. Course-content override: an EMOTIONAL_* label is accepted only if the message's top-1 similarity to the
+   course index is below settings.EMOTIONAL_OVERRIDE_MIN_SIMILARITY; then it gets a canned reply chosen here
+   from settings.EMOTIONAL_RESPONSES. Otherwise (or if the check is unavailable or fails) it is a question.
 Every "question" goes through retrieval and the similarity-threshold fallback, so no path lets the model answer
 from its own knowledge. All patterns, prompts and replies live in config/settings.py.
 """
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from config import settings
@@ -27,8 +30,9 @@ class Intent:
     """The routing decision for one message."""
     kind: str                   # "small_talk", "unclear", "emotional" or "question"
     reply: str | None = None    # fixed reply for small_talk / unclear / emotional; None for questions
-    path: str = "pattern"       # how it was decided: "pattern", "question_heuristic" or "classifier"
-    label: str | None = None    # raw classifier output (only when path == "classifier")
+    path: str = "pattern"       # "pattern", "question_heuristic", "classifier" or "similarity_override"
+    label: str | None = None    # raw classifier output (when the classifier was called)
+    top_score: float | None = None   # top-1 course similarity (when the override check ran)
 
 
 def _normalise(message: str) -> str:
@@ -66,9 +70,10 @@ def classify(message: str) -> str:
     return output if output in settings.INTENT_LABELS else settings.INTENT_FALLBACK_LABEL
 
 
-def route(message: str) -> Intent:
+def route(message: str, top_score: Callable[[str], float] | None = None) -> Intent:
     """Classify the message: small talk, unclear and emotional input get a fixed reply; anything else is a
-    question that goes to retrieval."""
+    question that goes to retrieval. top_score(message) returns the top-1 course similarity; it is needed to
+    accept an emotional label (without it, emotional labels fall back to a question)."""
     text = _normalise(message)
 
     # Small talk first, so one-letter phrases such as "k" are not caught by the unclear check below.
@@ -85,6 +90,14 @@ def route(message: str) -> Intent:
         return Intent("question", path="question_heuristic")
 
     label = classify(message)
-    if label in settings.EMOTIONAL_RESPONSES:
-        return Intent("emotional", settings.EMOTIONAL_RESPONSES[label], path="classifier", label=label)
-    return Intent("question", path="classifier", label=label)
+    if label not in settings.EMOTIONAL_RESPONSES:
+        return Intent("question", path="classifier", label=label)
+
+    # Emotional label: accept it only if the message is NOT close to course content (fail safe -> question).
+    try:
+        score = top_score(message) if top_score else None
+    except Exception:
+        score = None
+    if score is None or score >= settings.EMOTIONAL_OVERRIDE_MIN_SIMILARITY:
+        return Intent("question", path="similarity_override", label=label, top_score=score)
+    return Intent("emotional", settings.EMOTIONAL_RESPONSES[label], path="classifier", label=label, top_score=score)

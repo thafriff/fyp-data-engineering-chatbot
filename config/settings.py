@@ -484,6 +484,10 @@ INTENT_CLASSIFIER_EXAMPLES = [
     ("im tired of my pipeline failing, how do i add retries", "REAL_QUESTION"),
     ("star schema vs snowflake schema", "REAL_QUESTION"),
 ]
+# Course-content override: an EMOTIONAL_* label is accepted ONLY if the message's top-1 similarity to the course
+# index is below this value; otherwise it is treated as REAL_QUESTION (the small classifier sometimes labels
+# course fragments such as "star schema" as emotional). Same value as the retrieval threshold.
+EMOTIONAL_OVERRIDE_MIN_SIMILARITY = SIMILARITY_THRESHOLD
 INTENT_CLASSIFIER_MAX_TOKENS = 8         # a label is at most ~6 tokens; stops any free-form text early
 INTENT_CLASSIFIER_TIMEOUT_SECONDS = 20    # on timeout -> REAL_QUESTION (retrieval)
 EMOTIONAL_RESPONSES = {
