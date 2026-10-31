@@ -1,0 +1,3334 @@
+{
+ "run_settings": {
+  "model": "llama3.2:3b",
+  "top_k": 5,
+  "similarity_threshold": 0.7,
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "llm_temperature": 0.2,
+  "num_ctx": 4096,
+  "max_answer_tokens": 800,
+  "spell_correction": true,
+  "intent_routing": "skipped (all evaluation questions are real course questions)",
+  "date": "2026-10-31T15:25:18+00:00",
+  "git": {
+   "commit": "9bd492e06f4aae44cd88a48993d181fb31e3dd1d",
+   "tracked_changes": false
+  },
+  "questions_file": "evaluation\\test_questions.json"
+ },
+ "summary": {
+  "questions_run": 100,
+  "errors": 0,
+  "fallback_count": 0,
+  "mean_seconds": 12.69,
+  "hit_at_5": 0.97,
+  "stopped_by": {
+   "finished": 100,
+   "fallback": 0,
+   "repetition_guard": 0,
+   "length_cap": 0
+  }
+ },
+ "results": [
+  {
+   "id": "Q01",
+   "question": "What is the difference between OLTP and OLAP databases?",
+   "answer": "To explain the difference between OLTP and OLAP databases, let's break it down step by step.\n\n**Step 1: Understand the purpose of each type of database**\n\nOLTP databases are designed for online transaction processing, which means they are used for managing operational or transactional data. On the other hand, OLAP databases are designed for online analytical processing, which means they are used for analyzing data to gain insights.\n\n**Step 2: Identify the key characteristics of each type of database**\n\nOLTP databases are normalized for efficiency, which means they are designed to handle small, fast updates initiated by users. In contrast, OLAP databases are denormalized for analysis, which means they are designed to handle large, periodic updates of data.\n\n**Step 3: Consider the user groups for each type of database**\n\nOLTP databases are used by customer-facing personnel, clerks, and online shoppers, who need to interact with the database in real-time. In contrast, OLAP databases are used by knowledge workers, such as data analysts, business analysts, and executives, who need to analyze data to gain insights.\n\n**Step 4: Think about the data updates and storage requirements**\n\nOLTP databases have short, fast updates initiated by users, while OLAP databases have large, periodic updates of data that are stored in a generally large database.\n\nBy considering these differences, you can understand that OLTP databases are designed for real-time transactional data management, while OLAP databases are designed for analyzing large datasets to gain insights.\n\nHere's a simple pseudo-code example to illustrate the difference:\n\n```\n// OLTP database\nINSERT INTO orders (customer_id, order_date, total) VALUES (1, '2022-01-01', 100.00)\n\n// OLAP database\nUPDATE aggregated_sales_data SET total_sales = total_sales + 100.00 WHERE date = '2022-01-01'\n```\n\nIn the OLTP example, a single update is inserted into the database, while in the OLAP example, a large update is applied to a aggregated dataset.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between OLTP and OLAP databases?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0204",
+     "score": 0.875
+    },
+    {
+     "chunk_id": "S06-0205",
+     "score": 0.8718
+    },
+    {
+     "chunk_id": "S06-0206",
+     "score": 0.807
+    },
+    {
+     "chunk_id": "S04-0342",
+     "score": 0.8032
+    },
+    {
+     "chunk_id": "S04-0296",
+     "score": 0.7706
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 49.17,
+   "error": null
+  },
+  {
+   "id": "Q02",
+   "question": "How is a data lake different from a data warehouse?",
+   "answer": "To explain the difference between a data lake and a data warehouse, let's break it down step by step.\n\n**Step 1: Understand the purpose of each**\nA data warehouse is designed to store and manage structured data for business intelligence, decision-making, and reporting. [S04-0204]\n\nA data lake, on the other hand, is an architectural approach to handle data of every variety, including structured, semi-structured, and unstructured data. [S04-0202]\n\n**Step 2: Consider the data storage**\nA data warehouse typically requires a predefined schema to be defined before the data is stored. [S04-0204]\n\nIn contrast, a data lake stores raw data without a predefined schema, allowing for flexibility in data processing and analysis. [S04-0200]\n\n**Step 3: Think about data processing and analysis**\nA data warehouse is designed for batch reporting, business intelligence, and machine learning, predictive analytics. [S04-0204]\n\nA data lake, however, allows for real-time processing and analysis of data, enabling businesses to gain insights from new sources of data. [S04-0200]\n\n**Step 4: Consider the user perspective**\nA data warehouse is typically used by decision-makers, while a data lake is used by data scientists. [S04-0204]\n\nBy understanding these differences, you can see that a data lake is designed to handle a broader range of data types and allow for more flexible data processing and analysis.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How is a data lake different from a data warehouse?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0204",
+     "score": 0.8705
+    },
+    {
+     "chunk_id": "S04-0202",
+     "score": 0.8698
+    },
+    {
+     "chunk_id": "S04-0203",
+     "score": 0.8656
+    },
+    {
+     "chunk_id": "S04-0208",
+     "score": 0.8425
+    },
+    {
+     "chunk_id": "S04-0200",
+     "score": 0.8365
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 14.12,
+   "error": null
+  },
+  {
+   "id": "Q03",
+   "question": "What are fact tables and dimension tables?",
+   "answer": "To answer your question, let's break down the definitions of fact tables and dimension tables from the course materials.\n\nFact tables are measurements, metrics, or business events, which can be thought of as **verbs**. They correspond to a business process. [S06-0324]\n\nDimension tables, on the other hand, are the context around those facts, which can be thought of as **nouns**. They correspond to a business entity like a customer or a product. [S06-0324]\n\nIn summary, fact tables represent events or processes, while dimension tables represent the context or attributes of those events or processes.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What are fact tables and dimension tables?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0324",
+     "score": 0.8561
+    },
+    {
+     "chunk_id": "S06-0375",
+     "score": 0.7919
+    },
+    {
+     "chunk_id": "S05-0094",
+     "score": 0.7464
+    },
+    {
+     "chunk_id": "S04-0193",
+     "score": 0.7346
+    },
+    {
+     "chunk_id": "S05-0095",
+     "score": 0.7205
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.92,
+   "error": null
+  },
+  {
+   "id": "Q04",
+   "question": "Why is BigQuery called serverless, and why does that matter?",
+   "answer": "BigQuery is called serverless because it doesn't require you to manage servers or install database software [S06-0209]. This means that BigQuery provides the infrastructure and software for you, which is a big advantage.\n\nThis matters because when you start using a data warehouse, a lot of time is spent on creating and maintaining the warehouse. BigQuery removes that pain by providing everything you need, including scalability and high availability [S06-0209]. \n\nIn a serverless setup, you don't have to worry about the servers growing with your data size, which can be a problem in traditional setups [S06-0210]. BigQuery separates the compute engine from storage, so you can analyze your data on a storage of your choice, which is a huge win in terms of cost [S06-0210].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "Why is BigQuery called serverless, and why does that matter?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0209",
+     "score": 0.803
+    },
+    {
+     "chunk_id": "S06-0210",
+     "score": 0.763
+    },
+    {
+     "chunk_id": "S06-0216",
+     "score": 0.756
+    },
+    {
+     "chunk_id": "S06-0257",
+     "score": 0.7547
+    },
+    {
+     "chunk_id": "S06-0242",
+     "score": 0.7502
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.31,
+   "error": null
+  },
+  {
+   "id": "Q05",
+   "question": "What is dbt used for in a data warehouse?",
+   "answer": "dbt is used to transform raw data in a data warehouse into something useful for downstream consumers, such as analysts, BI tools, and ML pipelines [S06-0328]. \n\nTo understand how dbt is used in a data warehouse, let's break down the process:\n\n1. **Data Ingestion**: Data flows into the data warehouse from various sources, such as backend systems, frontend apps, and third-party APIs [S06-0328].\n2. **Data Transformation**: dbt is used to transform the raw data into a structured format that can be consumed by downstream consumers [S06-0328].\n3. **Data Persistence**: The transformed data is persisted in the data warehouse as tables or views [S06-0328].\n\nThink of dbt as a layer on top of your data warehouse that helps you transform your raw data into a usable format for analytics and business intelligence. \n\nNext steps:\n\n* Read more about dbt and its features.\n* Understand how data is transformed and persisted in a data warehouse.\n* Research how dbt is used in real-world scenarios.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is dbt used for in a data warehouse?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0328",
+     "score": 0.8407
+    },
+    {
+     "chunk_id": "S05-0016",
+     "score": 0.7903
+    },
+    {
+     "chunk_id": "S06-0329",
+     "score": 0.7743
+    },
+    {
+     "chunk_id": "S06-0207",
+     "score": 0.7714
+    },
+    {
+     "chunk_id": "S05-0099",
+     "score": 0.7687
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.82,
+   "error": null
+  },
+  {
+   "id": "Q06",
+   "question": "How is the fct_trips dbt model configured to load data incrementally?",
+   "answer": "To load data incrementally, the `fct_trips` dbt model is configured to use an incremental strategy called \"merge\". This is indicated by the `incremental_strategy='merge'` parameter in the model's configuration [S06-0547].\n\nWhen the model is run, it will only process new records that have changed since the last run, instead of reprocessing the entire dataset. This is achieved by using the `is_incremental()` function, which returns `true` if the run is incremental [S06-0548].\n\nThe model also specifies a unique key (`trip_id`) to identify each row, which helps dbt to determine what has changed since the last run [S06-0547].\n\nAdditionally, the model is configured to materialize incrementally, which means that it will store only the changes made since the last run, instead of storing the entire dataset [S06-0547].\n\nTo take advantage of this incremental loading, you can use the `--select` flag with the `state:modified+` operator, which tells dbt to only process rows that have changed since the last run [S06-0547].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How is the fct_trips dbt model configured to load data incrementally?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0519",
+     "score": 0.8713
+    },
+    {
+     "chunk_id": "S06-0399",
+     "score": 0.7734
+    },
+    {
+     "chunk_id": "S06-0548",
+     "score": 0.7605
+    },
+    {
+     "chunk_id": "S06-0458",
+     "score": 0.7555
+    },
+    {
+     "chunk_id": "S06-0547",
+     "score": 0.752
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 14.31,
+   "error": null
+  },
+  {
+   "id": "Q07",
+   "question": "Why was Apache Spark created when MapReduce already existed?",
+   "answer": "According to [S03-0026], Spark was originally developed to improve MapReduce on performance. This suggests that Spark was created to address some of the limitations of MapReduce, rather than simply replacing it.\n\nIn other words, MapReduce had some problems that Spark was able to address, such as reading and storing data from main memory instead of hard disks, and running iterative algorithms much faster [S03-0040]. Spark was designed to build upon the existing MapReduce framework, but with additional features and improvements.\n\nSo, while MapReduce already existed, Spark was created to address some of its limitations and provide a more efficient and scalable alternative for big data processing.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "Why was Apache Spark created when MapReduce already existed?",
+   "retrieved": [
+    {
+     "chunk_id": "S03-0040",
+     "score": 0.8429
+    },
+    {
+     "chunk_id": "S03-0026",
+     "score": 0.8305
+    },
+    {
+     "chunk_id": "S04-0248",
+     "score": 0.8287
+    },
+    {
+     "chunk_id": "S03-0025",
+     "score": 0.8191
+    },
+    {
+     "chunk_id": "S03-0023",
+     "score": 0.7951
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.81,
+   "error": null
+  },
+  {
+   "id": "Q08",
+   "question": "When should I use batch processing instead of stream processing?",
+   "answer": "To determine when to use batch processing instead of stream processing, let's consider the main business use case for batch processing, as mentioned in [S05-0126] [S05-0126]. \n\nFor the majority of live data cases, stream processing is still preferred. However, batch processing is a good option when large quantities of data need to be analyzed that stream data processing is not a viable option. This is because batch processing can handle large amounts of data all at once, making it efficient for handling frequent, repetitive tasks.\n\nIn other words, use batch processing when you need to process a large amount of data that doesn't change frequently, and stream processing when you need to process data in real-time or near real-time as it's generated.\n\nAdditionally, batch processing is suitable for handling non-continuous data, whereas stream processing is typically used for continuous data.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "When should I use batch processing instead of stream processing?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0120",
+     "score": 0.8724
+    },
+    {
+     "chunk_id": "S05-0126",
+     "score": 0.8491
+    },
+    {
+     "chunk_id": "S05-0117",
+     "score": 0.8322
+    },
+    {
+     "chunk_id": "S05-0116",
+     "score": 0.8243
+    },
+    {
+     "chunk_id": "S06-0649",
+     "score": 0.8207
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.61,
+   "error": null
+  },
+  {
+   "id": "Q09",
+   "question": "Which libraries are built on top of Apache Spark?",
+   "answer": "According to the course materials, Apache Spark has several libraries built on top of it, including:\n\n* Spark SQL and Dataframes [S03-0062]\n* MLlib [S03-0062]\n* GraphFrames [S03-0062]\n* Structured Streaming [S03-0062]\n\nThese libraries provide additional functionality for specific use cases, such as analytics, machine learning, graph processing, and stream data processing.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "Which libraries are built on top of Apache Spark?",
+   "retrieved": [
+    {
+     "chunk_id": "S03-0025",
+     "score": 0.8037
+    },
+    {
+     "chunk_id": "S03-0062",
+     "score": 0.7974
+    },
+    {
+     "chunk_id": "S03-0040",
+     "score": 0.7835
+    },
+    {
+     "chunk_id": "S06-0879",
+     "score": 0.7815
+    },
+    {
+     "chunk_id": "S04-0248",
+     "score": 0.7759
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 7.97,
+   "error": null
+  },
+  {
+   "id": "Q10",
+   "question": "What does Flink handle for you that a plain Kafka consumer does not?",
+   "answer": "To answer your question, Flink handles several aspects that a plain Kafka consumer does not, as stated in [S06-0919] [S06-0977]. Specifically, Flink handles:\n\n* Windowing: Flink provides built-in tumbling, sliding, and session windows, which a plain consumer would need to implement manually.\n* Checkpointing: Flink automatically recovers state after failures, whereas a plain consumer would need to track checkpoints manually.\n* Parallelism: Flink distributes processing across multiple workers, which a plain consumer would need to manage manually.\n* Connectors: Flink provides built-in connectors for JDBC, Kafka, and filesystem sinks, which a plain consumer would need to implement manually.\n* SQL interface: Flink allows express stream processing with SQL queries, which a plain consumer would not have.\n\nThese features make Flink a more comprehensive and efficient stream processing framework compared to a plain Kafka consumer.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What does Flink handle for you that a plain Kafka consumer does not?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0969",
+     "score": 0.8632
+    },
+    {
+     "chunk_id": "S06-0919",
+     "score": 0.8103
+    },
+    {
+     "chunk_id": "S06-0977",
+     "score": 0.7836
+    },
+    {
+     "chunk_id": "S06-0929",
+     "score": 0.7579
+    },
+    {
+     "chunk_id": "S06-0956",
+     "score": 0.7514
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.84,
+   "error": null
+  },
+  {
+   "id": "Q11",
+   "question": "How do you turn on checkpointing in a PyFlink job?",
+   "answer": "To turn on checkpointing in a PyFlink job, you need to call the `enable_checkpointing` method on the `StreamExecutionEnvironment` object, passing in the desired checkpoint interval in milliseconds.\n\nHere's a step-by-step guide:\n\n1. Create a `StreamExecutionEnvironment` object: `env = StreamExecutionEnvironment.get_execution_environment()`\n2. Call the `enable_checkpointing` method, passing in the desired checkpoint interval: `env.enable_checkpointing(10 * 1000)` [S06-0933]\n\nBy setting the checkpoint interval to 10 seconds (10 * 1000 milliseconds), Flink will take a snapshot of the job's state every 10 seconds, capturing the Kafka offsets and any in-flight data. This allows the job to resume from the last checkpoint if it crashes or restarts.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How do you turn on checkpointing in a PyFlink job?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0936",
+     "score": 0.7905
+    },
+    {
+     "chunk_id": "S06-0935",
+     "score": 0.7742
+    },
+    {
+     "chunk_id": "S06-0926",
+     "score": 0.7671
+    },
+    {
+     "chunk_id": "S06-0968",
+     "score": 0.7612
+    },
+    {
+     "chunk_id": "S06-0933",
+     "score": 0.7553
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.06,
+   "error": null
+  },
+  {
+   "id": "Q12",
+   "question": "What is a foreign key and how does it relate to a primary key?",
+   "answer": "A foreign key is an attribute in a table that references the primary key in another table [S01-0091]. In other words, a foreign key is used to further identify the characterized table.\n\nTo understand how it relates to a primary key, let's break it down:\n\n* A primary key is a key chosen by the database designer to be used as an identifying mechanism for the whole entity set [S01-0098].\n* A foreign key references the primary key in another table, which means it's used to link the two tables together [S01-0091].\n* The foreign key and primary key must be of the same data type [S01-0098].\n\nThink of it like a address book. The primary key is like a unique ID for each person in the book (e.g., EID for the Employee table). The foreign key is like a field that contains the ID of the person's department (e.g., DepartmentID). This way, you can easily link each employee to their department.\n\nTo summarize:\n\n1. Identify the primary key in a table.\n2. Identify the attribute in another table that references the primary key.\n3. This attribute is the foreign key.\n\nDoes this help clarify the relationship between foreign keys and primary keys?",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is a foreign key and how does it relate to a primary key?",
+   "retrieved": [
+    {
+     "chunk_id": "S01-0098",
+     "score": 0.838
+    },
+    {
+     "chunk_id": "S01-0091",
+     "score": 0.8259
+    },
+    {
+     "chunk_id": "S01-0090",
+     "score": 0.8052
+    },
+    {
+     "chunk_id": "S05-0101",
+     "score": 0.8017
+    },
+    {
+     "chunk_id": "S01-0111",
+     "score": 0.7976
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.24,
+   "error": null
+  },
+  {
+   "id": "Q13",
+   "question": "What do the ACID properties of a database transaction mean?",
+   "answer": "The ACID properties of a database transaction are:\n\n* Atomicity: The transaction is treated as a single, indivisible unit of work, and if any part of the transaction fails, the entire transaction is rolled back and the database state is left unchanged [S03-0087].\n* Consistency: The transaction takes the database from one consistent state to another, ensuring that the data remains in a valid and reliable state [S03-0087].\n* Isolation: The transaction is executed independently of other transactions, without interference or impact from other transactions [S03-0087].\n* Durability: Once a transaction has been committed, it remains so, and the changes made by the transaction are permanent and not subject to rollback [S03-0087].\n\nThese properties work together to ensure that database transactions are reliable, accurate, and consistent, and that the data remains in a valid and reliable state.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What do the ACID properties of a database transaction mean?",
+   "retrieved": [
+    {
+     "chunk_id": "S03-0087",
+     "score": 0.8711
+    },
+    {
+     "chunk_id": "S04-0074",
+     "score": 0.8672
+    },
+    {
+     "chunk_id": "S04-0071",
+     "score": 0.8259
+    },
+    {
+     "chunk_id": "S04-0136",
+     "score": 0.7874
+    },
+    {
+     "chunk_id": "S04-0137",
+     "score": 0.7834
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.84,
+   "error": null
+  },
+  {
+   "id": "Q14",
+   "question": "What is a common table expression (CTE) in SQL?",
+   "answer": "A Common Table Expression (CTE) in SQL is a temporary result set that you can reference within a SELECT, INSERT, UPDATE, or DELETE statement. [S06-0481]\n\nTo create a CTE, you use the WITH statement, followed by the name of the CTE and the SELECT statement that defines the CTE. [S06-0481]\n\nThink of a CTE like a temporary table that exists only for the duration of the main query. You can use it to simplify complex queries and make them more readable. [S06-0481]\n\nHere's a simple example of a CTE:\n```sql\nWITH cte_name AS (\n    SELECT column1, column2\n    FROM some_table\n    WHERE condition\n)\nSELECT * FROM cte_name;\n```\nThis CTE is like a query within a query. You can use it to store results temporarily and then reference them in the main query. [S06-0481]\n\nCTEs can be reused during the entire session, making them a powerful tool for complex queries. [S05-0287]\n\nIn contrast to subqueries, CTEs are generally more readable and can be used multiple times in the body of a query. [S05-0287]\n\nNow, can you think of a scenario where you might use a CTE in your SQL queries?",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is a common table expression (CTE) in SQL?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0481",
+     "score": 0.9013
+    },
+    {
+     "chunk_id": "S06-0482",
+     "score": 0.878
+    },
+    {
+     "chunk_id": "S05-0287",
+     "score": 0.7671
+    },
+    {
+     "chunk_id": "S06-0484",
+     "score": 0.7372
+    },
+    {
+     "chunk_id": "S06-0468",
+     "score": 0.7296
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 14.11,
+   "error": null
+  },
+  {
+   "id": "Q15",
+   "question": "In what order does SQL execute the clauses of a query?",
+   "answer": "To determine the order in which SQL executes the clauses of a query, let's look at the excerpt from the SQL Guide [S05-0280]. According to this excerpt, SQL executes each clause in a query in a defined order. The order is as follows:\n\n1. FROM, including JOINs\n2. WHERE\n3. GROUP BY\n4. HAVING\n5. WINDOW functions\n6. SELECT\n7. DISTINCT\n8. UNION\n9. ORDER BY\n10. LIMIT and OFFSET\n\nSo, the order in which SQL executes the clauses of a query is: FROM, WHERE, GROUP BY, HAVING, WINDOW functions, SELECT, DISTINCT, UNION, ORDER BY, and finally LIMIT and OFFSET.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "In what order does SQL execute the clauses of a query?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0280",
+     "score": 0.84
+    },
+    {
+     "chunk_id": "S05-0281",
+     "score": 0.7918
+    },
+    {
+     "chunk_id": "S01-0257",
+     "score": 0.7544
+    },
+    {
+     "chunk_id": "S05-0290",
+     "score": 0.7473
+    },
+    {
+     "chunk_id": "S05-0287",
+     "score": 0.7434
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.55,
+   "error": null
+  },
+  {
+   "id": "Q16",
+   "question": "When is a table in Boyce-Codd normal form?",
+   "answer": "To answer your question, according to the excerpt [S01-0179], a table is in Boyce-Codd normal form (BCNF) if, and only if, every determinant is a candidate key.\n\nIn other words, a table is in BCNF if it meets the following condition:\n\n* The relation is in 3NF (third normal form).\n* Every determinant (i.e., a non-key attribute that is functionally dependent on a key) is a candidate key.\n\nThis means that if a table has multiple candidate keys, it can still be in BCNF if the determinants are also candidate keys.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "When is a table in Boyce-Codd normal form?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0336",
+     "score": 0.7991
+    },
+    {
+     "chunk_id": "S01-0172",
+     "score": 0.7793
+    },
+    {
+     "chunk_id": "S01-0184",
+     "score": 0.7729
+    },
+    {
+     "chunk_id": "S01-0179",
+     "score": 0.7571
+    },
+    {
+     "chunk_id": "S04-0102",
+     "score": 0.7361
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.28,
+   "error": null
+  },
+  {
+   "id": "Q17",
+   "question": "What is a data pipeline?",
+   "answer": "A data pipeline is a workflow consisting of one or more tasks that ingest, move, and transform raw data from one or more sources to a destination [S05-0103]. \n\nAccording to the course materials, a data pipeline can be categorized into two main types: batch processing and real-time processing pipelines [S05-0103]. \n\nA data pipeline is also described as a service that receives data as input and outputs more data, such as reading a CSV file, transforming the data, and storing it as a table in a PostgreSQL database [S06-0009]. \n\nIn general, a data pipeline's architecture consists of four main parts: a data source, business logic, a destination, and a scheduler (for batch) [S05-0104]. \n\nThe destination of a data pipeline is typically another database, such as a database or data storage area made for analytics, like a data warehouse or data lake [S05-0107].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is a data pipeline?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0103",
+     "score": 0.9209
+    },
+    {
+     "chunk_id": "S06-0009",
+     "score": 0.8429
+    },
+    {
+     "chunk_id": "S05-0104",
+     "score": 0.8398
+    },
+    {
+     "chunk_id": "S05-0109",
+     "score": 0.8064
+    },
+    {
+     "chunk_id": "S05-0107",
+     "score": 0.8048
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.57,
+   "error": null
+  },
+  {
+   "id": "Q18",
+   "question": "What are the advantages of using Docker in data engineering?",
+   "answer": "To answer your question, let's break down the advantages of using Docker in data engineering based on the excerpts provided.\n\nAccording to [S06-0002], Docker provides the following advantages:\n\n* Reproducibility: Same environment everywhere\n* Isolation: Applications run independently\n* Portability: Run anywhere Docker is installed\n\nThese advantages are particularly relevant in data engineering, where consistency and reliability are crucial.\n\nAdditionally, Docker is used in various data engineering scenarios, such as:\n\n* Integration tests: CI/CD pipelines [S06-0002]\n* Running pipelines on the cloud: AWS Batch, Kubernetes jobs [S06-0002]\n* Spark: Analytics engine for large-scale data processing [S06-0002]\n\nThese examples illustrate how Docker can be used to improve the efficiency and reliability of data engineering workflows.\n\nSo, to summarize, the advantages of using Docker in data engineering include reproducibility, isolation, and portability, which are essential for ensuring consistency and reliability in data processing and analysis.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What are the advantages of using Docker in data engineering?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0002",
+     "score": 0.8148
+    },
+    {
+     "chunk_id": "S05-0006",
+     "score": 0.7516
+    },
+    {
+     "chunk_id": "S05-0272",
+     "score": 0.7248
+    },
+    {
+     "chunk_id": "S05-0017",
+     "score": 0.7247
+    },
+    {
+     "chunk_id": "S05-0232",
+     "score": 0.7201
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.6,
+   "error": null
+  },
+  {
+   "id": "Q19",
+   "question": "What is Terraform used for?",
+   "answer": "Terraform is an open-source tool by HashiCorp, used for provisioning infrastructure resources [S06-0088]. It supports DevOps best practices for change management [S06-0088]. Terraform is also used for Infrastructure-as-Code (IaC), which means building, changing, and managing infrastructure in a safe, consistent, and repeatable way by defining resource configurations [S06-0088].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is Terraform used for?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0089",
+     "score": 0.8219
+    },
+    {
+     "chunk_id": "S06-0088",
+     "score": 0.7791
+    },
+    {
+     "chunk_id": "S06-0092",
+     "score": 0.7567
+    },
+    {
+     "chunk_id": "S06-0120",
+     "score": 0.7513
+    },
+    {
+     "chunk_id": "S06-0090",
+     "score": 0.7437
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.28,
+   "error": null
+  },
+  {
+   "id": "Q20",
+   "question": "What does a workflow orchestration tool do?",
+   "answer": "A workflow orchestration tool helps to schedule, run, and observe the entire process of tasks that form your data pipeline [S05-0161]. It allows you to create complex custom workflows, makes it easier to create idempotent workflows, alerts you if something fails, and allows you to gracefully retry and recover from failures [S05-0162].\n\nThink of a workflow orchestrator like a conductor in an orchestra. It helps multiple tools and platforms work together, following a schedule or events to ensure they all come together at the right time [S06-0131].\n\nTo answer this question, you can consider the tasks a workflow orchestrator might do, such as running workflows with predefined steps, monitoring and logging errors, and automatically running workflows based on schedules and events [S06-0132].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What does a workflow orchestration tool do?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0161",
+     "score": 0.9002
+    },
+    {
+     "chunk_id": "S06-0132",
+     "score": 0.8697
+    },
+    {
+     "chunk_id": "S06-0131",
+     "score": 0.8345
+    },
+    {
+     "chunk_id": "S05-0162",
+     "score": 0.8104
+    },
+    {
+     "chunk_id": "S05-0108",
+     "score": 0.787
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.28,
+   "error": null
+  },
+  {
+   "id": "Q21",
+   "question": "What are some common reasons why data goes missing in a dataset?",
+   "answer": "According to the course materials, some common reasons why data goes missing in a dataset include:\n\n* Measurement errors [S02-0273]\n* Human error [S02-0273]\n* Data not being collected for a particular variable [S02-0273]\n* Data collection errors [S02-0266]\n* Data corruption [S02-0266]\n* Nonresponse from participants in a study [S02-0266]\n\nThese reasons can be categorized into measurement errors, human errors, and data collection issues.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What are some common reasons why data goes missing in a dataset?",
+   "retrieved": [
+    {
+     "chunk_id": "S02-0273",
+     "score": 0.8392
+    },
+    {
+     "chunk_id": "S02-0266",
+     "score": 0.8209
+    },
+    {
+     "chunk_id": "S02-0267",
+     "score": 0.788
+    },
+    {
+     "chunk_id": "S02-0361",
+     "score": 0.7648
+    },
+    {
+     "chunk_id": "S02-0268",
+     "score": 0.7618
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.26,
+   "error": null
+  },
+  {
+   "id": "Q22",
+   "question": "What are the main steps of data cleaning and preprocessing?",
+   "answer": "The main steps of data cleaning and preprocessing are:\n\n1. Data integration [S02-0263]\n2. Data cleaning [S02-0264]\n3. Data transformation [S02-0264]\n4. Data reduction [S02-0264]\n5. Data discretization [S02-0265]\n6. Data sampling [S02-0265]\n\nThese steps are designed to ensure that the data is accurate, comprehensive, and ready for analysis.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What are the main steps of data cleaning and preprocessing?",
+   "retrieved": [
+    {
+     "chunk_id": "S02-0263",
+     "score": 0.8638
+    },
+    {
+     "chunk_id": "S02-0264",
+     "score": 0.8562
+    },
+    {
+     "chunk_id": "S02-0262",
+     "score": 0.8201
+    },
+    {
+     "chunk_id": "S02-0265",
+     "score": 0.8123
+    },
+    {
+     "chunk_id": "S02-0285",
+     "score": 0.7911
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 8.99,
+   "error": null
+  },
+  {
+   "id": "Q23",
+   "question": "What is denormalization and why do analytical systems use it?",
+   "answer": "Denormalization is the process of combining data into a \"wide\" table that is optimized for read workloads. [S05-0092]\n\nThis process is used in analytical systems because updates are not required and data redundancy is not an issue, making it suitable for OLAP systems where historical data analysis is needed. [S05-0092]\n\nDenormalization is used to decrease the running time of queries by making data more accessible, which is the main goal of this strategy. [S04-0126]\n\nIn analytical systems, denormalization is used to improve performance by reducing the need for joins, which can be slower operations. [S05-0093]\n\nTo understand why denormalization is used, let's consider the process of denormalization. It involves selecting information from different tables about a specific entity and then copying it to an aggregated table. [S04-0235]\n\nThink of denormalization as a way to reduce the complexity of queries by storing redundant data. By doing so, analytical systems can quickly retrieve data without having to perform multiple joins.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is denormalization and why do analytical systems use it?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0092",
+     "score": 0.8406
+    },
+    {
+     "chunk_id": "S04-0235",
+     "score": 0.7863
+    },
+    {
+     "chunk_id": "S05-0093",
+     "score": 0.7572
+    },
+    {
+     "chunk_id": "S02-0289",
+     "score": 0.7098
+    },
+    {
+     "chunk_id": "S04-0126",
+     "score": 0.6979
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.93,
+   "error": null
+  },
+  {
+   "id": "Q24",
+   "question": "How does HDFS keep data available when a machine fails?",
+   "answer": "To answer your question, let's analyze the excerpt [S03-0078] which describes HDFS.\n\nAccording to this excerpt, HDFS is a distributed replicated filesystem where \"All data is replicated by default on three different Data Nodes\" [S03-0078]. This means that each piece of data is stored on three different machines, which provides redundancy and ensures that data is available even if one machine fails.\n\nIn other words, HDFS uses replication to keep data available across multiple machines, making it more fault-tolerant. This is why HDFS is designed to handle node failures without losing access to the data.\n\nSo, to summarize: HDFS keeps data available when a machine fails due to its replication mechanism, where data is stored on multiple nodes to ensure that it remains accessible even if one node fails.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does HDFS keep data available when a machine fails?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0750",
+     "score": 0.7699
+    },
+    {
+     "chunk_id": "S03-0078",
+     "score": 0.742
+    },
+    {
+     "chunk_id": "S06-0751",
+     "score": 0.7353
+    },
+    {
+     "chunk_id": "S04-0244",
+     "score": 0.7344
+    },
+    {
+     "chunk_id": "S01-0036",
+     "score": 0.7337
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.51,
+   "error": null
+  },
+  {
+   "id": "Q25",
+   "question": "How does BigQuery separate storage and compute internally?",
+   "answer": "To answer the question, let's break down the steps based on the provided excerpts.\n\nBigQuery separates storage and compute internally by using a separate storage system called Colossus [S06-0251]. Colossus is a cheap storage system that keeps data in a columnar format, with each column stored on its own [S06-0251].\n\nThe separation of storage from compute allows BigQuery to significantly reduce costs. When you store data in Colossus, you only pay for storing it, which is very cheap. The expensive part is reading the data and running queries, which happens when you actually run something [S06-0251].\n\nIn other words, BigQuery separates the compute engine from storage, and analyzes your data on a storage of your choice. This separation enables BigQuery to scale more efficiently and reduce costs [S06-0210].\n\nSo, to summarize, BigQuery separates storage and compute internally by using a separate storage system called Colossus, which stores data in a columnar format, and then separates the compute engine from storage to reduce costs.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does BigQuery separate storage and compute internally?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0251",
+     "score": 0.8168
+    },
+    {
+     "chunk_id": "S06-0210",
+     "score": 0.7989
+    },
+    {
+     "chunk_id": "S06-0242",
+     "score": 0.7796
+    },
+    {
+     "chunk_id": "S06-0249",
+     "score": 0.7748
+    },
+    {
+     "chunk_id": "S06-0209",
+     "score": 0.7725
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.64,
+   "error": null
+  },
+  {
+   "id": "Q26",
+   "question": "Besides accuracy, what other dimensions describe data quality?",
+   "answer": "According to the excerpts, besides accuracy, data quality can be described by two major dimensions: contextual and intrinsic data quality.\n\nContextual data quality refers to characteristics such as completeness, accessibility, and others that are related to the context in which the data is used.\n\nIntrinsic data quality, on the other hand, focuses on the characteristics of the data itself, such as accuracy, completeness, consistency, and accessibility.\n\nThese two dimensions are mentioned in [S07-0011] and [S04-0219].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "Besides accuracy, what other dimensions describe data quality?",
+   "retrieved": [
+    {
+     "chunk_id": "S07-0011",
+     "score": 0.8228
+    },
+    {
+     "chunk_id": "S04-0024",
+     "score": 0.816
+    },
+    {
+     "chunk_id": "S04-0219",
+     "score": 0.7873
+    },
+    {
+     "chunk_id": "S04-0282",
+     "score": 0.7629
+    },
+    {
+     "chunk_id": "S04-0022",
+     "score": 0.7566
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.77,
+   "error": null
+  },
+  {
+   "id": "Q27",
+   "question": "What kinds of tests can you write in dbt to check your data?",
+   "answer": "In dbt, you can write several types of tests to check your data. \n\nFirst, you can write **singular tests**, which are plain SQL queries that stick in the `tests/` directory. If the query returns any rows, the test fails. These are great for one-off business rules that are very specific to your organization. [S06-0414]\n\nAnother type of test is the **generic test**, which is an SQL file that lives in `tests/generic/`. The syntax uses Jinja test blocks, and dbt will pick them up and make them available just like the built-ins. [S06-0420]\n\nLastly, you can write **unit tests**, which are available from dbt v1.8 onwards. These tests let you test your SQL logic in isolation, without hitting the warehouse with real data. You define a small set of mock input rows and the expected output rows, and dbt runs your model's SQL against those mocks and checks whether the output matches what you said it should be. [S06-0422]\n\nThese are the main types of tests you can write in dbt to check your data.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What kinds of tests can you write in dbt to check your data?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0219",
+     "score": 0.8134
+    },
+    {
+     "chunk_id": "S06-0414",
+     "score": 0.8042
+    },
+    {
+     "chunk_id": "S06-0420",
+     "score": 0.7984
+    },
+    {
+     "chunk_id": "S06-0354",
+     "score": 0.7966
+    },
+    {
+     "chunk_id": "S06-0422",
+     "score": 0.7945
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.19,
+   "error": null
+  },
+  {
+   "id": "Q28",
+   "question": "What is the difference between ETL and ELT?",
+   "answer": "To explain the difference between ETL and ELT, let's break it down step by step.\n\n**ETL (Extract → Transform → Load)**\n\n* Extract: Data is pulled out of its source system [S06-0155]\n* Transform: Data is transformed into a format suitable for analysis [S06-0155]\n* Load: Data is loaded into a target system, such as a data warehouse [S06-0155]\n\n**ELT (Extract → Load → Transform)**\n\n* Extract: Data is pulled out of its source system [S06-0155]\n* Load: Data is loaded into a target system, such as a data lake [S06-0156]\n* Transform: Data is transformed into a format suitable for analysis within the target system [S06-0156]\n\nThe key difference between ETL and ELT is the order in which the data is transformed. In ETL, the data is transformed before it is loaded into the target system. In ELT, the data is loaded first and then transformed within the target system.\n\nELT is often preferred because it allows for more flexibility and scalability, as the data can be transformed and analyzed directly within the target system, without the need to move the data around. Additionally, ELT can take advantage of the cost-effective storage options available in cloud-based data warehouses.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between ETL and ELT?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0155",
+     "score": 0.8089
+    },
+    {
+     "chunk_id": "S06-0322",
+     "score": 0.796
+    },
+    {
+     "chunk_id": "S06-0158",
+     "score": 0.7533
+    },
+    {
+     "chunk_id": "S06-0156",
+     "score": 0.7343
+    },
+    {
+     "chunk_id": "S05-0114",
+     "score": 0.7257
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.54,
+   "error": null
+  },
+  {
+   "id": "Q29",
+   "question": "What is a data mart and how does it relate to a data warehouse?",
+   "answer": "To answer your question, let's break down what we know about data marts and data warehouses from the excerpts.\n\nA data mart is a \"scaled-down version of a data warehouse aimed at meeting the information needs of a homogeneous small group of end users\" [S04-0196]. This means that a data mart is a smaller, subject-specific database that is part of a larger data warehouse.\n\nIn other words, a data warehouse is a central repository for data that is used for reporting and analytics, and a data mart is a smaller, specialized part of that repository that is designed to meet the specific needs of a particular group of users.\n\nFor example, a company might have a data warehouse that contains data from various departments, such as finance, marketing, and supply chain. Within that data warehouse, each department might have its own data mart that contains only the data relevant to that department.\n\nHere are the steps to think about this concept:\n\n1. What is the main difference between a data warehouse and a data mart?\n2. What are the characteristics of a data mart?\n3. How do data marts relate to the data warehouse?\n\nThink about these questions and see if you can come up with some answers on your own!",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is a data mart and how does it relate to a data warehouse?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0009",
+     "score": 0.8967
+    },
+    {
+     "chunk_id": "S04-0196",
+     "score": 0.8879
+    },
+    {
+     "chunk_id": "S06-0207",
+     "score": 0.8643
+    },
+    {
+     "chunk_id": "S04-0316",
+     "score": 0.8492
+    },
+    {
+     "chunk_id": "S05-0016",
+     "score": 0.8491
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.13,
+   "error": null
+  },
+  {
+   "id": "Q30",
+   "question": "How does a snowflake schema differ from a star schema?",
+   "answer": "To explain the difference between a snowflake schema and a star schema, let's first recall what each schema is.\n\nA star schema is a data model with one large fact table connected to smaller tables [S04-0192]. The fact table contains keys referring to each dimension table [S04-0192].\n\nA snowflake schema, on the other hand, is a data model that normalizes the dimension table [S05-0095]. It has one fact table, and it creates smaller tables with primary–foreign key relationships [S05-0095]. \n\nTo illustrate the difference, consider the following steps:\n\n1. Identify the key differences between the two schema types.\n2. Think about how the snowflake schema normalizes the dimension table compared to the star schema.\n3. Consider how the fact table is structured in each schema type.\n\nBy analyzing these differences, you can better understand how a snowflake schema differs from a star schema.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does a snowflake schema differ from a star schema?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0193",
+     "score": 0.8671
+    },
+    {
+     "chunk_id": "S05-0095",
+     "score": 0.8104
+    },
+    {
+     "chunk_id": "S04-0192",
+     "score": 0.7238
+    },
+    {
+     "chunk_id": "S04-0301",
+     "score": 0.7221
+    },
+    {
+     "chunk_id": "S04-0194",
+     "score": 0.7079
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.13,
+   "error": null
+  },
+  {
+   "id": "Q31",
+   "question": "Why does partitioning a BigQuery table by date make queries cheaper?",
+   "answer": "Partitioning a BigQuery table by date makes queries cheaper because once BigQuery understands it only needs the data for a specific date, it will not read or process the data for other dates. This reduces the amount of data that needs to be processed, which in turn reduces the cost.\n\nTo understand why this is the case, let's look at what happens when you partition a table by date. Each date becomes its own partition, so all rows created on a specific date go into the same partition. When you run a query, BigQuery only needs to read the data for the specific date you're querying, rather than having to read all the data for every date. This means that BigQuery can process less data, which reduces the cost.\n\nHere's a step-by-step example of how this works:\n\n1. Suppose you have a table of Stack Overflow questions from 2018, with a column for the creation date.\n2. You partition this table by the creation date.\n3. When you run a query that filters on a specific date, such as \"how many questions were asked in March 2018?\", BigQuery only needs to read the data for that specific date.\n4. Because the data is partitioned by date, BigQuery can skip reading the data for other dates, such as February 2018 or April 2018.\n5. This means that BigQuery only needs to process a smaller amount of data, which reduces the cost.\n\nBy partitioning your table by date, you can take advantage of this optimization and make your queries cheaper.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "Why does partitioning a BigQuery table by date make queries cheaper?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0218",
+     "score": 0.8879
+    },
+    {
+     "chunk_id": "S06-0230",
+     "score": 0.8296
+    },
+    {
+     "chunk_id": "S06-0221",
+     "score": 0.8244
+    },
+    {
+     "chunk_id": "S06-0231",
+     "score": 0.8186
+    },
+    {
+     "chunk_id": "S06-0245",
+     "score": 0.8176
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 15.13,
+   "error": null
+  },
+  {
+   "id": "Q32",
+   "question": "When should I choose clustering instead of partitioning in BigQuery?",
+   "answer": "To choose between partitioning and clustering in BigQuery, let's consider the criteria mentioned in the course materials.\n\nAccording to [S06-0234], the choice between partitioning and clustering comes down to two criteria: cost and granularity.\n\nPartitioning is beneficial when the cost is known upfront, which is important because BigQuery lets you specify a maximum cost for a query. If the cost is unknown, BigQuery won't execute the query. This is relevant when you want to avoid exceeding a certain cost limit.\n\nOn the other hand, clustering is useful when you need more granularity than partitioning alone can provide.\n\nSo, to answer your question: choose clustering when you need more granularity than partitioning alone can provide.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "When should I choose clustering instead of partitioning in BigQuery?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0234",
+     "score": 0.8918
+    },
+    {
+     "chunk_id": "S06-0238",
+     "score": 0.8705
+    },
+    {
+     "chunk_id": "S06-0229",
+     "score": 0.8682
+    },
+    {
+     "chunk_id": "S06-0230",
+     "score": 0.8627
+    },
+    {
+     "chunk_id": "S06-0231",
+     "score": 0.8606
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.38,
+   "error": null
+  },
+  {
+   "id": "Q33",
+   "question": "How can I reduce the cost of my BigQuery queries?",
+   "answer": "To reduce the cost of your BigQuery queries, let's follow the best practices mentioned in the course materials.\n\nFirst, consider using streaming inserts with caution, as they can increase costs drastically [S06-0243]. Instead, materialize query results in stages, such as reusing a CTE (common table expression) and storing the result in a table [S06-0243]. This way, you can avoid recomputing the same query multiple times and take advantage of BigQuery's caching mechanism.\n\nNext, avoid using `SELECT *` and instead specify only the columns you need. BigQuery stores data columnar, so it only reads the necessary columns, reducing the amount of data it needs to scan [S06-0242]. Also, check the estimated price of your query before running it, as it's displayed in the top right corner of the query editor [S06-0241].\n\nAdditionally, consider using clustered or partitioned tables, as they can help BigQuery skip large parts of the table, reducing the amount of data it needs to process [S06-0241]. You can also optimize your join patterns by placing the table with the largest number of rows first, followed by the table with the fewest rows, and so on [S06-0247].\n\nLastly, be mindful of your pricing model. If you're scanning a large amount of data, on-demand pricing might be more cost-effective than flat rate pricing [S06-0211]. However, if you're scanning above 200 TB of data, flat rate pricing might be more suitable.\n\nBy following these best practices, you can reduce the cost of your BigQuery queries and optimize their performance.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How can I reduce the cost of my BigQuery queries?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0243",
+     "score": 0.7911
+    },
+    {
+     "chunk_id": "S06-0242",
+     "score": 0.7854
+    },
+    {
+     "chunk_id": "S06-0241",
+     "score": 0.7603
+    },
+    {
+     "chunk_id": "S06-0211",
+     "score": 0.7559
+    },
+    {
+     "chunk_id": "S06-0247",
+     "score": 0.755
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 15.48,
+   "error": null
+  },
+  {
+   "id": "Q34",
+   "question": "How does Kimball's restaurant analogy describe the areas of a data warehouse?",
+   "answer": "According to Kimball's restaurant analogy, a data warehouse is divided into three main areas: the Staging area (the pantry), the Processing area (the kitchen), and the Presentation area (the dining hall) [S06-0325].\n\nHere's a brief explanation of each area:\n\n* The Staging area (the pantry) is where raw data lands, not meant for business users. Only people who know what they're doing should be poking around in it.\n* The Processing area (the kitchen) is where raw data gets transformed into proper data models. Again, limited to the people doing the cooking — the data engineers and analytics engineers. The focus here is on efficiency and following standards.\n* The Presentation area (the dining hall) is the final, polished output. This is what business stakeholders actually see and interact with. Clean, structured, ready to consume.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does Kimball's restaurant analogy describe the areas of a data warehouse?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0325",
+     "score": 0.8478
+    },
+    {
+     "chunk_id": "S04-0190",
+     "score": 0.7477
+    },
+    {
+     "chunk_id": "S04-0316",
+     "score": 0.743
+    },
+    {
+     "chunk_id": "S04-0189",
+     "score": 0.7344
+    },
+    {
+     "chunk_id": "S05-0016",
+     "score": 0.7306
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.45,
+   "error": null
+  },
+  {
+   "id": "Q35",
+   "question": "How should models be organised into staging, intermediate and marts folders in a dbt project?",
+   "answer": "To organize models into staging, intermediate, and marts folders in a dbt project, follow these steps:\n\n1. **Identify the source definitions**: In the `staging/` folder, place source definitions that tell dbt where your raw data lives in the database. [S06-0355]\n2. **Create staging models**: In the `staging/` folder, create staging models that are a 1:1 copy of each source table with minimal cleaning applied. [S06-0355]\n3. **Move intermediate models**: Move any models that are not raw and not ready to expose to end users to the `intermediate/` folder. This includes complex joins, heavy-duty cleaning or standardization, and data quality processing. [S06-0356]\n4. **Create marts**: In the `marts/` folder, place all the final, consumption-ready tables that are ready for end users. [S06-0357]\n5. **Ensure only marts tables are exposed**: In a well-governed dbt project, only marts tables should be exposed to BI tools, analysts, and business stakeholders. [S06-0357]\n\nBy following these steps, you can organize your models into the correct folders and ensure that your dbt project is structured in a way that is easy to maintain and use.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How should models be organised into staging, intermediate and marts folders in a dbt project?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0355",
+     "score": 0.8464
+    },
+    {
+     "chunk_id": "S06-0350",
+     "score": 0.8126
+    },
+    {
+     "chunk_id": "S06-0356",
+     "score": 0.8052
+    },
+    {
+     "chunk_id": "S06-0346",
+     "score": 0.7807
+    },
+    {
+     "chunk_id": "S06-0357",
+     "score": 0.778
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.22,
+   "error": null
+  },
+  {
+   "id": "Q36",
+   "question": "What is the difference between dbt Core and dbt Cloud?",
+   "answer": "To understand the difference between dbt Core and dbt Cloud, let's break it down step by step.\n\nFirst, we need to know what dbt Core is. According to [S06-0338], dbt Core is an open-source, command-line tool that was born in 2016. It's 100% free and runs locally on your own machine. All code is available on GitHub, which means you can fork, modify, and contribute to it.\n\nOn the other hand, dbt Cloud is a paid SaaS platform that was introduced two years after dbt Core (~2018) by dbt Labs. It's essentially a cloud-based version of dbt Core, which means it handles the heavy lifting for you, such as hosting dbt documentation, orchestration, environment setup, backups of dbt artifacts, and more.\n\nThe key differences between dbt Core and dbt Cloud are:\n\n* dbt Core is open-source and runs locally on your machine, while dbt Cloud is a paid SaaS platform that runs dbt Core under the hood.\n* dbt Core requires you to manage infrastructure yourself, while dbt Cloud abstracts away many of these tasks.\n* dbt Cloud provides additional features such as collaboration and security features that are not available in dbt Core.\n\nSo, to summarize, dbt Core is a free, open-source tool that you install and run locally, while dbt Cloud is a paid SaaS platform that provides a more managed experience, including hosting and orchestration.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between dbt Core and dbt Cloud?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0333",
+     "score": 0.8668
+    },
+    {
+     "chunk_id": "S06-0334",
+     "score": 0.8378
+    },
+    {
+     "chunk_id": "S06-0344",
+     "score": 0.8239
+    },
+    {
+     "chunk_id": "S06-0338",
+     "score": 0.8219
+    },
+    {
+     "chunk_id": "S06-0339",
+     "score": 0.8158
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 14.61,
+   "error": null
+  },
+  {
+   "id": "Q37",
+   "question": "Why are column-oriented databases a good fit for analytics?",
+   "answer": "According to the course materials, column-oriented databases are a good fit for analytics because they are more efficient when querying a subset of columns [S05-0173]. This is because the database doesn't need to read columns that aren't relevant, which can lead to significant storage and query improvements.\n\nAdditionally, column-oriented databases are well-suited for analytical queries or OLAP workloads such as metrics and aggregations [S05-0174]. This is because the data for each column in a datatable is stored together, making it easier to perform aggregations and calculations on specific columns.\n\nIn fact, BigQuery, a column-oriented database, uses this structure to give a huge gain in performance, especially when it comes to aggregations over columns [S06-0254]. This is because columns are stored separately, so the rest of the table is never touched when filtering and aggregating on specific columns.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "Why are column-oriented databases a good fit for analytics?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0173",
+     "score": 0.8363
+    },
+    {
+     "chunk_id": "S05-0174",
+     "score": 0.8307
+    },
+    {
+     "chunk_id": "S05-0171",
+     "score": 0.801
+    },
+    {
+     "chunk_id": "S04-0298",
+     "score": 0.7808
+    },
+    {
+     "chunk_id": "S06-0254",
+     "score": 0.7788
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.68,
+   "error": null
+  },
+  {
+   "id": "Q38",
+   "question": "What is the One Big Table approach to data modelling?",
+   "answer": "The One Big Table (OBT) approach to data modeling is to join all of the data necessary for analytics into wide denormalized tables. [S05-0099]\n\nThis approach is often used when starting a new data warehouse to provide value immediately, while also working on longer-term approaches like a Dimensional Model or a Data Vault. [S05-0099]\n\nIn other words, OBT is a technique used in data modeling to serve analytics at larger scales, taking advantage of the benefits of columnar databases. [S05-0099]\n\nIt's usually combined with other techniques, such as a Dimensional Model or Data Vault. [S05-0099]",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the One Big Table approach to data modelling?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0099",
+     "score": 0.8072
+    },
+    {
+     "chunk_id": "S05-0088",
+     "score": 0.7816
+    },
+    {
+     "chunk_id": "S01-0044",
+     "score": 0.7775
+    },
+    {
+     "chunk_id": "S01-0058",
+     "score": 0.7709
+    },
+    {
+     "chunk_id": "S01-0046",
+     "score": 0.7639
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.55,
+   "error": null
+  },
+  {
+   "id": "Q39",
+   "question": "What is an external table in BigQuery and why does it show zero rows?",
+   "answer": "An external table in BigQuery is a table that is created over an external data source, such as a CSV file stored in Google Cloud Storage. According to [S06-0216], when you create an external table, BigQuery cannot determine its rows or size because the data is not inside BigQuery, but rather in the external system (Google Cloud Storage).\n\nThis is why the external table shows zero rows and zero size. The data is not loaded into BigQuery, but rather referenced from the external source. [S06-0217] shows the details of the external table, which includes the table ID, table size, long-term storage size, number of rows, table expiration, data location, source URI, and source format.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is an external table in BigQuery and why does it show zero rows?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0216",
+     "score": 0.8277
+    },
+    {
+     "chunk_id": "S06-0217",
+     "score": 0.7784
+    },
+    {
+     "chunk_id": "S06-0214",
+     "score": 0.7622
+    },
+    {
+     "chunk_id": "S06-0298",
+     "score": 0.7594
+    },
+    {
+     "chunk_id": "S06-0215",
+     "score": 0.7534
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.52,
+   "error": null
+  },
+  {
+   "id": "Q40",
+   "question": "What is an operational data store?",
+   "answer": "An operational data store (ODS) is a staging area that provides query facilities [S04-0317]. It is used for analysis tools that need data that are closer to real time [S04-0317].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is an operational data store?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0317",
+     "score": 0.8398
+    },
+    {
+     "chunk_id": "S04-0199",
+     "score": 0.8267
+    },
+    {
+     "chunk_id": "S04-0297",
+     "score": 0.7941
+    },
+    {
+     "chunk_id": "S04-0316",
+     "score": 0.7921
+    },
+    {
+     "chunk_id": "S04-0061",
+     "score": 0.744
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 8.14,
+   "error": null
+  },
+  {
+   "id": "Q41",
+   "question": "What is business intelligence and how does it use the data warehouse?",
+   "answer": "Business intelligence (BI) is a set of activities, techniques, and tools aimed at understanding patterns in past data to predict the future. [S04-0209]\n\nTo answer your question, business intelligence uses the data warehouse to support decision-making. The data warehouse is a central repository for data that will be used for reporting and analytics. [S05-0016]\n\nBusiness intelligence tools, such as Tableau, ClickView, and Microsoft Power BI, facilitate the use of the data warehouse. These tools help to analyze and visualize the data in the warehouse to gain insights and make informed decisions. [S04-0209]\n\nThe quality of data in the warehouse is crucial for the quality of results, and bad data can lead to bad insights (remember GIGO). [S04-0209]\n\nBusiness intelligence uses the data warehouse to analyze data for marketing and targeted sales, among other uses. [S04-0207]\n\nIn summary, business intelligence is a set of activities that use the data warehouse to analyze and gain insights from data, with the ultimate goal of supporting decision-making.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is business intelligence and how does it use the data warehouse?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0209",
+     "score": 0.8543
+    },
+    {
+     "chunk_id": "S05-0016",
+     "score": 0.8371
+    },
+    {
+     "chunk_id": "S04-0191",
+     "score": 0.8264
+    },
+    {
+     "chunk_id": "S04-0207",
+     "score": 0.8216
+    },
+    {
+     "chunk_id": "S06-0207",
+     "score": 0.8189
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.24,
+   "error": null
+  },
+  {
+   "id": "Q42",
+   "question": "What are seeds in dbt and when should you use them?",
+   "answer": "Seeds in dbt are a way to upload a CSV file and make it available as a dbt model. [S06-0389]\n\nYou should use seeds when you need to bring in lookup data, such as when you have a lookup table that doesn't exist in your warehouse yet, or when you don't have write permissions to load data properly. [S06-0390]\n\nSeeds are also useful for quick experiments or local testing before committing to a proper data load, or for showing a stakeholder something before fully committing to a data load. [S06-0352]\n\nHowever, seeds are not recommended when you have confidential data, as they go into your git repo. [S06-0391] Also, keep the data small, as large CSVs in git will slow down pulls and pushes. [S06-0391]\n\nSeeds are a quick-and-dirty approach, and it's generally better to load data properly at the source if you have the option. [S06-0352]",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What are seeds in dbt and when should you use them?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0352",
+     "score": 0.8051
+    },
+    {
+     "chunk_id": "S06-0389",
+     "score": 0.7812
+    },
+    {
+     "chunk_id": "S06-0391",
+     "score": 0.7775
+    },
+    {
+     "chunk_id": "S06-0390",
+     "score": 0.7751
+    },
+    {
+     "chunk_id": "S06-0444",
+     "score": 0.7583
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.15,
+   "error": null
+  },
+  {
+   "id": "Q43",
+   "question": "Which dbt model calculates monthly revenue per pickup zone, and what does it group by?",
+   "answer": "To find the dbt model that calculates monthly revenue per pickup zone, we need to look at the course materials. According to [S06-0374], a report model for monthly revenue per zone is part of the course, and it's located inside the `models/core/` folder.\n\nThe model is likely to be related to the `fct_monthly_zone_revenue` model, which is mentioned in [S06-0549]. This model is optimized for business reporting and dashboards, and it enables analysis of revenue trends across different zones and taxi types.\n\nTo find the specific model that calculates monthly revenue per pickup zone, we need to look at the `fct_monthly_zone_revenue` model and see what it groups by. According to [S06-0549], this model groups by `pickup_zone`, `revenue_month`, and `service_type`.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "Which dbt model calculates monthly revenue per pickup zone, and what does it group by?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0549",
+     "score": 0.8515
+    },
+    {
+     "chunk_id": "S06-0376",
+     "score": 0.739
+    },
+    {
+     "chunk_id": "S06-0739",
+     "score": 0.7271
+    },
+    {
+     "chunk_id": "S06-0374",
+     "score": 0.7034
+    },
+    {
+     "chunk_id": "S06-0547",
+     "score": 0.6957
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.44,
+   "error": null
+  },
+  {
+   "id": "Q44",
+   "question": "What is an RDD in Spark?",
+   "answer": "According to the course materials, an RDD (Resilient Distributed Dataset) in Spark is a distributed collection of objects that is partitioned and executed by each executor. [S06-0785]\n\nIn other words, an RDD is a collection of data that is split into smaller chunks, called partitions, and each partition is processed independently by a separate executor. [S06-0785]\n\nThis is in contrast to a DataFrame, which has a specific structure and schema, and is built on top of RDDs. [S06-0785]\n\nTo work with RDDs, you can use various transformations and actions, such as map, filter, reduce, and take. [S03-0063]\n\nFor example, you can use the `map` function to apply a transformation to each element in an RDD, and the `take` function to retrieve a specified number of elements from an RDD. [S03-0063]\n\n RDDs can also be converted from DataFrames using the `rdd` attribute of a DataFrame. [S06-0787]\n\nFor instance, you can use the following code to convert a DataFrame to an RDD:\n```python\nrdd = df_green.rdd.take(5)\n```\nThis code retrieves the first 5 rows of the RDD. [S06-0787]\n\nI hope this helps clarify what an RDD is in Spark!",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is an RDD in Spark?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0785",
+     "score": 0.8503
+    },
+    {
+     "chunk_id": "S03-0063",
+     "score": 0.8008
+    },
+    {
+     "chunk_id": "S06-0787",
+     "score": 0.7945
+    },
+    {
+     "chunk_id": "S06-0801",
+     "score": 0.7931
+    },
+    {
+     "chunk_id": "S06-0814",
+     "score": 0.7827
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.32,
+   "error": null
+  },
+  {
+   "id": "Q45",
+   "question": "What is the difference between narrow and wide dependencies in Spark?",
+   "answer": "To answer your question, let's break down the differences between narrow and wide dependencies in Spark based on the provided excerpts.\n\nAccording to [S03-0059], narrow dependencies allow the data partition from an input RDD to be scheduled on the same physical machine as the output RDD, which is called \"pipelining\". This means that RDD operations with only narrow dependencies can be scheduled without any network traffic.\n\nOn the other hand, wide dependencies require all RDD partitions at the previous level of the lineage to be inputs to computing an RDD partition. This requires sending the RDD data over the network, which is known as the \"shuffle\" operation in Spark terminology [S03-0059].\n\nIn summary, the key difference between narrow and wide dependencies is that narrow dependencies allow for local processing without network traffic, while wide dependencies require data to be sent over the network for processing.\n\nTo illustrate this further, let's consider an example. Suppose we have an RDD that we want to process using a groupBy operation. If the groupBy operation only depends on the original data and not on any intermediate results, it would be a narrow dependency. However, if the groupBy operation depends on the intermediate results of a previous operation, it would be a wide dependency.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between narrow and wide dependencies in Spark?",
+   "retrieved": [
+    {
+     "chunk_id": "S03-0059",
+     "score": 0.8389
+    },
+    {
+     "chunk_id": "S03-0058",
+     "score": 0.7542
+    },
+    {
+     "chunk_id": "S03-0040",
+     "score": 0.741
+    },
+    {
+     "chunk_id": "S03-0025",
+     "score": 0.7405
+    },
+    {
+     "chunk_id": "S06-0763",
+     "score": 0.7324
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.64,
+   "error": null
+  },
+  {
+   "id": "Q46",
+   "question": "Why did Spark introduce DataFrames when it already had RDDs?",
+   "answer": "Spark introduced DataFrames as an alternative to RDDs to improve performance and scalability for certain types of applications [S03-0067]. \n\nThe main problem with RDDs is that they are operated by arbitrary user-defined functions, making it hard to optimize them [S03-0067]. \n\nDataFrames, on the other hand, allow only a limited number of DataFrame native operations, but also enable the Spark SQL optimizer to rewrite user DataFrame code to equivalent but faster codes [S03-0067]. \n\nThis means that DataFrames can be optimized by the SQL query optimizer, which can lead to significant performance improvements [S03-0067].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "Why did Spark introduce DataFrames when it already had RDDs?",
+   "retrieved": [
+    {
+     "chunk_id": "S03-0067",
+     "score": 0.8339
+    },
+    {
+     "chunk_id": "S06-0784",
+     "score": 0.8084
+    },
+    {
+     "chunk_id": "S06-0785",
+     "score": 0.8075
+    },
+    {
+     "chunk_id": "S06-0787",
+     "score": 0.8043
+    },
+    {
+     "chunk_id": "S03-0066",
+     "score": 0.8027
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.1,
+   "error": null
+  },
+  {
+   "id": "Q47",
+   "question": "How does the classic MapReduce word count example work?",
+   "answer": "To understand how the classic MapReduce word count example works, let's break it down step by step.\n\nFirst, the Map function reads in words one at a time from the input file and outputs (word, 1) for each parsed input word. This means that for each unique word in the file, the Map function will produce a key-value pair where the key is the word and the value is 1.\n\nFor example, given the input file \"Hello World Bye World Hello Hadoop Goodbye Hadoop\", the Map function will produce the following output:\n\n(Hello, 1)\n(World, 1)\n(Bye, 1)\n(World, 1)\n(Hello, 1)\n(Hadoop, 1)\n(Goodbye, 1)\n(Hadoop, 1)\n\n[S03-0039]\n\nNext, the Shuffle phase between the Map and Reduce phases creates a list of values associated with each key. In this case, the list will contain the word and the count of 1.\n\n[S03-0039]\n\nThe Reduce phase then takes these lists of values and reduces them to a single value for each key. In this case, the Reduce function will sum the counts for each word.\n\n[S03-0049]\n\nThe output of the Reduce function is the final output of the MapReduce job, which in this case will be:\n\n(Bye, 1)\n(Goodbye, 1)\n(Hadoop, 2)\n(Hello, 2)\n(World, 2)\n\n[S03-0039]\n\nSo, to summarize, the classic MapReduce word count example works by first producing a list of key-value pairs with the word as the key and a count of 1 as the value, and then reducing these pairs to a single value for each key by summing the counts.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does the classic MapReduce word count example work?",
+   "retrieved": [
+    {
+     "chunk_id": "S03-0038",
+     "score": 0.9159
+    },
+    {
+     "chunk_id": "S03-0039",
+     "score": 0.8767
+    },
+    {
+     "chunk_id": "S03-0048",
+     "score": 0.8246
+    },
+    {
+     "chunk_id": "S03-0049",
+     "score": 0.7988
+    },
+    {
+     "chunk_id": "S03-0045",
+     "score": 0.796
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 15.35,
+   "error": null
+  },
+  {
+   "id": "Q48",
+   "question": "What is the difference between transformations and actions in Spark?",
+   "answer": "To answer your question, let's break down the differences between transformations and actions in Spark based on the provided excerpts.\n\nTransformations in Spark are operations that transform the data, such as selecting columns, filtering rows, or applying a function to a column, but they are not executed immediately. Instead, they build a DAG (Directed Acyclic Graph) of dependencies between RDD partitions, but the actual data processing is done lazily [S03-0051]. This means that transformations do not trigger the evaluation of the data.\n\nOn the other hand, actions in Spark are operations that trigger the evaluation of the data. Examples of actions include printing the results with `show()`, getting a subset of records with `take(5)` or `head(5)`, writing the results to a file with `write.csv()` or `write.parquet()`, and grouping the data with `groupBy()` [S06-0705]. These actions start the computation and execute the entire transformation graph.\n\nIn summary, transformations in Spark are operations that transform the data without executing it immediately, while actions are operations that trigger the execution of the data.\n\nWould you like me to explain further or provide more examples?",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between transformations and actions in Spark?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0704",
+     "score": 0.9033
+    },
+    {
+     "chunk_id": "S03-0063",
+     "score": 0.8627
+    },
+    {
+     "chunk_id": "S06-0705",
+     "score": 0.8615
+    },
+    {
+     "chunk_id": "S03-0051",
+     "score": 0.7846
+    },
+    {
+     "chunk_id": "S03-0056",
+     "score": 0.781
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.33,
+   "error": null
+  },
+  {
+   "id": "Q49",
+   "question": "What do the driver, master and executors do in a Spark cluster?",
+   "answer": "Based on the excerpts provided, here's what the driver, master, and executors do in a Spark cluster:\n\n* The driver submits the job to the master, which coordinates the work and assigns tasks to the executors. [S06-0748]\n* The master coordinates the work and assigns tasks to the executors. It also keeps track of which machines are healthy and reassigns work if a machine becomes unhealthy. [S06-0748]\n* The executors do the actual computation and process the partitions of the DataFrame. They pull a partition, work through it, and mark the task as completed successfully. [S06-0749]\n* The master and executors work together to ensure that the job is completed successfully. The master knows which executors are available and assigns tasks to them, and the executors pull partitions from the DataFrame to process. [S06-0748]\n\nIn summary, the driver submits the job, the master coordinates the work, and the executors do the actual computation.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What do the driver, master and executors do in a Spark cluster?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0748",
+     "score": 0.8734
+    },
+    {
+     "chunk_id": "S06-0747",
+     "score": 0.8669
+    },
+    {
+     "chunk_id": "S06-0752",
+     "score": 0.8546
+    },
+    {
+     "chunk_id": "S06-0745",
+     "score": 0.8399
+    },
+    {
+     "chunk_id": "S06-0749",
+     "score": 0.8072
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.27,
+   "error": null
+  },
+  {
+   "id": "Q50",
+   "question": "How does a Kafka consumer group keep track of which messages it has already read?",
+   "answer": "To keep track of which messages a Kafka consumer group has already read, the group tracks its progress through the topic. [S06-0909]\n\nHere's how it works: when a consumer starts reading a topic, it begins at the earliest available record (i.e., the earliest offset). As it reads and processes messages, it updates its offset to the next message it has read. This way, when the consumer restarts, it can pick up where it left off. [S06-0911]\n\nIn other words, the consumer group keeps track of its offset, which represents the last message it has read. This offset is used to determine where to start reading from when the consumer restarts. [S05-0149]\n\nSo, to summarize: the consumer group tracks its progress through the topic by keeping track of its offset, which represents the last message it has read.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does a Kafka consumer group keep track of which messages it has already read?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0911",
+     "score": 0.7839
+    },
+    {
+     "chunk_id": "S06-0996",
+     "score": 0.7794
+    },
+    {
+     "chunk_id": "S05-0147",
+     "score": 0.7591
+    },
+    {
+     "chunk_id": "S05-0149",
+     "score": 0.7571
+    },
+    {
+     "chunk_id": "S06-0909",
+     "score": 0.7365
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.96,
+   "error": null
+  },
+  {
+   "id": "Q51",
+   "question": "What is the difference between tumbling, sliding and session windows?",
+   "answer": "To understand the differences between tumbling, sliding, and session windows, let's examine each type individually.\n\n**Tumbling Windows**:\nTumbling windows are fixed-size, non-overlapping, and every event belongs to exactly one window. They are essentially a way to speed up batch processing by cutting up data into fixed segments. [S06-0962]\n\n**Sliding Windows**:\nSliding windows are fixed-size, overlapping, and an event can belong to multiple windows. The window size isn't fixed; it's based on a sliding interval, which captures all possible windows within a certain time frame. [S06-0963]\n\n**Session Windows**:\nSession windows are dynamic windows based on inactivity gaps. Unlike tumbling and sliding windows, the window size isn't fixed; it closes after a specified amount of inactivity. This type of window is useful for grouping user behavior together. [S06-0965]\n\nNow, let's compare these three types:\n\n* Tumbling windows are fixed-size and non-overlapping, whereas sliding windows are fixed-size but overlapping.\n* Session windows are dynamic and based on inactivity gaps, whereas tumbling and sliding windows are based on fixed intervals.\n* Tumbling windows are useful for batch processing, while sliding windows capture all possible windows within a certain time frame. Session windows are useful for grouping user behavior together.\n\nIn summary, the main differences between tumbling, sliding, and session windows are their fixed-size nature, overlap, and the criteria used to determine the window boundaries.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between tumbling, sliding and session windows?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0962",
+     "score": 0.8033
+    },
+    {
+     "chunk_id": "S06-0965",
+     "score": 0.7843
+    },
+    {
+     "chunk_id": "S06-0963",
+     "score": 0.7474
+    },
+    {
+     "chunk_id": "S06-0955",
+     "score": 0.7268
+    },
+    {
+     "chunk_id": "S06-0957",
+     "score": 0.72
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 15.26,
+   "error": null
+  },
+  {
+   "id": "Q52",
+   "question": "What does a watermark do in Flink stream processing?",
+   "answer": "A watermark in Flink stream processing is a trigger that tells Flink when to publish the results of a tumbling window. [S06-0950]\n\nIn other words, the watermark is the \"patience\" that allows for small delays in event arrival times, while still ensuring that events are not dropped. [S06-0951]\n\nThe watermark is always 5 seconds behind the latest event timestamp that Flink has seen. [S06-0951]\n\nThis means that if an event arrives within 5 seconds of the window end, it will be included in the results of that window. [S06-0951]\n\nThe watermark is used in conjunction with upsert behavior to ensure that late events are correctly incorporated into the results. [S06-0959]\n\nWhen the watermark passes the end of a window, Flink publishes the results of that window. [S06-0951]\n\nHowever, if an event arrives after the watermark has passed the window end, it will be treated as a new event and will update the results of the previous window. [S06-0959]\n\nThis allows for a trade-off between latency and accuracy, as the watermark allows for some delay in event arrival times, but still ensures that events are not lost. [S06-0971]",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What does a watermark do in Flink stream processing?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0951",
+     "score": 0.7954
+    },
+    {
+     "chunk_id": "S06-0971",
+     "score": 0.7702
+    },
+    {
+     "chunk_id": "S06-0970",
+     "score": 0.7676
+    },
+    {
+     "chunk_id": "S06-0950",
+     "score": 0.7647
+    },
+    {
+     "chunk_id": "S06-0959",
+     "score": 0.7405
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.54,
+   "error": null
+  },
+  {
+   "id": "Q53",
+   "question": "What is the Lambda architecture for data processing?",
+   "answer": "The Lambda architecture is a data processing pattern that uses a combination of batch processing and real-time stream processing to strike a balance between low latency, high throughput, and fault tolerance. [S05-0025]\n\nTo understand this, let's break it down into its main components:\n\n1. **Batch Layer**: This is where batch processing is used to create accurate views of large data sets. [S05-0025]\n2. **Speed Layer**: This is where real-time stream processing is used to provide views of live data. [S05-0025]\n3. **Serving Layer**: This is where the results from both the batch and speed layers are merged and presented together. [S05-0025]\n\nIn summary, the Lambda architecture uses batch processing for accuracy and real-time stream processing for timeliness, and then combines the results to provide a complete view of the data. [S05-0025]",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the Lambda architecture for data processing?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0025",
+     "score": 0.8727
+    },
+    {
+     "chunk_id": "S03-0061",
+     "score": 0.7652
+    },
+    {
+     "chunk_id": "S05-0160",
+     "score": 0.7622
+    },
+    {
+     "chunk_id": "S05-0021",
+     "score": 0.7609
+    },
+    {
+     "chunk_id": "S03-0025",
+     "score": 0.7552
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.6,
+   "error": null
+  },
+  {
+   "id": "Q54",
+   "question": "What is the difference between concurrent and parallel batch processing?",
+   "answer": "To answer your question, let's break down the differences between concurrent and parallel batch processing based on the course materials.\n\nConcurrent batch processing [S05-0124] refers to jobs that run batches partially overlapping in time. This means that parts of different batches are executed simultaneously, but not necessarily entire batches. On the other hand, parallel batch processing [S05-0124] takes a similar approach, but instead of overlapping parts of batches over time, entire batches are scheduled in parallel.\n\nIn other words, concurrent batch processing is about overlapping batches in time, while parallel batch processing is about executing entire batches at the same time. Both approaches aim to improve processing efficiency, but they differ in their execution strategy.\n\nTo illustrate the difference, consider a scenario where you have two batches of data, each requiring processing. In concurrent batch processing, you might process 50% of the first batch and 50% of the second batch simultaneously. In parallel batch processing, you would process the entire first batch and the entire second batch at the same time.\n\nWhile both approaches can be effective, parallel batch processing can take advantage of multiple CPU cores, making it a more efficient option for large-scale data processing.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between concurrent and parallel batch processing?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0123",
+     "score": 0.8963
+    },
+    {
+     "chunk_id": "S05-0124",
+     "score": 0.885
+    },
+    {
+     "chunk_id": "S05-0125",
+     "score": 0.8727
+    },
+    {
+     "chunk_id": "S05-0122",
+     "score": 0.818
+    },
+    {
+     "chunk_id": "S05-0120",
+     "score": 0.8074
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.02,
+   "error": null
+  },
+  {
+   "id": "Q55",
+   "question": "What is Dataproc and how do you submit a Spark job to it?",
+   "answer": "Dataproc is Google Cloud's managed Spark service, which creates the master and workers for you, and you only submit jobs to it.\n\nTo submit a Spark job to Dataproc, you can use the web UI or the `gcloud` SDK. Here are the steps to submit a job using the web UI:\n\n1. Open the cluster in the Dataproc UI.\n2. Click \"Submit job\" and fill in the form with the required information:\n\t* Job type: `PySpark`\n\t* Main Python file: `gs://<bucket-name>/code/06_spark_sql.py`\n\t* Dependencies and jar files: none\n\t* `--input_green`: `gs://<bucket-name>/pq/green/2021/*`\n\t* `--input_yellow`: `gs://<bucket-name>/pq/yellow/2021/*`\n\t* `--output`: `gs://<bucket-name>/report-2021`\n3. Submit the job and wait for it to finish.\n\nAlternatively, you can use the `gcloud` SDK to submit a job. Here's an example command:\n```bash\ngcloud dataproc jobs submit pyspark \\\n    --cluster=\"${CLUSTER_NAME}\" \\\n    --region=\"${REGION}\" \\\n    \"gs://${BUCKET}/code/06_spark_sql.py\" \\\n    -- \\\n        --input_green=\"gs://${BUCKET}/pq/green/2020/*/\" \\\n        --input_yellow=\"gs://${BUCKET}/pq/yellow/2020/*/\" \\\n        --output=\"gs://${BUCKET}/report-2020\"\n```\nNote that you need to replace `<bucket-name>`, `<cluster-name>`, and `<region>` with the actual values for your project.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is Dataproc and how do you submit a Spark job to it?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0848",
+     "score": 0.8571
+    },
+    {
+     "chunk_id": "S06-0847",
+     "score": 0.8547
+    },
+    {
+     "chunk_id": "S06-0843",
+     "score": 0.8444
+    },
+    {
+     "chunk_id": "S06-0850",
+     "score": 0.8172
+    },
+    {
+     "chunk_id": "S06-0857",
+     "score": 0.7915
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 16.8,
+   "error": null
+  },
+  {
+   "id": "Q56",
+   "question": "How does the Spark SQL job script get its input and output paths?",
+   "answer": "To determine the input and output paths for the Spark SQL job script, we need to look at the form fields in the web UI submission process.\n\nAccording to [S06-0848], the form fields are:\n\n| Form field | Value |\n|---|---|\n| `--input_green` | `gs://<bucket-name>/pq/green/2021/*/` |\n| `--input_yellow` | `gs://<bucket-name>/pq/yellow/2021/*/` |\n| `--output` | `gs://<bucket-name>/report-2021` |\n\nThese values indicate that the input paths are the Green and Yellow buckets, and the output path is a new bucket named `report-2021`.\n\nThe script uses these paths in the `06_spark_sql.py` file, but the exact code is not shown in the excerpts. However, we can infer that the script uses the `--input_green` and `--input_yellow` paths as input files, and the `--output` path as the output directory.\n\nTo confirm this, you can try to look at the code in the `06_spark_sql.py` file, or check the Spark UI logs to see how the input and output paths are being used.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does the Spark SQL job script get its input and output paths?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0686",
+     "score": 0.7858
+    },
+    {
+     "chunk_id": "S06-0848",
+     "score": 0.7825
+    },
+    {
+     "chunk_id": "S06-0847",
+     "score": 0.7743
+    },
+    {
+     "chunk_id": "S06-0837",
+     "score": 0.767
+    },
+    {
+     "chunk_id": "S06-0743",
+     "score": 0.7636
+    }
+   ],
+   "hit_at_5": false,
+   "seconds": 14.06,
+   "error": null
+  },
+  {
+   "id": "Q57",
+   "question": "How does Spark join a large table with a small table efficiently?",
+   "answer": "To join a large table with a small table efficiently, Spark uses a broadcast join. This is because the small table is small enough that it can be sent to every executor, and then the join can be done in memory.\n\nHere's a step-by-step explanation of how it works:\n\n1. First, the small table (e.g. `df_zones`) is read into memory using `spark.read.parquet('zones/') [S06-0781]`.\n2. The large table (e.g. `df_join`) is then joined with the small table using a broadcast join. This involves sending a full copy of the small table to every executor, and then doing the join in memory for each partition of the large table.\n3. The join is done by looking up the zone information in the small table for each record in the large table, and appending the corresponding zone information to the result.\n4. Because the small table is small, it only needs to be sent around once, and no data needs to be shuffled. This makes the join much faster than a sort merge join.\n\nHere's some pseudo-code to illustrate the process:\n```\n// Read small table into memory\ndf_zones = spark.read.parquet('zones/')\n\n// Join large table with small table using broadcast join\ndf_result = df_join \\\n    .join(df_zones, df_join.zone == df_zones.LocationID)\n```\nNote that the `BroadcastExchange` stage in the execution plan indicates that the small table is being broadcast to every executor, and that the join is being done in memory for each partition of the large table.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does Spark join a large table with a small table efficiently?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0782",
+     "score": 0.8524
+    },
+    {
+     "chunk_id": "S06-0780",
+     "score": 0.83
+    },
+    {
+     "chunk_id": "S06-0778",
+     "score": 0.8261
+    },
+    {
+     "chunk_id": "S06-0781",
+     "score": 0.8195
+    },
+    {
+     "chunk_id": "S06-0773",
+     "score": 0.8078
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 14.67,
+   "error": null
+  },
+  {
+   "id": "Q58",
+   "question": "How does the Flink aggregation job count trips per pickup location for each hour?",
+   "answer": "To count trips per pickup location for each hour, we need to consider the windowing logic in Flink. According to [S06-0949], the window defines what you're counting, which is a 1-hour bucket of taxi trips. However, Flink needs a trigger to know when to stop waiting and publish the count for the 2 PM - 3 PM hour.\n\nThe trigger is not explicitly mentioned in the excerpts, but we can infer that Flink uses a watermark to determine when to publish window results. The watermark is set to `event_timestamp - INTERVAL '5' SECOND` [S06-0949]. This means that Flink will wait for events to arrive within 5 seconds of the expected timestamp before publishing the count.\n\nTo count trips per pickup location for each hour, we need to group the events by both time window and pickup location. This is achieved by including `PULocationID` in the output [S06-0944]. The `PRIMARY KEY` constraint enables upsert behavior, which ensures that the corrected count replaces the old one automatically when late-arriving events are received [S06-0944].\n\nHere's a step-by-step approach to achieve this:\n\n1. Define the windowing logic using the `WATERMARK` clause.\n2. Group the events by both time window and pickup location.\n3. Use the `GROUP BY` clause to aggregate the events.\n4. Apply the watermark to determine when to publish the count.\n5. Use the `PRIMARY KEY` constraint to enable upsert behavior.\n\nBy following these steps, we can implement the windowing logic in Flink to count trips per pickup location for each hour.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does the Flink aggregation job count trips per pickup location for each hour?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0943",
+     "score": 0.7639
+    },
+    {
+     "chunk_id": "S06-0957",
+     "score": 0.7638
+    },
+    {
+     "chunk_id": "S06-0944",
+     "score": 0.7303
+    },
+    {
+     "chunk_id": "S06-0949",
+     "score": 0.7289
+    },
+    {
+     "chunk_id": "S06-0547",
+     "score": 0.7251
+    }
+   ],
+   "hit_at_5": false,
+   "seconds": 17.11,
+   "error": null
+  },
+  {
+   "id": "Q59",
+   "question": "What does the ROW_NUMBER window function do, and how does PARTITION BY change it?",
+   "answer": "The ROW_NUMBER() window function assigns a unique row number to each row within a partition. It starts at 1 and numbers the rows according to the ORDER BY part of the window statement.\n\nWhen PARTITION BY is used with ROW_NUMBER(), it allows you to begin counting 1 again in each partition. This means that if you have multiple groups of rows, each group will be assigned a unique row number starting from 1.\n\nFor example, if you have a table with multiple locations and you want to assign a unique row number to each location based on a certain column, PARTITION BY will divide the result set into groups, and ROW_NUMBER() will assign a unique row number to each group.\n\nTo illustrate this, let's consider an example: \n\nSuppose you have a table with the following data:\n\n| total_amount | PULocationID |\n|-----------|-----------|\n| 8.51      | 224       |\n| 8.3       | 224       |\n| 8.3       | 224       |\n| 7.3       | 224       |\n| 3.3       | 224       |\n| 86.42     | 234       |\n| 73.5      | 234       |\n| 62.7      | 234       |\n| 61.94     | 234       |\n| 61.94     | 234       |\n\nIf you use ROW_NUMBER() with PARTITION BY PULocationID, the result will be:\n\n| total_amount | PULocationID | ranking |\n|-----------|-----------|-----------|\n| 8.51      | 224       | 1         |\n| 8.3       | 224       | 2         |\n| 8.3       | 224       | 3         |\n| 7.3       | 224       | 4         |\n| 3.3       | 224       | 5         |\n| 86.42     | 234       | 1         |\n| 73.5      | 234       | 2         |\n| 62.7      | 234       | 3         |\n| 61.94     | 234       | 4         |\n| 61.94     | 234       | 5         |\n\nAs you can see, the row numbers are unique within each location group.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What does the ROW_NUMBER window function do, and how does PARTITION BY change it?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0471",
+     "score": 0.8288
+    },
+    {
+     "chunk_id": "S06-0470",
+     "score": 0.8013
+    },
+    {
+     "chunk_id": "S06-0473",
+     "score": 0.7883
+    },
+    {
+     "chunk_id": "S06-0474",
+     "score": 0.77
+    },
+    {
+     "chunk_id": "S06-0469",
+     "score": 0.7657
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 19.62,
+   "error": null
+  },
+  {
+   "id": "Q60",
+   "question": "When is a table in first normal form?",
+   "answer": "To determine when a table is in first normal form (1NF), let's look at the definition from the course materials.\n\nAccording to [S04-0102], \"In the first normal form, only single values are permitted at the intersection of each row and column; hence, there are no repeating groups.\"\n\nThis means that a table is in 1NF if it has no repeating groups, or in other words, if each value in a column is unique and not repeated across different rows.\n\nAdditionally, [S01-0172] states that \"To normalize a relation that contains a repeating group, remove the repeating group and form two new relations.\"\n\nThis implies that if a table has a repeating group, it is not in 1NF, and we need to break it down into separate tables.\n\nSo, to summarize: a table is in 1NF if it has no repeating groups, and if it has a repeating group, we need to break it down into separate tables.\n\nCan you think of a scenario where a table might have a repeating group?",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "When is a table in first normal form?",
+   "retrieved": [
+    {
+     "chunk_id": "S01-0172",
+     "score": 0.7915
+    },
+    {
+     "chunk_id": "S04-0102",
+     "score": 0.7613
+    },
+    {
+     "chunk_id": "S02-0284",
+     "score": 0.7446
+    },
+    {
+     "chunk_id": "S01-0183",
+     "score": 0.7444
+    },
+    {
+     "chunk_id": "S01-0175",
+     "score": 0.7433
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.88,
+   "error": null
+  },
+  {
+   "id": "Q61",
+   "question": "What is the difference between second normal form and third normal form?",
+   "answer": "To answer your question, let's first look at the definitions of second normal form (2NF) and third normal form (3NF) from the course materials.\n\nAccording to [S01-0175], a relation is in 2NF if it is in 1NF and the primary key (PK) comprises a single attribute. On the other hand, [S01-0175] also states that a relation is in 3NF if it is in 2NF and all transitive dependencies must be removed.\n\nIn other words, the main difference between 2NF and 3NF is that 2NF requires the primary key to have only one attribute, while 3NF requires that all non-key attributes must be fully dependent on the entire primary key, and not on a subset of it.\n\nTo illustrate the difference, consider a relation where a non-key attribute depends on a subset of the primary key. In this case, the relation would not be in 2NF, but it would be in 3NF if the non-key attribute is fully dependent on the entire primary key.\n\nSo, to summarize: 2NF requires the primary key to have only one attribute, while 3NF requires that all non-key attributes are fully dependent on the primary key, and not on a subset of it.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between second normal form and third normal form?",
+   "retrieved": [
+    {
+     "chunk_id": "S01-0175",
+     "score": 0.7638
+    },
+    {
+     "chunk_id": "S01-0172",
+     "score": 0.7511
+    },
+    {
+     "chunk_id": "S01-0184",
+     "score": 0.7489
+    },
+    {
+     "chunk_id": "S01-0178",
+     "score": 0.7374
+    },
+    {
+     "chunk_id": "S04-0102",
+     "score": 0.7348
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 14.09,
+   "error": null
+  },
+  {
+   "id": "Q62",
+   "question": "What is a functional dependency between attributes?",
+   "answer": "To answer your question, \"What is a functional dependency between attributes?\", let's break it down step by step.\n\nA functional dependency is a relationship between two attributes, typically between the Primary Key (PK) and other non-key attributes within a table. [S01-0158]\n\nIn other words, a functional dependency exists when the value of one attribute (the determinant) uniquely determines the value of another attribute (the dependent). [S01-0158]\n\nTo illustrate this, let's consider an example. Suppose we have a table with attributes StudentNo, StudentName, and ProgramID. A functional dependency between these attributes would be: StudentNo → StudentName, because given the value of StudentNo, we can uniquely determine the value of StudentName. [S01-0164]\n\nSo, a functional dependency is a relationship between two attributes where the value of one attribute determines the value of the other attribute. Does that make sense?",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is a functional dependency between attributes?",
+   "retrieved": [
+    {
+     "chunk_id": "S01-0158",
+     "score": 0.8499
+    },
+    {
+     "chunk_id": "S01-0147",
+     "score": 0.8143
+    },
+    {
+     "chunk_id": "S04-0101",
+     "score": 0.7977
+    },
+    {
+     "chunk_id": "S01-0168",
+     "score": 0.7899
+    },
+    {
+     "chunk_id": "S01-0164",
+     "score": 0.7789
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.17,
+   "error": null
+  },
+  {
+   "id": "Q63",
+   "question": "What is a weak entity in an entity relationship model?",
+   "answer": "A weak entity in an entity relationship model is an entity that cannot be uniquely identified based on its attributes alone and must rely on a strong entity to provide the context necessary for identification [S04-0110]. \n\nTo understand this concept better, let's break it down: a weak entity is one that cannot exist independently, meaning it needs another entity to fully identify it. This is in contrast to a strong entity, which can exist on its own [S01-0086].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is a weak entity in an entity relationship model?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0110",
+     "score": 0.8762
+    },
+    {
+     "chunk_id": "S01-0086",
+     "score": 0.8117
+    },
+    {
+     "chunk_id": "S01-0117",
+     "score": 0.8082
+    },
+    {
+     "chunk_id": "S01-0112",
+     "score": 0.7679
+    },
+    {
+     "chunk_id": "S01-0085",
+     "score": 0.7553
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.3,
+   "error": null
+  },
+  {
+   "id": "Q64",
+   "question": "How is a many-to-many relationship implemented in a relational database?",
+   "answer": "To implement a many-to-many relationship in a relational database, consider the following steps:\n\n1. Identify the entities involved in the many-to-many relationship. In this case, the entities are \"Employee\" and \"Project\".\n2. Recognize that a many-to-many relationship cannot be implemented directly in the relational model [S01-0105].\n3. Break up the many-to-many relationship into two one-to-many relationships. This can be achieved by creating a new table that acts as a bridge between the two entities. For example, a new table \"Employee_Project\" can be created to store the many-to-many relationship.\n4. The new table \"Employee_Project\" must contain at least the primary keys of the original tables, which are the Employee ID and Project ID [S01-0105].\n5. The linking table \"Employee_Project\" must contain multiple occurrences of the foreign key values, which are the Employee ID and Project ID [S01-0105].\n6. Additional attributes may be assigned as needed to the new table \"Employee_Project\" to capture the specific relationship between the two entities.\n\nHere's a simple pseudo-code to illustrate this:\n```\nCREATE TABLE Employee (\n  EmployeeID INT PRIMARY KEY,\n  Name VARCHAR(255)\n);\n\nCREATE TABLE Project (\n  ProjectID INT PRIMARY KEY,\n  ProjectName VARCHAR(255)\n);\n\nCREATE TABLE Employee_Project (\n  EmployeeID INT,\n  ProjectID INT,\n  PRIMARY KEY (EmployeeID, ProjectID),\n  FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID),\n  FOREIGN KEY (ProjectID) REFERENCES Project(ProjectID)\n);\n```\nNote that this is just one way to implement a many-to-many relationship in a relational database, and the specific design may vary depending on the requirements of the application.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How is a many-to-many relationship implemented in a relational database?",
+   "retrieved": [
+    {
+     "chunk_id": "S01-0104",
+     "score": 0.8002
+    },
+    {
+     "chunk_id": "S01-0105",
+     "score": 0.7736
+    },
+    {
+     "chunk_id": "S05-0197",
+     "score": 0.7702
+    },
+    {
+     "chunk_id": "S04-0127",
+     "score": 0.7612
+    },
+    {
+     "chunk_id": "S04-0076",
+     "score": 0.7526
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 15.66,
+   "error": null
+  },
+  {
+   "id": "Q65",
+   "question": "What is the difference between DDL and DML in SQL?",
+   "answer": "To answer your question, let's look at the definitions of DDL and DML from the course materials.\n\nAccording to [S05-0292], DDL is the Data Definition Language, which deals with database schemas and descriptions, of how the data should reside in the database.\n\nOn the other hand, [S01-0244] defines DML as the Data Manipulation Language, which is used to query and modify database data.\n\nIn other words, DDL is concerned with the structure and organization of the database, while DML is concerned with the actual data within the database.\n\nTo illustrate the difference, consider the following examples:\n\n*   Creating a new table in the database: This would be an example of DDL, as it involves defining the structure of the database.\n*   Inserting data into a table: This would be an example of DML, as it involves modifying the data within the database.\n\nI hope this helps clarify the difference between DDL and DML in SQL!",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between DDL and DML in SQL?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0291",
+     "score": 0.901
+    },
+    {
+     "chunk_id": "S05-0292",
+     "score": 0.8992
+    },
+    {
+     "chunk_id": "S01-0244",
+     "score": 0.8198
+    },
+    {
+     "chunk_id": "S01-0248",
+     "score": 0.8079
+    },
+    {
+     "chunk_id": "S04-0051",
+     "score": 0.798
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.61,
+   "error": null
+  },
+  {
+   "id": "Q66",
+   "question": "What is the difference between WHERE and HAVING in a query?",
+   "answer": "To understand the difference between WHERE and HAVING, let's examine the excerpts.\n\nThe excerpt [S05-0284] explains that the WHERE clause introduces a condition on individual rows. In contrast, the HAVING clause introduces a condition on aggregations, such as the results of a GROUP BY operation.\n\nThe excerpt [S05-0286] explicitly states that:\n\n* `WHERE` introduces a condition on individual rows and should be used before the `GROUP BY` clause.\n* `HAVING` introduces a condition on aggregations and should be used after the `GROUP BY` clause.\n\nThis suggests that the main difference between WHERE and HAVING is the scope of the condition: WHERE applies to individual rows, while HAVING applies to the aggregated results of a GROUP BY operation.\n\nTo illustrate this, consider the following example:\n\n```sql\nSELECT StorID, qty, TitleID\nFROM Sales\nWHERE qty >= 20 and qty <= 50\nGROUP BY StorID\nHAVING SUM(qty) > 100\n```\n\nIn this example, the WHERE clause filters the rows based on the quantity, while the HAVING clause filters the groups based on the aggregated sum of the quantity.\n\nTo summarize:\n\n* WHERE applies to individual rows and is used before the GROUP BY clause.\n* HAVING applies to aggregations and is used after the GROUP BY clause.\n\nDoes this help clarify the difference between WHERE and HAVING?",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between WHERE and HAVING in a query?",
+   "retrieved": [
+    {
+     "chunk_id": "S01-0260",
+     "score": 0.792
+    },
+    {
+     "chunk_id": "S01-0252",
+     "score": 0.7283
+    },
+    {
+     "chunk_id": "S01-0253",
+     "score": 0.7186
+    },
+    {
+     "chunk_id": "S05-0284",
+     "score": 0.7156
+    },
+    {
+     "chunk_id": "S05-0286",
+     "score": 0.6979
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 15.25,
+   "error": null
+  },
+  {
+   "id": "Q67",
+   "question": "What is the difference between an INNER JOIN and a LEFT OUTER JOIN?",
+   "answer": "To answer your question, let's compare INNER JOIN and LEFT OUTER JOIN based on the excerpts provided.\n\nAn INNER JOIN returns only the rows that have matching values in both tables, whereas a LEFT OUTER JOIN returns all rows from the left table and the matching rows from the right table. If there's no match, the result will contain NULL values from the right table.\n\nIn other words, an INNER JOIN discards unmatched rows, whereas a LEFT OUTER JOIN includes all rows from the left table, even if there's no match in the right table.\n\nTo illustrate the difference, consider the following example:\n\n```sql\nSELECT *\nFROM Employees\nINNER JOIN Jobs ON Employees.job_id = Jobs.job_id\n```\n\nThis INNER JOIN will only return the rows where the job_id exists in both tables. If an employee doesn't have a job, they won't be included in the result.\n\nOn the other hand, a LEFT OUTER JOIN would return all employees, even if they don't have a job, with NULL values in the job columns.\n\n```sql\nSELECT *\nFROM Employees\nLEFT OUTER JOIN Jobs ON Employees.job_id = Jobs.job_id\n```\n\nTo summarize, the main difference between an INNER JOIN and a LEFT OUTER JOIN is that INNER JOIN discards unmatched rows, whereas LEFT OUTER JOIN includes all rows from the left table and fills in NULL values from the right table.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between an INNER JOIN and a LEFT OUTER JOIN?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0090",
+     "score": 0.8453
+    },
+    {
+     "chunk_id": "S05-0282",
+     "score": 0.8368
+    },
+    {
+     "chunk_id": "S01-0279",
+     "score": 0.8282
+    },
+    {
+     "chunk_id": "S01-0280",
+     "score": 0.8243
+    },
+    {
+     "chunk_id": "S01-0278",
+     "score": 0.8058
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.85,
+   "error": null
+  },
+  {
+   "id": "Q68",
+   "question": "How do indexes make database queries faster?",
+   "answer": "Indexes make database queries faster by allowing the database to quickly retrieve records from the database more quickly [S04-0124]. \n\nAccording to the excerpt, an index is a data structure that allows you to quickly retrieve records from a database object by creating pointers that point to where data is stored [S05-0230]. This means that indexes help the database to quickly locate the required data, which improves the performance of the query process.\n\nIn more detail, the excerpt explains that an index holds the field being sorted and points from each record to the corresponding record where the data are stored [S04-0124]. This allows the database to quickly access the required data, making the query faster.\n\nAdditionally, the excerpt mentions that indexing can improve the query performance by avoiding JavaScript user-defined functions (UDFs), using approximate aggregation functions, optimizing join patterns, and placing the table with the largest number of rows first in the query [S06-0247]. However, these are general tips for improving query performance, and the specific mechanism by which indexes make queries faster is related to how indexes are organized and stored in the database.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How do indexes make database queries faster?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0124",
+     "score": 0.8085
+    },
+    {
+     "chunk_id": "S05-0230",
+     "score": 0.7927
+    },
+    {
+     "chunk_id": "S06-0247",
+     "score": 0.791
+    },
+    {
+     "chunk_id": "S02-0335",
+     "score": 0.7472
+    },
+    {
+     "chunk_id": "S06-0244",
+     "score": 0.7463
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.77,
+   "error": null
+  },
+  {
+   "id": "Q69",
+   "question": "What is the difference between a view and a materialized view?",
+   "answer": "To answer your question, let's compare the definitions of a view and a materialized view from the course materials.\n\nA view is described as a \"virtual table based on the results of a SQL statement\" [S05-0288]. This means that a view is a subset of the database, but it does not physically exist in the database.\n\nOn the other hand, a materialized view is defined as a \"snapshot of a query saved as a physical object within the database\" [S05-0289]. This means that a materialized view is a physical object within the database that contains the results of a query.\n\nThe key difference between a view and a materialized view is that a view is virtual, while a materialized view is physical. Additionally, a materialized view requires periodic updates to ensure that it remains accurate, whereas a view does not require any maintenance.\n\nTo summarize:\n\n* A view is a virtual table based on the results of a SQL statement.\n* A materialized view is a physical object within the database that contains the results of a query.\n\nI hope this helps clarify the difference between a view and a materialized view!",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between a view and a materialized view?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0289",
+     "score": 0.9038
+    },
+    {
+     "chunk_id": "S05-0288",
+     "score": 0.8808
+    },
+    {
+     "chunk_id": "S01-0031",
+     "score": 0.7483
+    },
+    {
+     "chunk_id": "S04-0199",
+     "score": 0.7058
+    },
+    {
+     "chunk_id": "S01-0039",
+     "score": 0.7044
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 12.72,
+   "error": null
+  },
+  {
+   "id": "Q70",
+   "question": "What is the difference between logical and physical data independence?",
+   "answer": "To answer your question, let's break down the concepts of logical and physical data independence based on the excerpts provided.\n\nLogical data independence refers to the ability to change the logical schema (conceptual design of the database) without affecting the external schema or user view. This means that changes to the logical schema, such as adding or removing entities, attributes, or relationships, should not impact the function of the application (external views) [S01-0056].\n\nOn the other hand, physical data independence refers to the immunity of the internal model to changes in the physical model. This means that even though changes are made to file organization, storage structures, storage devices, or indexing strategy, the logical schema stays unchanged [S01-0057].\n\nIn simpler terms, logical data independence focuses on the conceptual design of the database, while physical data independence focuses on the storage and organization of the data. Both concepts work together to provide data independence, which is essential for hiding complexity from the database user.\n\nTo illustrate the difference, consider a scenario where you want to add a new attribute to a table. With logical data independence, you can modify the logical schema to include the new attribute without affecting the external view of the database. However, with physical data independence, the actual storage and organization of the data remain unchanged, even if the new attribute is added.\n\nI hope this explanation helps clarify the difference between logical and physical data independence!",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between logical and physical data independence?",
+   "retrieved": [
+    {
+     "chunk_id": "S01-0055",
+     "score": 0.8667
+    },
+    {
+     "chunk_id": "S01-0057",
+     "score": 0.8437
+    },
+    {
+     "chunk_id": "S04-0053",
+     "score": 0.8101
+    },
+    {
+     "chunk_id": "S04-0326",
+     "score": 0.7874
+    },
+    {
+     "chunk_id": "S01-0056",
+     "score": 0.7663
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.5,
+   "error": null
+  },
+  {
+   "id": "Q71",
+   "question": "What is a candidate key?",
+   "answer": "A candidate key is a simple or composite key that is unique and minimal. It is unique because no two rows in a table may have the same value at any time. It is minimal because every column is necessary in order to attain uniqueness. [S01-0095]\n\nIn other words, a candidate key is a set of attributes that can uniquely identify individual tuples in a table, and it is the smallest possible set of attributes that can do so.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is a candidate key?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0077",
+     "score": 0.802
+    },
+    {
+     "chunk_id": "S01-0097",
+     "score": 0.7745
+    },
+    {
+     "chunk_id": "S01-0095",
+     "score": 0.7354
+    },
+    {
+     "chunk_id": "S01-0096",
+     "score": 0.7314
+    },
+    {
+     "chunk_id": "S01-0109",
+     "score": 0.711
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.54,
+   "error": null
+  },
+  {
+   "id": "Q72",
+   "question": "What is Docker Compose and why use it instead of starting containers one by one?",
+   "answer": "Docker Compose is a tool that allows us to launch multiple containers using a single configuration file, so that we don't have to run multiple complex `docker run` commands separately [S06-0061].\n\nWe use Docker Compose instead of starting containers one by one because it provides several benefits, including a single command to start all services, automatic network creation, easy configuration management, and declarative infrastructure [S06-0067].\n\nBy using Docker Compose, we can avoid having to manually specify all the details of the containers, such as environment variables, volumes, and ports, which can be tedious and error-prone [S06-0063]. Instead, we can define these details in a single YAML file, which makes it easier to manage our containers and their dependencies.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is Docker Compose and why use it instead of starting containers one by one?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0061",
+     "score": 0.8501
+    },
+    {
+     "chunk_id": "S06-0067",
+     "score": 0.7791
+    },
+    {
+     "chunk_id": "S06-0065",
+     "score": 0.758
+    },
+    {
+     "chunk_id": "S06-0064",
+     "score": 0.7498
+    },
+    {
+     "chunk_id": "S06-0063",
+     "score": 0.7443
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.09,
+   "error": null
+  },
+  {
+   "id": "Q73",
+   "question": "What is Kestra?",
+   "answer": "To answer the student's question, \"What is Kestra?\", we can directly take the definition from the excerpt:\n\nKestra is an open-source, infinitely-scalable orchestration platform that enables all engineers to manage business-critical workflows. [S06-0133]\n\nThis excerpt provides a clear and concise definition of what Kestra is, highlighting its key features as an orchestration platform.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is Kestra?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0133",
+     "score": 0.7864
+    },
+    {
+     "chunk_id": "S06-0170",
+     "score": 0.6635
+    },
+    {
+     "chunk_id": "S06-0141",
+     "score": 0.6501
+    },
+    {
+     "chunk_id": "S06-0136",
+     "score": 0.6379
+    },
+    {
+     "chunk_id": "S06-0135",
+     "score": 0.634
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 8.91,
+   "error": null
+  },
+  {
+   "id": "Q74",
+   "question": "How do you backfill historical data with a scheduled workflow?",
+   "answer": "To backfill historical data with a scheduled workflow, follow these steps:\n\n1. Identify the historical data you want to backfill. In this case, you want to backfill the entire dataset for both the yellow and green taxi data.\n2. Use the Kestra UI to schedule the workflow to run daily at the desired time (e.g., 9 AM UTC for the green dataset and 10 AM UTC for the yellow dataset).\n3. Since you are processing data in a cloud environment with infinitely scalable storage and compute, you can backfill the entire dataset without worrying about running out of resources on your local machine.\n4. To backfill only a specific subset of data, you can use the `backfill` function in the workflow code. However, in this case, the excerpts do not provide specific details on how to use the `backfill` function.\n\nLet's focus on the scheduled workflow. The excerpt [S06-0154] mentions that you can schedule the pipeline to run daily at 9 AM UTC for the green dataset and at 10 AM UTC for the yellow dataset. The workflow code for this is located in the file [`05_postgres_taxi_scheduled.yaml`](flows/05_postgres_taxi_scheduled.yaml).\n\nTo backfill historical data, you can modify the workflow code to include the `backfill` function. However, the excerpts do not provide specific details on how to implement this. You can try searching for more information on how to use the `backfill` function in the workflow code or ask your lecturer for guidance.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How do you backfill historical data with a scheduled workflow?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0164",
+     "score": 0.7792
+    },
+    {
+     "chunk_id": "S06-0154",
+     "score": 0.7381
+    },
+    {
+     "chunk_id": "S06-0983",
+     "score": 0.7022
+    },
+    {
+     "chunk_id": "S06-0987",
+     "score": 0.6969
+    },
+    {
+     "chunk_id": "S06-0190",
+     "score": 0.694
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 15.18,
+   "error": null
+  },
+  {
+   "id": "Q75",
+   "question": "How can a simple data pipeline be scheduled with cron?",
+   "answer": "To schedule a simple data pipeline with cron, you need to install cron on a server where you want your script to run, and then use cron syntax to tell it when to run.\n\nHere are the general steps:\n\n1. Install cron on the server where your script will run.\n2. Create a cron job that specifies the command to run and the schedule (e.g., daily, monthly, etc.).\n3. Use cron syntax to specify the exact time and date when the script should run.\n\nFor example, if you want to run a script every day at 2am, you would add the following line to your cron table:\n```\n0 2 * * * /path/to/your/script\n```\nThis will run the script every day at 2am.\n\nNote that the cron syntax may vary depending on the operating system you are using. You can find more information on cron syntax in the [crontab.guru](https://crontab.guru/) documentation.\n\nHere's a hint: you can use the following cron syntax to schedule a pipeline to run:\n```\n[0 0 * * *]  # run daily at midnight\n[0 0 1 * *]  # run monthly at midnight\n```\nYou can also use cron expressions to specify more complex schedules. For example:\n```\n[0 0-23 * * *]  # run every hour\n[0 0 1-7 * *]  # run every day of the week\n```\nI hope this helps! Let me know if you have any further questions.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How can a simple data pipeline be scheduled with cron?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0108",
+     "score": 0.8415
+    },
+    {
+     "chunk_id": "S06-0611",
+     "score": 0.7534
+    },
+    {
+     "chunk_id": "S05-0104",
+     "score": 0.7182
+    },
+    {
+     "chunk_id": "S06-0609",
+     "score": 0.7155
+    },
+    {
+     "chunk_id": "S06-0643",
+     "score": 0.7146
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 14.48,
+   "error": null
+  },
+  {
+   "id": "Q76",
+   "question": "What does it mean for a data pipeline to be idempotent?",
+   "answer": "To determine if a data pipeline is idempotent, let's look at the definition provided in the course materials: \"If you execute a data pipeline multiple times with the same input, the output will stay the same.\" [S05-0229]\n\nThis means that if we run the same input through the pipeline multiple times, the output will be the same each time. In other words, the pipeline will produce the same result regardless of how many times it is executed.\n\nTo illustrate this, let's consider an example. Suppose we have a pipeline that takes a list of names as input, removes duplicates, and outputs the unique names. If we run this pipeline with the same list of names multiple times, the output will be the same each time: a list of unique names. [S05-0229]\n\nTo make a data pipeline idempotent, we need to ensure that it produces the same output regardless of how many times it is executed, even if the input changes. This might involve using techniques such as caching or storing the output of previous executions so that the pipeline can rely on it.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What does it mean for a data pipeline to be idempotent?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0229",
+     "score": 0.8051
+    },
+    {
+     "chunk_id": "S05-0104",
+     "score": 0.7422
+    },
+    {
+     "chunk_id": "S05-0271",
+     "score": 0.7421
+    },
+    {
+     "chunk_id": "S05-0103",
+     "score": 0.7376
+    },
+    {
+     "chunk_id": "S05-0274",
+     "score": 0.72
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.32,
+   "error": null
+  },
+  {
+   "id": "Q77",
+   "question": "What do the terraform init, plan and apply commands do?",
+   "answer": "To understand what the `terraform init`, `plan`, and `apply` commands do, let's break them down step by step:\n\n1. `terraform init`:\n   * Initializes & configures the backend, installs plugins/providers, & checks out an existing configuration from a version control [S06-0092].\n   * This command sets up Terraform to work with your project, making sure it knows where to find your infrastructure configuration files.\n\n2. `terraform plan`:\n   * Matches/previews local changes against a remote state, and proposes an Execution Plan [S06-0092].\n   * This command shows you what changes Terraform would make to your infrastructure if you were to run `terraform apply`. It's like a preview of what's about to happen.\n\n3. `terraform apply`:\n   * Asks for approval to the proposed plan, and applies changes to cloud [S06-0092].\n   * This command actually makes the changes to your infrastructure that `terraform plan` showed you. It's the main command for applying changes to your infrastructure.\n\nThink of it like a workflow:\n- `terraform init` sets up Terraform.\n- `terraform plan` shows you what's about to happen.\n- `terraform apply` makes the changes happen.\n\nThese commands are the core of how Terraform works, and they're used together to manage your infrastructure.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What do the terraform init, plan and apply commands do?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0092",
+     "score": 0.841
+    },
+    {
+     "chunk_id": "S06-0123",
+     "score": 0.7704
+    },
+    {
+     "chunk_id": "S06-0088",
+     "score": 0.7572
+    },
+    {
+     "chunk_id": "S06-0120",
+     "score": 0.7559
+    },
+    {
+     "chunk_id": "S06-0089",
+     "score": 0.7529
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.4,
+   "error": null
+  },
+  {
+   "id": "Q78",
+   "question": "How does the upload script send a local file to a Google Cloud Storage bucket?",
+   "answer": "To send a local file to a Google Cloud Storage bucket, the script uses the `upload_from_filename` method of the `Blob` object. This method takes the path to the local file as an argument and uploads it to the bucket.\n\nHere's a step-by-step breakdown of how it works:\n\n1. The script creates a `Client` object, which is used to interact with the Google Cloud Storage API.\n2. It then creates a `Bucket` object, which represents the bucket where the file will be uploaded.\n3. The script creates a `Blob` object, which represents the file to be uploaded. It sets the `object_name` attribute to the name of the file in the bucket.\n4. The `upload_from_filename` method is called on the `Blob` object, passing the path to the local file as an argument.\n5. This method sends the file to the bucket, where it is stored.\n\nHere's some pseudo-code that illustrates this process:\n```python\nclient = storage.Client()\nbucket = client.bucket(bucket_name)\nblob = bucket.blob(object_name)\nblob.upload_from_filename(local_file_path)\n```\nThis pseudo-code is based on the `upload_to_gcs` function in the excerpt [S06-0314].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does the upload script send a local file to a Google Cloud Storage bucket?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0819",
+     "score": 0.7863
+    },
+    {
+     "chunk_id": "S06-0309",
+     "score": 0.7615
+    },
+    {
+     "chunk_id": "S06-0314",
+     "score": 0.7592
+    },
+    {
+     "chunk_id": "S06-0820",
+     "score": 0.7582
+    },
+    {
+     "chunk_id": "S06-0302",
+     "score": 0.7555
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 17.0,
+   "error": null
+  },
+  {
+   "id": "Q79",
+   "question": "How do you load a large CSV file into Postgres in chunks with pandas?",
+   "answer": "To load a large CSV file into Postgres in chunks with pandas, you can follow these steps:\n\n1. First, you need to count the total number of rows in the CSV file. You can do this by opening the file in gzip mode and counting the number of lines. This is done in the `csv_to_parquet_with_progress` function, where the total number of rows is calculated as `total_rows = sum(1 for _ in f) - 1`. [S06-0307]\n\n2. Next, you need to specify the dtypes for each column in the CSV file. In this case, you have a fixed set of dtypes for each column, which are defined in the `dtypes` dictionary. [S06-0307]\n\n3. Then, you can use the `read_csv` function from pandas to read the CSV file in chunks. You can specify the `chunksize` parameter to control the number of rows to read at a time. [S06-0308]\n\n4. After reading the CSV file in chunks, you can convert the datetime columns to a suitable format for Postgres. This is done in the `csv_to_parquet_with_progress` function, where the `parse_dates` variable is set based on the service color. [S06-0307]\n\n5. Finally, you can use the `to_sql` function from pandas to insert the data into Postgres. However, since you want to load the data into Postgres in chunks, you will need to use the `to_sql` function with the `chunked` parameter set to `True`. Unfortunately, this parameter is not explicitly mentioned in the excerpts.\n\nHowever, you can use the `chunked` parameter with the `to_sql` function by using the `chunksize` parameter when calling `read_csv`. Here's a hint on how to do this:\n\n```python\nfor chunk in pd.read_csv(csv_path, chunksize=chunksize):\n    # process the chunk\n    chunk.to_sql('table_name', con=engine, if_exists='append', chunksize=chunksize)\n```\n\nNote that you will need to replace `engine` with the connection object to your Postgres database.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How do you load a large CSV file into Postgres in chunks with pandas?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0308",
+     "score": 0.7794
+    },
+    {
+     "chunk_id": "S06-0688",
+     "score": 0.7712
+    },
+    {
+     "chunk_id": "S06-0307",
+     "score": 0.7636
+    },
+    {
+     "chunk_id": "S06-0036",
+     "score": 0.7572
+    },
+    {
+     "chunk_id": "S06-0811",
+     "score": 0.743
+    }
+   ],
+   "hit_at_5": false,
+   "seconds": 19.85,
+   "error": null
+  },
+  {
+   "id": "Q80",
+   "question": "What is Bruin and what problem does it solve?",
+   "answer": "To answer your question, let's break down what we know about Bruin from the excerpts.\n\nBruin is an end-to-end data platform that combines several key components into a single tool, including ingestion, transformations, orchestration, data quality checks, metadata, and lineage [S06-0554]. This means that Bruin aims to simplify the data engineering workflow by providing a unified platform for managing data pipelines.\n\nThe main problem that Bruin solves is the need for a single, integrated tool that can handle the complexity of data engineering, rather than using multiple separate tools [S06-0554]. By combining these components into one platform, Bruin aims to make it easier for data engineers to manage their data pipelines and reduce the complexity of their workflow.\n\nIn summary, Bruin is an end-to-end data platform that solves the problem of managing complex data pipelines by providing a unified platform for ingestion, transformations, orchestration, data quality checks, metadata, and lineage.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is Bruin and what problem does it solve?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0554",
+     "score": 0.7913
+    },
+    {
+     "chunk_id": "S06-0599",
+     "score": 0.7101
+    },
+    {
+     "chunk_id": "S06-0593",
+     "score": 0.7078
+    },
+    {
+     "chunk_id": "S06-0600",
+     "score": 0.688
+    },
+    {
+     "chunk_id": "S06-0558",
+     "score": 0.6815
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.27,
+   "error": null
+  },
+  {
+   "id": "Q81",
+   "question": "What is the difference between MCAR, MAR and MNAR missing data?",
+   "answer": "To explain the difference between MCAR, MAR, and MNAR missing data, let's break it down step by step.\n\nFirst, let's define each type of missing data:\n\n* MCAR (Missing Completely At Random) data is missing data that is not related to any other variables, with no underlying cause for its absence. [S02-0270]\n* MAR (Missing At Random) data is missing data related to other variables but not to any unknown or unmeasured variables. [S02-0361]\n* MNAR (Missing Not At Random) data is missing data in a way that depends on unobserved data. [S02-0361]\n\nNow, let's look at the examples provided in the excerpts to understand the differences:\n\n* MCAR data is not related to any other variables, as seen in the survey example where income level is missing due to respondents accidentally skipping the question. [S02-0270]\n* MAR data is related to other variables, but not to any unknown or unmeasured variables, as seen in the survey example where loneliness factors are missing due to age. [S02-0271]\n* MNAR data is missing in a way that depends on unobserved data, as seen in the survey example where credit card debt is missing due to respondents with high credit card debt being less likely to respond. [S02-0272]\n\nIn summary:\n\n* MCAR data is missing data with no underlying cause and is not related to other variables.\n* MAR data is missing data related to other variables, but not to any unknown or unmeasured variables.\n* MNAR data is missing data in a way that depends on unobserved data.\n\nI hope this explanation helps you understand the differences between MCAR, MAR, and MNAR missing data!",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between MCAR, MAR and MNAR missing data?",
+   "retrieved": [
+    {
+     "chunk_id": "S02-0270",
+     "score": 0.8178
+    },
+    {
+     "chunk_id": "S02-0272",
+     "score": 0.8089
+    },
+    {
+     "chunk_id": "S02-0361",
+     "score": 0.7868
+    },
+    {
+     "chunk_id": "S02-0271",
+     "score": 0.7528
+    },
+    {
+     "chunk_id": "S02-0362",
+     "score": 0.6997
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 15.52,
+   "error": null
+  },
+  {
+   "id": "Q82",
+   "question": "How should outliers in a dataset be handled?",
+   "answer": "To handle outliers in a dataset, you should first identify them using visualization techniques such as scatterplots, box plots, IQR (interquartile range), or histograms [S02-0269], or through statistical methods like calculating the mean, median, and standard deviation [S02-0269]. \n\nNext, consider the influence of outliers on your analysis. You can either delete them from the dataset or analyze them separately from the rest of the data [S02-0274]. \n\nAnother approach is to use imputation methods, where you replace the absent values with estimated values based on the remaining data or use predictive models to fill in the missing values [S02-0274]. \n\nIt's also essential to validate the results after handling missing data and outliers to ensure they are robust and accurate [S02-0268].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How should outliers in a dataset be handled?",
+   "retrieved": [
+    {
+     "chunk_id": "S02-0275",
+     "score": 0.8317
+    },
+    {
+     "chunk_id": "S02-0268",
+     "score": 0.8205
+    },
+    {
+     "chunk_id": "S02-0274",
+     "score": 0.8129
+    },
+    {
+     "chunk_id": "S02-0267",
+     "score": 0.808
+    },
+    {
+     "chunk_id": "S02-0269",
+     "score": 0.7923
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.32,
+   "error": null
+  },
+  {
+   "id": "Q83",
+   "question": "What does data standardization mean when preparing data for analysis?",
+   "answer": "According to [S02-0280], data standardization is the process of systematically transforming collected information into a consistent and manageable format. This means that data standardization involves transforming data into a common scale or range to help remove any unit differences or variations in magnitude.\n\nIn other words, data standardization is about making the data more uniform and comparable, so that it can be easily analyzed and interpreted. This process helps to remove inconsistencies and errors, and makes the data more suitable for analysis.\n\nTo illustrate this, let's consider the example of the marketing company that conducted a survey on customer satisfaction. They collected data from 1,000 respondents, but had to remove duplicate entries and fill in missing values before they could analyze the data. This is an example of data standardization, as they were transforming the data into a more consistent and manageable format.\n\nSo, to answer your question, data standardization means transforming data into a common scale or range to make it more uniform and comparable, so that it can be easily analyzed and interpreted.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What does data standardization mean when preparing data for analysis?",
+   "retrieved": [
+    {
+     "chunk_id": "S02-0280",
+     "score": 0.8401
+    },
+    {
+     "chunk_id": "S02-0285",
+     "score": 0.821
+    },
+    {
+     "chunk_id": "S02-0358",
+     "score": 0.7929
+    },
+    {
+     "chunk_id": "S02-0306",
+     "score": 0.7907
+    },
+    {
+     "chunk_id": "S02-0281",
+     "score": 0.782
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.83,
+   "error": null
+  },
+  {
+   "id": "Q84",
+   "question": "What is binning, or data discretization?",
+   "answer": "Binning, also known as data discretization, is a technique used to convert continuous data into discrete categories or intervals. This allows for easier analysis and processing of the data.\n\nTo bin data, you can follow these steps:\n\n1. Identify the range of values in the continuous data that you want to group into discrete categories.\n2. Decide on the number of intervals or bins that you want to create.\n3. Determine the boundaries of each bin by dividing the range of values into equal parts.\n4. Assign each value in the continuous data to one of the bins based on the boundaries you determined.\n\nFor example, if you want to bin age data into groups of 10 years, you would create bins like 0-10, 10-20, 20-30, and so on.\n\nThis process is also referred to as data discretization, as it involves converting continuous data into discrete categories.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is binning, or data discretization?",
+   "retrieved": [
+    {
+     "chunk_id": "S02-0265",
+     "score": 0.7813
+    },
+    {
+     "chunk_id": "S02-0336",
+     "score": 0.756
+    },
+    {
+     "chunk_id": "S02-0357",
+     "score": 0.7316
+    },
+    {
+     "chunk_id": "S04-0235",
+     "score": 0.727
+    },
+    {
+     "chunk_id": "S02-0298",
+     "score": 0.7041
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.68,
+   "error": null
+  },
+  {
+   "id": "Q85",
+   "question": "What is database normalization trying to achieve?",
+   "answer": "According to the excerpts, database normalization is trying to achieve several goals:\n\n* Reduce redundancy in data [S01-0171]\n* Improve data integrity [S05-0097]\n* Make the database design simpler and faster [S05-0097]\n* Eliminate redundant data [S02-0282]\n* Establish relationships between entities in a database [S02-0282]\n\nIn other words, normalization aims to eliminate data redundancy and improve data integrity, making the database design more efficient and easier to maintain.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is database normalization trying to achieve?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0097",
+     "score": 0.8694
+    },
+    {
+     "chunk_id": "S04-0102",
+     "score": 0.8271
+    },
+    {
+     "chunk_id": "S01-0183",
+     "score": 0.8176
+    },
+    {
+     "chunk_id": "S02-0282",
+     "score": 0.816
+    },
+    {
+     "chunk_id": "S01-0171",
+     "score": 0.8151
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.52,
+   "error": null
+  },
+  {
+   "id": "Q86",
+   "question": "What is change data capture and when is it used?",
+   "answer": "Change data capture (CDC) is a specialized incremental ingestion technique that captures changes from database transaction logs using CDC software. [S05-0036]\n\nIt is used in situations where you want to replicate data that is overwritten to another database, such as replicating data from an operational database to a data warehouse. [S05-0039]\n\nCDC is typically used for real-time or near real-time data replication, and it captures all types of changes (INSERT, UPDATE, DELETE) and often schema changes as well. [S05-0037]\n\nSome common scenarios where CDC is used include replicating changes into a data warehouse or data lake, replicating changes into Kafka (or other streaming tool) in a microservices architecture, upgrading a database to a higher version with minimal downtime, and migrating data from database X to database Y with minimal downtime. [S05-0039]",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is change data capture and when is it used?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0039",
+     "score": 0.8836
+    },
+    {
+     "chunk_id": "S05-0036",
+     "score": 0.8652
+    },
+    {
+     "chunk_id": "S05-0037",
+     "score": 0.8304
+    },
+    {
+     "chunk_id": "S05-0110",
+     "score": 0.7718
+    },
+    {
+     "chunk_id": "S05-0038",
+     "score": 0.7474
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.81,
+   "error": null
+  },
+  {
+   "id": "Q87",
+   "question": "What are the five Vs of big data?",
+   "answer": "The Five Vs of big data are: \n\n* Volume: the amount of data; also referred to as data at rest [S04-0214]\n* Velocity: the speed at which data comes in and goes out; data in motion [S04-0214]\n* Variety: the range of data types and sources that are used; data in its many forms [S04-0214]\n* Veracity: the uncertainty of the data; data in doubt [S04-0214]\n* Value: the actual value derived using the total cost of ownership (TCO) and return on investment (ROI) of the data [S04-0214]",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What are the five Vs of big data?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0214",
+     "score": 0.8762
+    },
+    {
+     "chunk_id": "S04-0213",
+     "score": 0.7524
+    },
+    {
+     "chunk_id": "S07-0007",
+     "score": 0.7454
+    },
+    {
+     "chunk_id": "S07-0008",
+     "score": 0.7419
+    },
+    {
+     "chunk_id": "S02-0324",
+     "score": 0.7249
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.91,
+   "error": null
+  },
+  {
+   "id": "Q88",
+   "question": "What does the CAP theorem say about distributed databases?",
+   "answer": "The CAP theorem states that a distributed database system cannot guarantee all three properties: consistency, availability, and partition tolerance at the same time. [S03-0088]\n\nIn other words, you have to choose between two of these properties. For example, a system can be consistent and available (CA), but not partition tolerant. Or, it can be consistent and partition tolerant (CP), but not available. Or, it can be available and partition tolerant (AP), but not consistent. [S03-0090]\n\nThis means that if you want to ensure that all nodes in a distributed database system see the same data at the same time, you may need to sacrifice availability or partition tolerance. On the other hand, if you want to ensure that the system can continue to operate even if some nodes go down or are added, you may need to sacrifice consistency. [S04-0182]\n\nTo illustrate this, consider a distributed database system that is designed to be highly available, but not partition tolerant. In this case, the system may become inconsistent if some nodes go down or are added, because the data on those nodes may not be up-to-date. [S05-0212]\n\nI hope this helps clarify the CAP theorem! Let me know if you have any further questions.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What does the CAP theorem say about distributed databases?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0182",
+     "score": 0.8559
+    },
+    {
+     "chunk_id": "S05-0212",
+     "score": 0.8376
+    },
+    {
+     "chunk_id": "S04-0276",
+     "score": 0.8291
+    },
+    {
+     "chunk_id": "S03-0088",
+     "score": 0.7987
+    },
+    {
+     "chunk_id": "S03-0090",
+     "score": 0.7922
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.13,
+   "error": null
+  },
+  {
+   "id": "Q89",
+   "question": "What does eventual consistency mean in NoSQL databases?",
+   "answer": "Eventual consistency in NoSQL databases means that the data and its replicas become consistent at some point in time after each transaction. [S04-0181]\n\nTo understand this concept better, let's break it down:\n\n1. **Eventual consistency** is a property of NoSQL databases that guarantees data consistency at some point in time, but not necessarily immediately after each transaction.\n2. It's a trade-off between consistency and availability. NoSQL databases prioritize availability over data consistency, which means they may return slightly outdated or inconsistent data to ensure that the system remains available and responsive.\n3. When a transaction is made, the data may not be immediately consistent across all replicas. However, eventually, the data will converge to a consistent state.\n\nThink of it like this: Imagine you're searching for a specific piece of information on Google. You want the most up-to-date results, but the search engine index might not be updated immediately. In this case, the search engine will return the best answer it can based on the available data, even if it's not 100% up-to-date. This is similar to how eventual consistency works in NoSQL databases.\n\nDoes this help clarify the concept of eventual consistency?",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What does eventual consistency mean in NoSQL databases?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0182",
+     "score": 0.8771
+    },
+    {
+     "chunk_id": "S04-0173",
+     "score": 0.8583
+    },
+    {
+     "chunk_id": "S04-0181",
+     "score": 0.8373
+    },
+    {
+     "chunk_id": "S03-0114",
+     "score": 0.8003
+    },
+    {
+     "chunk_id": "S01-0017",
+     "score": 0.7859
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.55,
+   "error": null
+  },
+  {
+   "id": "Q90",
+   "question": "What are the main types of NoSQL databases?",
+   "answer": "According to the course materials, NoSQL databases are generally categorized into several types, including:\n\n* Document-based NoSQL databases, which store data in flexible formats such as documents [S05-0177].\n* Key-value pair NoSQL databases, which store data as key-value pairs [S05-0177].\n* Graph NoSQL databases, which store data in graph formats [S05-0177].\n* Wide-column NoSQL databases, which store data in columns instead of rows [S05-0206].\n\nThese types of NoSQL databases are designed to provide scalability and schema-less design for diverse data types, making them suitable for handling unstructured data [S04-0161].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What are the main types of NoSQL databases?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0172",
+     "score": 0.8128
+    },
+    {
+     "chunk_id": "S05-0177",
+     "score": 0.7875
+    },
+    {
+     "chunk_id": "S04-0161",
+     "score": 0.771
+    },
+    {
+     "chunk_id": "S05-0206",
+     "score": 0.7678
+    },
+    {
+     "chunk_id": "S04-0188",
+     "score": 0.7572
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.08,
+   "error": null
+  },
+  {
+   "id": "Q91",
+   "question": "How do shared-memory, shared-disk and shared-nothing database architectures differ?",
+   "answer": "To answer your question, let's break down the differences between shared-memory, shared-disk, and shared-nothing database architectures based on the provided excerpts.\n\n**Shared-Memory Architecture:**\nIn a shared-memory architecture, each processor has its central storage, but shares secondary storage with other processors using a Network Attached Storage (NAS) or Storage Area Network (SAN) [S04-0144]. This means that all processors in the system share the same secondary storage, but each processor has its own central storage.\n\n**Shared-Disk Architecture:**\nIn a shared-disk architecture, each processor has its central storage, but shares secondary storage with other processors using a NAS or SAN [S04-0144]. However, the excerpt does not explicitly state how secondary storage is shared. We can infer that it's shared, but the exact mechanism is not described.\n\n**Shared-Nothing Architecture:**\nIn a shared-nothing architecture, each processor has its central storage and hard disk units, and data sharing occurs through the processors communicating with one another over the network [S04-0145]. This means that each processor is independent and does not share storage with other processors.\n\nIn summary, the main difference between shared-memory and shared-disk architectures is the way secondary storage is shared. In shared-memory, it's shared, but the exact mechanism is not described. In shared-nothing, each processor has its own storage and communicates with others over the network.\n\nTo further clarify, you can think of it this way:\n\n* Shared-memory: All processors share secondary storage, but each has its own central storage.\n* Shared-disk: Each processor has its own central storage, but shares secondary storage with others.\n* Shared-nothing: Each processor has its own central storage and hard disk units, and communicates with others over the network to share data.\n\nI hope this helps you understand the differences between these architectures!",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How do shared-memory, shared-disk and shared-nothing database architectures differ?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0144",
+     "score": 0.8518
+    },
+    {
+     "chunk_id": "S04-0145",
+     "score": 0.784
+    },
+    {
+     "chunk_id": "S04-0143",
+     "score": 0.7793
+    },
+    {
+     "chunk_id": "S01-0069",
+     "score": 0.7519
+    },
+    {
+     "chunk_id": "S04-0325",
+     "score": 0.7387
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 15.44,
+   "error": null
+  },
+  {
+   "id": "Q92",
+   "question": "What is a key-value store, and what are some examples?",
+   "answer": "A key-value store is a type of database that stores data as a table where you have a unique key for each data value [S05-0190]. \n\nExamples of key-value stores include Redis, Riak, Apache Cassandra (partially), and Scalaris [S03-0109]. \n\nThese stores are often used for caching data because they are very fast and don't require complex querying [S05-0193].",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is a key-value store, and what are some examples?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0174",
+     "score": 0.8492
+    },
+    {
+     "chunk_id": "S05-0190",
+     "score": 0.8079
+    },
+    {
+     "chunk_id": "S03-0109",
+     "score": 0.7779
+    },
+    {
+     "chunk_id": "S05-0193",
+     "score": 0.7659
+    },
+    {
+     "chunk_id": "S03-0110",
+     "score": 0.7612
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 7.67,
+   "error": null
+  },
+  {
+   "id": "Q93",
+   "question": "How does the dbt intermediate trips model remove duplicate trips?",
+   "answer": "To remove duplicate trips, the dbt intermediate trips model uses a combination of the `qualify` function and a window function called `row_number()`. \n\nHere's how it works:\n\n1. The `qualify` function is used to select only the rows that have a unique combination of `vendor_id`, `pickup_datetime`, `pickup_location_id`, and `service_type`. This is done by applying the `row_number()` function to these columns.\n\n2. The `row_number()` function assigns a unique number to each row within each partition of the result set. In this case, the partition is defined by the columns `vendor_id`, `pickup_datetime`, `pickup_location_id`, and `service_type`.\n\n3. The `order by` clause in the `row_number()` function specifies that the rows should be ordered by `dropoff_datetime`. This ensures that the first occurrence of each trip is kept.\n\n4. By selecting only the rows with `row_number()` equal to 1, the model removes all duplicate trips, keeping only the first occurrence of each trip.\n\nHere's a simplified pseudo-code representation of this process:\n\n```sql\n-- Deduplicate trips\nqualify row_number() over(\n    partition by vendor_id, pickup_datetime, pickup_location_id, service_type\n    order by dropoff_datetime\n) = 1\n```\n\nThis process is applied to the intermediate trips model, which is a union of the yellow and green trip data.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "How does the dbt intermediate trips model remove duplicate trips?",
+   "retrieved": [
+    {
+     "chunk_id": "S06-0399",
+     "score": 0.7937
+    },
+    {
+     "chunk_id": "S06-0378",
+     "score": 0.7677
+    },
+    {
+     "chunk_id": "S06-0519",
+     "score": 0.7677
+    },
+    {
+     "chunk_id": "S06-0548",
+     "score": 0.7668
+    },
+    {
+     "chunk_id": "S06-0543",
+     "score": 0.7595
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 13.61,
+   "error": null
+  },
+  {
+   "id": "Q94",
+   "question": "What is data governance?",
+   "answer": "To answer your question about what data governance is, let's break it down from the excerpts provided.\n\nData governance is a philosophy of data management that focuses on establishing responsibility for data throughout its entire lifecycle [S05-0258]. It's not a \"set it and forget it\" system, but rather a framework that involves rules, processes, procedures, and enforcement strategies to ensure data quality [S05-0258].\n\nIn simpler terms, data governance is about making data an asset rather than a liability, and it's centered around policymakers, data consumers, and subject matter experts [S05-0269]. These experts own data resources and must be mapped and consolidated under a data catalog with associated metadata [S05-0269].\n\nThe term \"data governance\" is also used to describe the set of policies and procedures that ensure data quality throughout its lifecycle [S05-0065]. This includes managing data as an asset rather than a liability, which is a key aspect of data governance [S04-0221].\n\nIn summary, data governance is about establishing a framework for managing data quality, involving policies, procedures, and standards to ensure data is properly accounted for and used as an asset.\n\nWould you like me to elaborate on any of these points or provide further clarification?",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is data governance?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0258",
+     "score": 0.9302
+    },
+    {
+     "chunk_id": "S05-0269",
+     "score": 0.9146
+    },
+    {
+     "chunk_id": "S05-0065",
+     "score": 0.892
+    },
+    {
+     "chunk_id": "S04-0221",
+     "score": 0.881
+    },
+    {
+     "chunk_id": "S05-0067",
+     "score": 0.8515
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.17,
+   "error": null
+  },
+  {
+   "id": "Q95",
+   "question": "What is a data contract between data producers and consumers?",
+   "answer": "A **Data Contract** is a formal agreement between data producers and data consumers that defines the structure, schema, semantics, quality rules, and Service Level Agreements (SLAs) for data exchanged between systems. [S05-0060]\n\nThis agreement establishes explicit interfaces to prevent unexpected breaking changes in downstream analytical and operational pipelines, similar to API contracts in software engineering. [S05-0060]\n\nThe main purpose of a data contract is to prevent breaking changes, establish clear ownership, shift-left quality, and serve as self-documenting architecture. [S05-0062]\n\nA data contract typically includes key components such as schema and types, semantics and metadata, data quality and expectations, service level agreements, and security and governance. [S05-0061]\n\nBy following these components, data producers and consumers can ensure a standardized and reliable data exchange, which is essential for modern data architectures.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is a data contract between data producers and consumers?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0060",
+     "score": 0.8774
+    },
+    {
+     "chunk_id": "S05-0062",
+     "score": 0.7511
+    },
+    {
+     "chunk_id": "S05-0069",
+     "score": 0.7475
+    },
+    {
+     "chunk_id": "S05-0061",
+     "score": 0.7184
+    },
+    {
+     "chunk_id": "S05-0064",
+     "score": 0.7165
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 10.0,
+   "error": null
+  },
+  {
+   "id": "Q96",
+   "question": "What is the difference between discrete and continuous data?",
+   "answer": "To answer your question, let's break down the differences between discrete and continuous data based on the excerpts provided.\n\nDiscrete data can take on any value over a range, but the values are limited to a specific set of numbers. For example, the number of students in a class can be 100, 150, or 200, but not 101, 151, or 201. This is because the class size is restricted to a finite set of numbers: 1, 2, 3, …, 198, 199, 200 [S02-0054].\n\nOn the other hand, continuous data can take on any value over a range, and the values are not limited to a specific set of numbers. For example, the temperature during the past three days can be 90°F, 85°F, or any other real number, because the set of real numbers is infinite [S02-0059].\n\nIn summary, the key difference between discrete and continuous data is that discrete data has a finite set of possible values, while continuous data has an infinite set of possible values.\n\nTo illustrate this further, consider the following steps:\n\n1. Identify the type of data: Is the data limited to a specific set of numbers, or can it take on any value over a range?\n2. Check for constraints: Are there any constraints or limitations on the data, such as a specific range or set of values?\n3. Determine the type: If the data is limited to a specific set of numbers, it is likely discrete. If the data can take on any value over a range, it is likely continuous.\n\nBy following these steps, you can determine whether a dataset is discrete or continuous.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between discrete and continuous data?",
+   "retrieved": [
+    {
+     "chunk_id": "S07-0003",
+     "score": 0.8547
+    },
+    {
+     "chunk_id": "S02-0055",
+     "score": 0.7677
+    },
+    {
+     "chunk_id": "S02-0054",
+     "score": 0.7459
+    },
+    {
+     "chunk_id": "S02-0059",
+     "score": 0.721
+    },
+    {
+     "chunk_id": "S04-0025",
+     "score": 0.7043
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 16.27,
+   "error": null
+  },
+  {
+   "id": "Q97",
+   "question": "What is the difference between structured and unstructured data?",
+   "answer": "To answer your question, let's break down the differences between structured and unstructured data based on the course materials.\n\nStructured data is organized in a tabular format with clearly defined fields and relationships [S04-0054]. It is typically stored in a traditional relational database. On the other hand, unstructured data lacks a fixed schema and is often in the form of text, images, videos, audio recordings, or other content that doesn't fit neatly into rows and columns [S02-0062].\n\nTo illustrate the difference, consider the following examples:\n\n* A dataset with a list of keywords that were searched on a web search engine in the past week is an unstructured dataset because each entry can be a freeform text [S02-0065].\n* However, if the same dataset is processed to summarize each search record as up to three words, along with the timestamp, it becomes a structured dataset because every entry follows the same structure with two attributes: a short keyword and the timestamp [S02-0065].\n\nIn summary, the key differences between structured and unstructured data are:\n\n* Organization: Structured data is organized in a tabular format, while unstructured data lacks a fixed schema.\n* Format: Structured data typically consists of rows and columns, while unstructured data consists of text, images, videos, audio recordings, or other content that doesn't fit into rows and columns.\n\nI hope this explanation helps clarify the difference between structured and unstructured data!",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is the difference between structured and unstructured data?",
+   "retrieved": [
+    {
+     "chunk_id": "S02-0062",
+     "score": 0.8957
+    },
+    {
+     "chunk_id": "S04-0054",
+     "score": 0.8317
+    },
+    {
+     "chunk_id": "S07-0006",
+     "score": 0.8278
+    },
+    {
+     "chunk_id": "S02-0065",
+     "score": 0.8043
+    },
+    {
+     "chunk_id": "S04-0171",
+     "score": 0.799
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 14.29,
+   "error": null
+  },
+  {
+   "id": "Q98",
+   "question": "What are the bronze, silver and gold layers of a medallion architecture?",
+   "answer": "The bronze, silver, and gold layers of a medallion architecture are:\n\n1. **Bronze Layer**: [S05-0029] - The bronze stage serves as the initial point for data ingestion and storage. Data is saved without processing or transformation.\n2. **Silver Layer**: [S05-0030] - The silver layer is where tables are cleaned, filtered, or transformed into a more usable format. This stage involves light modifications, not aggregations or enrichments.\n3. **Gold Layer**: Not explicitly defined in the provided excerpts, but implied as the final stage for analytics.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What are the bronze, silver and gold layers of a medallion architecture?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0028",
+     "score": 0.8013
+    },
+    {
+     "chunk_id": "S05-0030",
+     "score": 0.7871
+    },
+    {
+     "chunk_id": "S05-0029",
+     "score": 0.7336
+    },
+    {
+     "chunk_id": "S05-0032",
+     "score": 0.7006
+    },
+    {
+     "chunk_id": "S05-0034",
+     "score": 0.6855
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 9.36,
+   "error": null
+  },
+  {
+   "id": "Q99",
+   "question": "What is data ingestion, and how does batch ingestion differ from streaming ingestion?",
+   "answer": "Data ingestion is the process of extracting and importing data from various sources into a destination system where it can be stored, transformed, and analyzed. [S05-0040]\n\nBatch ingestion and streaming ingestion are two main approaches to data ingestion. Batch ingestion involves processing data in scheduled intervals, whereas streaming ingestion involves processing data continuously as it arrives. [S05-0044]\n\nBatch ingestion is characterized by higher latency (minutes to hours), is more efficient for large volumes, is easier to implement and debug, and has lower infrastructure costs. [S05-0044]\n\nStreaming ingestion, on the other hand, is characterized by near real-time processing (typically 5-15 minutes), balances latency and efficiency, is easier than true streaming, and is good for most use cases. [S05-0046]\n\nTo illustrate the difference between batch and streaming ingestion, consider the following flowcharts:\n\nBatch Ingestion:\n```mermaid\n%%{init: { \"flowchart\": { \"useMaxWidth\": true } } }%%\ngraph LR\n    A[Source System]\n    B[\"Scheduler (Airflow/Cron)\"]\n    C[Batch Extraction Script]\n    D[(Staging Area)]\n    E[(Data Warehouse/Data Lake)]\n\n    B -->|Trigger at interval| C\n    C -->|Extract data| A\n    A -->|Data files| C\n    C -->|Write batch| D\n    D -->|Load batch| E\n```\n\nStreaming Ingestion:\n```mermaid\n%%{init: { \"flowchart\": { \"useMaxWidth\": true } } }%%\ngraph LR\n    A[Source System]\n    B[\"Scheduler (Airflow/Cron)\"]\n    C[Micro-batch Extraction Script]\n    D[(Staging Area)]\n    E[(Data Warehouse/Data Lake)]\n\n    B -->|Trigger every few minutes| C\n    C -->|Extract recent data| A\n    A -->|New/changed data| C\n    C -->|Write micro-batch| D\n    D -->|Load micro-batch| E\n```\n\nNote that batch ingestion involves processing data in batches at scheduled intervals, whereas streaming ingestion involves processing data continuously as it arrives.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is data ingestion, and how does batch ingestion differ from streaming ingestion?",
+   "retrieved": [
+    {
+     "chunk_id": "S05-0040",
+     "score": 0.8648
+    },
+    {
+     "chunk_id": "S05-0044",
+     "score": 0.8519
+    },
+    {
+     "chunk_id": "S05-0046",
+     "score": 0.84
+    },
+    {
+     "chunk_id": "S05-0045",
+     "score": 0.8193
+    },
+    {
+     "chunk_id": "S05-0050",
+     "score": 0.797
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 18.32,
+   "error": null
+  },
+  {
+   "id": "Q100",
+   "question": "What is data integration and why do organisations need it?",
+   "answer": "Data integration is the process of combining data from multiple sources into a unified view or access, allowing organizations to provide a consistent view of all their organization data. [S04-0216]\n\nOrganizations need data integration to overcome the challenges of traditional siloed data and systems, where different departments have independent data and systems that do not share resources. [S04-0216]\n\nData integration enables organizations to answer queries and check updates more efficiently, and to provide a unified view of their data, which is essential for business intelligence and analytics. [S04-0216]\n\nIn addition, data integration allows organizations to integrate their processes, which can improve performance and efficiency. [S04-0218]\n\nThe main goal of data integration is to provide a unified view of all organization data, making it possible to combine and analyze data from multiple sources. [S02-0342]\n\nBy integrating data, organizations can reduce costs and improve patient outcomes, as mentioned in the context of hospitals. [S02-0342]\n\nData integration is a crucial aspect of data management, as it enables organizations to make better decisions based on accurate and consistent data.",
+   "fallback": false,
+   "stopped_by": "finished",
+   "search_query": "What is data integration and why do organizations need it?",
+   "retrieved": [
+    {
+     "chunk_id": "S04-0212",
+     "score": 0.8275
+    },
+    {
+     "chunk_id": "S04-0216",
+     "score": 0.8065
+    },
+    {
+     "chunk_id": "S04-0217",
+     "score": 0.7983
+    },
+    {
+     "chunk_id": "S02-0342",
+     "score": 0.7967
+    },
+    {
+     "chunk_id": "S04-0218",
+     "score": 0.7905
+    }
+   ],
+   "hit_at_5": true,
+   "seconds": 11.7,
+   "error": null
+  }
+ ]
+}
