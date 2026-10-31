@@ -1,0 +1,3450 @@
+{
+ "meta": {
+  "purpose": "Answer key for the 100 evaluation questions (proposal Table 3.14: question type and expected answer points), used to score Accuracy and Completeness (Tables 3.8 and 3.15).",
+  "questions_file": "evaluation/test_questions.json (frozen, not modified)",
+  "chunks_file": "data/chunks/chunks.json",
+  "method": "Drafted by Claude Code from the text of each question's relevant_chunk_ids only (no outside knowledge); each expected answer point cites the chunk that supports it. Drafted in batches of 20 and checked against the chunk text in a separate review pass; both the drafting and the review pass were done by an LLM. The author then checked all needs_review questions and accepted them as written (2026-10-31).",
+  "point_rules": "3-5 points per question; each point states one fact in the wording of the cited chunk (a contrast on one dimension may stay as one point); core = true if a correct answer must contain the point to fully answer the question as asked, false for useful background or details the question did not ask for (aim: 2-4 core). List rule: if the question asks for the complete set of something (the steps, the dimensions, the types, the libraries), one point per item and up to 6 core points; if it asks for 'some' examples or the list is only supporting detail, the items stay grouped in one point. A single core point is allowed only when the chunks contain just a one-sentence answer, and the question is then needs_review. outside_relevant_set = true marks a point citing a chunk that is not in the question's relevant_chunk_ids (a gap in the keyword-based relevance labelling); test_questions.json is not changed.",
+  "question_types": {
+   "definitional": "asks what something is or means",
+   "conceptual": "asks why, how something works, or how two things differ",
+   "procedural": "asks for steps, a process or how to do something"
+  },
+  "status": "FINAL - 100 of 100 questions; needs_review questions checked by the author on 2026-10-31"
+ },
+ "answers": [
+  {
+   "id": "Q01",
+   "question": "What is the difference between OLTP and OLAP databases?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "OLTP is used to control and run essential business operations in real time.",
+     "chunk_id": "S06-0206",
+     "core": true
+    },
+    {
+     "point": "OLAP is used to plan, solve problems, support decisions and discover hidden insights.",
+     "chunk_id": "S06-0206",
+     "core": true
+    },
+    {
+     "point": "In OLTP, data updates are short, fast and initiated by the user; in OLAP, data is periodically refreshed with scheduled, long-running batch jobs.",
+     "chunk_id": "S06-0206",
+     "core": true
+    },
+    {
+     "point": "OLTP databases are normalized for efficiency; OLAP databases are denormalized for analysis.",
+     "chunk_id": "S06-0205",
+     "core": true
+    },
+    {
+     "point": "OLTP users are customer-facing personnel, clerks and online shoppers; OLAP users are knowledge workers such as data analysts, business analysts and executives.",
+     "chunk_id": "S06-0205",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q02",
+   "question": "How is a data lake different from a data warehouse?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "A data warehouse holds relational data; a data lake holds nonrelational and relational data.",
+     "chunk_id": "S04-0204",
+     "core": true
+    },
+    {
+     "point": "In a data warehouse the schema is designed before the implementation; in a data lake it is written at the time of analysis.",
+     "chunk_id": "S04-0204",
+     "core": true
+    },
+    {
+     "point": "In a data lake, data can be stored as-is, with no need to convert it to a predefined schema.",
+     "chunk_id": "S04-0203",
+     "core": true
+    },
+    {
+     "point": "A data lake stores massive amounts of raw data in its native format.",
+     "chunk_id": "S05-0005",
+     "core": false
+    },
+    {
+     "point": "Data warehouse storage is expensive; data lake storage is low cost.",
+     "chunk_id": "S04-0204",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "S04-0204 is a garbled table extract (shows 'Schema-on-write' for both columns); the schema point relies on its 'designed before the implementation / written at the time of analysis' row."
+  },
+  {
+   "id": "Q03",
+   "question": "What are fact tables and dimension tables?",
+   "topic": "Data Warehousing",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "Fact tables hold measurements, metrics and business events, e.g. 'a sale happened'.",
+     "chunk_id": "S06-0324",
+     "core": true
+    },
+    {
+     "point": "Facts are usually made up of numerical values that can be aggregated.",
+     "chunk_id": "S05-0094",
+     "core": false
+    },
+    {
+     "point": "Dimension tables hold the context around the facts: who bought it, what product, when.",
+     "chunk_id": "S06-0324",
+     "core": true
+    },
+    {
+     "point": "In a star schema, the fact table contains keys referring to each dimension table.",
+     "chunk_id": "S04-0192",
+     "core": false
+    },
+    {
+     "point": "The dimensional model denormalizes data (increases data redundancy) in order to speed up queries.",
+     "chunk_id": "S05-0094",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q04",
+   "question": "Why is BigQuery called serverless, and why does that matter?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "BigQuery is serverless: there are no servers to manage and no database software to install.",
+     "chunk_id": "S06-0209",
+     "core": true
+    },
+    {
+     "point": "BigQuery provides the software as well as the infrastructure.",
+     "chunk_id": "S06-0209",
+     "core": true
+    },
+    {
+     "point": "This matters because a huge chunk of time normally goes into creating and maintaining a data warehouse.",
+     "chunk_id": "S06-0209",
+     "core": true
+    },
+    {
+     "point": "BigQuery is built with scalability and high availability in mind.",
+     "chunk_id": "S06-0209",
+     "core": false
+    },
+    {
+     "point": "You can start with a couple of gigabytes of data and scale to petabytes.",
+     "chunk_id": "S06-0209",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q05",
+   "question": "What is dbt used for in a data warehouse?",
+   "topic": "Data Warehousing",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "dbt is a transformation workflow tool that sits on top of the data warehouse.",
+     "chunk_id": "S06-0328",
+     "core": true
+    },
+    {
+     "point": "It turns raw data into something useful for downstream consumers such as analysts, BI tools and ML pipelines.",
+     "chunk_id": "S06-0328",
+     "core": true
+    },
+    {
+     "point": "Transformations are defined by writing SQL (or Python).",
+     "chunk_id": "S06-0328",
+     "core": false
+    },
+    {
+     "point": "dbt compiles the transformations and runs them against the warehouse.",
+     "chunk_id": "S06-0328",
+     "core": false
+    },
+    {
+     "point": "dbt manages dependencies and persists the results as tables or views.",
+     "chunk_id": "S06-0328",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q06",
+   "question": "How is the fct_trips dbt model configured to load data incrementally?",
+   "topic": "Data Warehousing",
+   "question_type": "procedural",
+   "type_note": "Asks how the model is set up to load incrementally; the answer is the list of config settings to use, so procedural is the closest fit (it could also be read as conceptual).",
+   "expected_answer_points": [
+    {
+     "point": "materialized='incremental'",
+     "chunk_id": "S06-0547",
+     "core": true
+    },
+    {
+     "point": "unique_key='trip_id'",
+     "chunk_id": "S06-0547",
+     "core": true
+    },
+    {
+     "point": "incremental_strategy='merge'",
+     "chunk_id": "S06-0547",
+     "core": true
+    },
+    {
+     "point": "on_schema_change='append_new_columns'",
+     "chunk_id": "S06-0547",
+     "core": true
+    },
+    {
+     "point": "A code comment says the model is materialized incrementally to handle large datasets efficiently.",
+     "chunk_id": "S06-0547",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Known literal-identifier question: the answer is the dbt config values in one code chunk."
+  },
+  {
+   "id": "Q07",
+   "question": "Why was Apache Spark created when MapReduce already existed?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Spark reads and stores data in main memory instead of on hard disks, and main memory is much faster than hard drives.",
+     "chunk_id": "S03-0040",
+     "core": true
+    },
+    {
+     "point": "Spark runs iterative algorithms much faster, which is especially important for many machine learning algorithms.",
+     "chunk_id": "S03-0040",
+     "core": true
+    },
+    {
+     "point": "Spark was originally developed to improve MapReduce on performance.",
+     "chunk_id": "S03-0026",
+     "core": true
+    },
+    {
+     "point": "MapReduce processes data in batches, so it is not suitable for processing real-time data.",
+     "chunk_id": "S04-0248",
+     "core": false
+    },
+    {
+     "point": "The original papers claim Spark is up to 100x faster than MapReduce when data fits into RAM, or up to 10x faster when data is on disks.",
+     "chunk_id": "S03-0041",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q08",
+   "question": "When should I use batch processing instead of stream processing?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "In batch processing, a chunk of data (e.g. the entire dataset for one day) is accumulated and processed in one go by a single job.",
+     "chunk_id": "S06-0649",
+     "core": true
+    },
+    {
+     "point": "Batch is enough when you don't need to react fast: many metrics can wait an hour, a day or even a week.",
+     "chunk_id": "S06-0656",
+     "core": true
+    },
+    {
+     "point": "Stream processing is used instead of batch when the timeliness of the data is critical and the data is needed in real time.",
+     "chunk_id": "S05-0160",
+     "core": true
+    },
+    {
+     "point": "Batch processing is usually less complex than stream processing and doesn't require special hardware.",
+     "chunk_id": "S05-0120",
+     "core": false
+    },
+    {
+     "point": "The main disadvantage of batch is delay, because jobs run at regular intervals.",
+     "chunk_id": "S06-0655",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q09",
+   "question": "Which libraries are built on top of Apache Spark?",
+   "topic": "Data Processing",
+   "question_type": "definitional",
+   "type_note": "A factual list question; 'definitional' is the closest of the three types.",
+   "expected_answer_points": [
+    {
+     "point": "Spark SQL and DataFrames: a parallel SQL database tailored for analytics (not realtime) workloads.",
+     "chunk_id": "S03-0062",
+     "core": true
+    },
+    {
+     "point": "MLlib: a parallel machine learning library.",
+     "chunk_id": "S03-0062",
+     "core": true
+    },
+    {
+     "point": "GraphFrames: a library for parallel graph processing.",
+     "chunk_id": "S03-0062",
+     "core": true
+    },
+    {
+     "point": "Structured Streaming: stream data processing.",
+     "chunk_id": "S03-0062",
+     "core": true
+    },
+    {
+     "point": "GraphX: a graph processing system, listed among the Spark extensions.",
+     "chunk_id": "S03-0061",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q10",
+   "question": "What does Flink handle for you that a plain Kafka consumer does not?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Windowing: Flink has built-in tumbling, sliding and session windows.",
+     "chunk_id": "S06-0919",
+     "core": true
+    },
+    {
+     "point": "Checkpointing: Flink does automatic state recovery after failures, with no manual offset tracking.",
+     "chunk_id": "S06-0919",
+     "core": true
+    },
+    {
+     "point": "Parallelism: Flink distributes processing across multiple workers.",
+     "chunk_id": "S06-0919",
+     "core": true
+    },
+    {
+     "point": "Connectors: Flink has built-in JDBC, Kafka and filesystem sinks.",
+     "chunk_id": "S06-0919",
+     "core": false
+    },
+    {
+     "point": "With a plain consumer you would have to handle watermarking and late data yourself.",
+     "chunk_id": "S06-0969",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q11",
+   "question": "How do you turn on checkpointing in a PyFlink job?",
+   "topic": "Data Processing",
+   "question_type": "procedural",
+   "expected_answer_points": [
+    {
+     "point": "Get the execution environment with StreamExecutionEnvironment.get_execution_environment().",
+     "chunk_id": "S06-0933",
+     "core": true
+    },
+    {
+     "point": "Call env.enable_checkpointing(10 * 1000) to checkpoint every 10 seconds.",
+     "chunk_id": "S06-0933",
+     "core": true
+    },
+    {
+     "point": "A checkpoint captures the Kafka offsets (how far Flink has read) and any in-flight data.",
+     "chunk_id": "S06-0935",
+     "core": false
+    },
+    {
+     "point": "If the job crashes, it resumes from the last checkpoint instead of starting from the beginning.",
+     "chunk_id": "S06-0935",
+     "core": false
+    },
+    {
+     "point": "With windows, Flink also serializes the open windows to disk, so a partially-filled window is intact after a restart.",
+     "chunk_id": "S06-0935",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Known literal-identifier question: the key step is the enable_checkpointing call in code."
+  },
+  {
+   "id": "Q12",
+   "question": "What is a foreign key and how does it relate to a primary key?",
+   "topic": "SQL",
+   "question_type": "definitional",
+   "type_note": "Second half (how it relates to a primary key) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "The primary key is a key chosen by the database designer as the identifying mechanism for the whole entity set.",
+     "chunk_id": "S01-0098",
+     "core": true
+    },
+    {
+     "point": "A foreign key is an attribute in a table that references the primary key in another table.",
+     "chunk_id": "S01-0098",
+     "core": true
+    },
+    {
+     "point": "Foreign and primary keys must be of the same data type.",
+     "chunk_id": "S01-0098",
+     "core": false
+    },
+    {
+     "point": "A foreign key can be null.",
+     "chunk_id": "S01-0098",
+     "core": false
+    },
+    {
+     "point": "Referential integrity requires that a foreign key must have a matching primary key or be null.",
+     "chunk_id": "S01-0120",
+     "core": true
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q13",
+   "question": "What do the ACID properties of a database transaction mean?",
+   "topic": "SQL",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "ACID stands for atomicity, consistency, isolation and durability.",
+     "chunk_id": "S03-0087",
+     "core": false
+    },
+    {
+     "point": "Atomicity: modifications follow an 'all or nothing' rule; if one part of the transaction fails, the entire transaction fails and the database state is left unchanged.",
+     "chunk_id": "S03-0087",
+     "core": true
+    },
+    {
+     "point": "Consistency: any transaction takes the database from one consistent state to another.",
+     "chunk_id": "S03-0087",
+     "core": true
+    },
+    {
+     "point": "Isolation: no transaction should be able to interfere with another transaction.",
+     "chunk_id": "S03-0087",
+     "core": true
+    },
+    {
+     "point": "Durability: once a transaction has been committed, it will remain so.",
+     "chunk_id": "S03-0087",
+     "core": true
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q14",
+   "question": "What is a common table expression (CTE) in SQL?",
+   "topic": "SQL",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "A CTE (Common Table Expression) is like a query within a query.",
+     "chunk_id": "S06-0481",
+     "core": true
+    },
+    {
+     "point": "A CTE is created with the WITH statement, which creates temporary tables to store results.",
+     "chunk_id": "S06-0481",
+     "core": true
+    },
+    {
+     "point": "These temporary tables exist only for the duration of the main query.",
+     "chunk_id": "S06-0481",
+     "core": false
+    },
+    {
+     "point": "CTEs make complex queries more readable and maintainable.",
+     "chunk_id": "S06-0481",
+     "core": false
+    },
+    {
+     "point": "Unlike a subquery, a CTE can be used multiple times in the body of a query.",
+     "chunk_id": "S05-0287",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "S06-0481 contradicts itself: CTE tables 'exist only for the duration of the main query' but a CTE is 'reusable during the entire session'; point 3 uses the query-scoped statement."
+  },
+  {
+   "id": "Q15",
+   "question": "In what order does SQL execute the clauses of a query?",
+   "topic": "SQL",
+   "question_type": "procedural",
+   "type_note": "Asks for an order of operations; could also be read as conceptual (how SQL works).",
+   "expected_answer_points": [
+    {
+     "point": "FROM, including JOINs, is executed first.",
+     "chunk_id": "S05-0280",
+     "core": true
+    },
+    {
+     "point": "Then WHERE, then GROUP BY, then HAVING.",
+     "chunk_id": "S05-0280",
+     "core": true
+    },
+    {
+     "point": "WINDOW functions come after HAVING and before SELECT.",
+     "chunk_id": "S05-0280",
+     "core": false
+    },
+    {
+     "point": "Then SELECT, then DISTINCT, then UNION.",
+     "chunk_id": "S05-0280",
+     "core": true
+    },
+    {
+     "point": "ORDER BY comes next, and LIMIT and OFFSET are last.",
+     "chunk_id": "S05-0280",
+     "core": true
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q16",
+   "question": "When is a table in Boyce-Codd normal form?",
+   "topic": "SQL",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "A relation is in BCNF if, and only if, every determinant is a candidate key.",
+     "chunk_id": "S01-0179",
+     "core": true
+    },
+    {
+     "point": "Boyce-Codd normal form is a special case of 3NF.",
+     "chunk_id": "S01-0179",
+     "core": true
+    },
+    {
+     "point": "When a table has more than one candidate key, anomalies may result even though the relation is in 3NF.",
+     "chunk_id": "S01-0179",
+     "core": false
+    },
+    {
+     "point": "In the book's example, the table is split into one table for the first three functional dependencies (Client_Interview2) and another table for the fourth (StaffRoom).",
+     "chunk_id": "S01-0182",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "S02-0355 defines BCNF more loosely ('all attributes depend on the primary key and nothing else') than S01 ('every determinant is a candidate key'); the key uses the S01 definition."
+  },
+  {
+   "id": "Q17",
+   "question": "What is a data pipeline?",
+   "topic": "Data Pipelines",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "A data pipeline is a workflow of one or more tasks that ingest, move and transform raw data from one or more sources to a destination.",
+     "chunk_id": "S05-0103",
+     "core": true
+    },
+    {
+     "point": "The data at the destination is usually used for analysis, machine learning or other business functions.",
+     "chunk_id": "S05-0103",
+     "core": true
+    },
+    {
+     "point": "Data pipelines fall into 2 categories: batch processing (most common) and real-time processing pipelines.",
+     "chunk_id": "S05-0103",
+     "core": false
+    },
+    {
+     "point": "A data pipeline's architecture has 4 main parts: a data source, business logic, a destination and a scheduler (for batch).",
+     "chunk_id": "S05-0104",
+     "core": false
+    },
+    {
+     "point": "Example: reading a CSV file, transforming the data and storing it as a table in a PostgreSQL database.",
+     "chunk_id": "S06-0009",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q18",
+   "question": "What are the advantages of using Docker in data engineering?",
+   "topic": "Data Pipelines",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Reproducibility: the same environment everywhere.",
+     "chunk_id": "S06-0002",
+     "core": true
+    },
+    {
+     "point": "Isolation: applications run independently.",
+     "chunk_id": "S06-0002",
+     "core": true
+    },
+    {
+     "point": "Portability: it runs anywhere Docker is installed.",
+     "chunk_id": "S06-0002",
+     "core": true
+    },
+    {
+     "point": "Docker isolates software in a similar way to virtual machines but in a much leaner way.",
+     "chunk_id": "S06-0001",
+     "core": false
+    },
+    {
+     "point": "Docker is used for integration tests (CI/CD), running pipelines on the cloud (AWS Batch, Kubernetes jobs), Spark and serverless (AWS Lambda, Google Functions).",
+     "chunk_id": "S06-0002",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q19",
+   "question": "What is Terraform used for?",
+   "topic": "Data Pipelines",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "Terraform is used for provisioning infrastructure resources.",
+     "chunk_id": "S06-0088",
+     "core": true
+    },
+    {
+     "point": "Terraform is an open-source tool by HashiCorp.",
+     "chunk_id": "S06-0088",
+     "core": false
+    },
+    {
+     "point": "It supports DevOps best practices for change management.",
+     "chunk_id": "S06-0088",
+     "core": false
+    },
+    {
+     "point": "It manages configuration files in source control to maintain an ideal provisioning state for testing and production environments.",
+     "chunk_id": "S06-0088",
+     "core": false
+    },
+    {
+     "point": "IaC (Infrastructure-as-Code) means building, changing and managing infrastructure in a safe, consistent and repeatable way by defining resource configurations that can be versioned, reused and shared.",
+     "chunk_id": "S06-0088",
+     "core": true
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q20",
+   "question": "What does a workflow orchestration tool do?",
+   "topic": "Data Pipelines",
+   "question_type": "definitional",
+   "type_note": "Asks what a tool does; partly conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "Workflow orchestration is the process of scheduling and arranging the tasks that form a data pipeline.",
+     "chunk_id": "S05-0161",
+     "core": true
+    },
+    {
+     "point": "A workflow orchestration tool allows you to schedule, run and observe the entire process.",
+     "chunk_id": "S05-0161",
+     "core": true
+    },
+    {
+     "point": "It runs workflows which contain a number of predefined steps.",
+     "chunk_id": "S06-0132",
+     "core": false
+    },
+    {
+     "point": "It monitors and logs errors, and takes extra steps when they occur.",
+     "chunk_id": "S06-0132",
+     "core": false
+    },
+    {
+     "point": "It automatically runs workflows based on schedules and events.",
+     "chunk_id": "S06-0132",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q21",
+   "question": "What are some common reasons why data goes missing in a dataset?",
+   "topic": "Data Cleaning",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Missing data can be due to data collection errors, data corruption, or nonresponse from participants in a study.",
+     "chunk_id": "S02-0266",
+     "core": true
+    },
+    {
+     "point": "Expected reasons for missing data include measurement errors, human error, or data not being collected for a particular variable.",
+     "chunk_id": "S02-0273",
+     "core": true
+    },
+    {
+     "point": "Example: a survey participant forgetting to answer a question.",
+     "chunk_id": "S02-0267",
+     "core": false
+    },
+    {
+     "point": "Example: a malfunction in data collection equipment resulting in missing values.",
+     "chunk_id": "S02-0267",
+     "core": false
+    },
+    {
+     "point": "Example: a participant choosing not to answer a question due to sensitivity or discomfort.",
+     "chunk_id": "S02-0267",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q22",
+   "question": "What are the main steps of data cleaning and preprocessing?",
+   "topic": "Data Cleaning",
+   "question_type": "procedural",
+   "expected_answer_points": [
+    {
+     "point": "Data integration: merging data from multiple sources into a single dataset.",
+     "chunk_id": "S02-0263",
+     "core": true
+    },
+    {
+     "point": "Data cleaning: assessing the data for errors or inconsistencies and correcting them, e.g. removing duplicate values, handling missing data, correcting formatting.",
+     "chunk_id": "S02-0264",
+     "core": true
+    },
+    {
+     "point": "Data transformation: transforming the data into a format suitable for further analysis, e.g. converting data types, scaling or normalizing numerical data, encoding categorical variables.",
+     "chunk_id": "S02-0264",
+     "core": true
+    },
+    {
+     "point": "Data reduction: selecting only the most appropriate columns or features for analysis.",
+     "chunk_id": "S02-0264",
+     "core": true
+    },
+    {
+     "point": "Data discretization: grouping continuous data into categories or ranges.",
+     "chunk_id": "S02-0265",
+     "core": true
+    },
+    {
+     "point": "Data sampling: when the data is too large to analyze in its entirety, taking a sample that maintains the overall characteristics of the original dataset.",
+     "chunk_id": "S02-0265",
+     "core": true
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q23",
+   "question": "What is denormalization and why do analytical systems use it?",
+   "topic": "Data Cleaning",
+   "question_type": "definitional",
+   "type_note": "The 'why' half is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "Denormalization is the process of combining data into 'wide' tables that are optimized for read workloads.",
+     "chunk_id": "S05-0092",
+     "core": true
+    },
+    {
+     "point": "Denormalization gives faster reads of historical/analytical data because fewer joins are needed.",
+     "chunk_id": "S05-0093",
+     "core": true
+    },
+    {
+     "point": "Denormalized tables are best suited for OLAP systems that analyze historical data, as updates are not required and data redundancy is not an issue.",
+     "chunk_id": "S05-0092",
+     "core": true
+    },
+    {
+     "point": "The disadvantage of denormalization is duplicate data.",
+     "chunk_id": "S05-0093",
+     "core": false
+    },
+    {
+     "point": "Denormalization adds redundant data, such as extra attributes or new tables, to decrease the running time of queries.",
+     "chunk_id": "S04-0126",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q24",
+   "question": "How does HDFS keep data available when a machine fails?",
+   "topic": "Big Data",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "All data is replicated by default on three different DataNodes.",
+     "chunk_id": "S03-0078",
+     "core": true
+    },
+    {
+     "point": "Any piece of data is available if at least one DataNode replica is up and running.",
+     "chunk_id": "S03-0079",
+     "core": true
+    },
+    {
+     "point": "By default one replica is written locally, the second in the same rack, and a third in another rack, to protect against rack failures (e.g. rack switch or rack power feed).",
+     "chunk_id": "S03-0079",
+     "core": true
+    },
+    {
+     "point": "A NameNode maintains the file locations, and there are many DataNodes (1000+).",
+     "chunk_id": "S03-0078",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q25",
+   "question": "How does BigQuery separate storage and compute internally?",
+   "topic": "Big Data",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "BigQuery stores the data in a separate storage system called Colossus.",
+     "chunk_id": "S06-0251",
+     "core": true
+    },
+    {
+     "point": "Dremel is the query execution engine.",
+     "chunk_id": "S06-0250",
+     "core": true
+    },
+    {
+     "point": "Jupiter is the network between storage and compute.",
+     "chunk_id": "S06-0250",
+     "core": true
+    },
+    {
+     "point": "Jupiter provides approximately one terabyte per second, so compute and storage can live on separate hardware and still talk to each other without delays.",
+     "chunk_id": "S06-0252",
+     "core": false
+    },
+    {
+     "point": "Separating storage from compute significantly reduces cost: if the data grows, you only pay for storing it in Colossus, which is very cheap.",
+     "chunk_id": "S06-0251",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q26",
+   "question": "Besides accuracy, what other dimensions describe data quality?",
+   "topic": "Data Quality",
+   "question_type": "definitional",
+   "type_note": "A list question ('what other dimensions'); definitional is the closest type.",
+   "expected_answer_points": [
+    {
+     "point": "Completeness is a data quality dimension.",
+     "chunk_id": "S04-0219",
+     "core": true
+    },
+    {
+     "point": "Consistency is a data quality dimension.",
+     "chunk_id": "S04-0219",
+     "core": true
+    },
+    {
+     "point": "Accessibility is a data quality dimension.",
+     "chunk_id": "S04-0219",
+     "core": true
+    },
+    {
+     "point": "Traditionally data quality was understood as accuracy, but researchers have identified other characteristics as well.",
+     "chunk_id": "S07-0011",
+     "core": false
+    },
+    {
+     "point": "Data quality characteristics can be grouped into two major dimensions: contextual and intrinsic data quality.",
+     "chunk_id": "S07-0011",
+     "core": false
+    },
+    {
+     "point": "Data quality ensures that data is accurate, complete, consistent, and fit for its intended use.",
+     "chunk_id": "S05-0068",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Sources list different sets of dimensions (accessibility only in S04-0219/S07-0011, 'fit for intended use' only in S05-0068); S07-0011 repeats 'completeness' and the S07-0012 table is garbled."
+  },
+  {
+   "id": "Q27",
+   "question": "What kinds of tests can you write in dbt to check your data?",
+   "topic": "Data Quality",
+   "question_type": "definitional",
+   "type_note": "A list question ('what kinds of tests'); definitional is the closest type.",
+   "expected_answer_points": [
+    {
+     "point": "Singular tests: plain SQL queries placed in the tests/ directory.",
+     "chunk_id": "S06-0414",
+     "core": true
+    },
+    {
+     "point": "A singular test fails if its query returns any rows.",
+     "chunk_id": "S06-0414",
+     "core": false
+    },
+    {
+     "point": "Source freshness tests: a freshness block in the source YAML tells dbt which column shows when data was last loaded, and dbt checks whether that timestamp is recent enough.",
+     "chunk_id": "S06-0415",
+     "core": true
+    },
+    {
+     "point": "Generic tests: parameterized, reusable tests defined in YAML alongside the column descriptions; the most common type of test.",
+     "chunk_id": "S06-0417",
+     "core": true
+    },
+    {
+     "point": "dbt ships with exactly four built-in generic tests: unique, not_null, accepted_values and relationships.",
+     "chunk_id": "S06-0418",
+     "core": true
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q28",
+   "question": "What is the difference between ETL and ELT?",
+   "topic": "ETL/ELT",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "In ETL (Extract -> Transform -> Load), the data is transformed before it hits the warehouse.",
+     "chunk_id": "S06-0322",
+     "core": true
+    },
+    {
+     "point": "In ELT (Extract -> Load -> Transform), the raw data is loaded first and then transformed inside the warehouse.",
+     "chunk_id": "S06-0322",
+     "core": true
+    },
+    {
+     "point": "ETL takes longer to set up because the transformation logic has to be built first.",
+     "chunk_id": "S06-0322",
+     "core": false
+    },
+    {
+     "point": "ELT is the more popular pattern because storage is cheap and keeping the raw data allows more flexibility in future data use cases.",
+     "chunk_id": "S05-0043",
+     "core": false
+    },
+    {
+     "point": "In ETL, if you need to change the way you calculate something you may not be able to, because the raw data may no longer be available.",
+     "chunk_id": "S05-0114",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q29",
+   "question": "What is a data mart and how does it relate to a data warehouse?",
+   "topic": "Data Warehousing",
+   "question_type": "definitional",
+   "type_note": "Second half (how it relates to a data warehouse) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "A data mart is a scaled-down version of a data warehouse aimed at meeting the information needs of a homogeneous small group of end users, such as a department or business unit.",
+     "chunk_id": "S04-0196",
+     "core": true
+    },
+    {
+     "point": "A data mart is a subject-specific database which acts as a partitioned segment of an enterprise data warehouse.",
+     "chunk_id": "S05-0009",
+     "core": true
+    },
+    {
+     "point": "Dependent data marts pull their data directly from a central data warehouse.",
+     "chunk_id": "S04-0196",
+     "core": true
+    },
+    {
+     "point": "Independent data marts are stand-alone systems drawing data directly from operational systems, external sources, or both.",
+     "chunk_id": "S04-0196",
+     "core": false
+    },
+    {
+     "point": "Separate data marts can be created for departments such as finance, marketing or supply chain.",
+     "chunk_id": "S05-0009",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q30",
+   "question": "How does a snowflake schema differ from a star schema?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "A star schema is a data model with one large fact table connected to smaller tables.",
+     "chunk_id": "S04-0192",
+     "core": true
+    },
+    {
+     "point": "The snowflake schema normalizes the dimension table.",
+     "chunk_id": "S04-0193",
+     "core": true
+    },
+    {
+     "point": "The snowflake schema has one fact table and creates smaller tables with primary-foreign key relationships.",
+     "chunk_id": "S04-0193",
+     "core": true
+    },
+    {
+     "point": "In a star schema, the fact table contains keys referring to each dimension table.",
+     "chunk_id": "S04-0192",
+     "core": false
+    },
+    {
+     "point": "A fact constellation has more than one fact table connected to other smaller dimension tables.",
+     "chunk_id": "S04-0193",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q31",
+   "question": "Why does partitioning a BigQuery table by date make queries cheaper?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "When a table is partitioned by date, each date becomes its own partition.",
+     "chunk_id": "S06-0218",
+     "core": true
+    },
+    {
+     "point": "Once BigQuery knows it only needs the data for one date, it does not read or process the data for the other dates.",
+     "chunk_id": "S06-0218",
+     "core": true
+    },
+    {
+     "point": "Processing less data reduces cost.",
+     "chunk_id": "S06-0218",
+     "core": true
+    },
+    {
+     "point": "In the example, the same June 2019 query processes about 106 MB on the partitioned table instead of 1.6 GB on the non-partitioned one.",
+     "chunk_id": "S06-0221",
+     "core": false
+    },
+    {
+     "point": "The example creates the partitioned table with PARTITION BY DATE(tpep_pickup_datetime).",
+     "chunk_id": "S06-0220",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q32",
+   "question": "When should I choose clustering instead of partitioning in BigQuery?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Choose clustering when partitioning would leave a small amount of data per partition (roughly less than 1 GB).",
+     "chunk_id": "S06-0236",
+     "core": true
+    },
+    {
+     "point": "Choose clustering when partitioning would create more partitions than the limit of 4000 per table.",
+     "chunk_id": "S06-0236",
+     "core": true
+    },
+    {
+     "point": "Choose clustering when mutation operations would modify the majority of the partitions frequently, e.g. writing to the table every few minutes.",
+     "chunk_id": "S06-0236",
+     "core": true
+    },
+    {
+     "point": "Use clustering when you need more granularity than partitioning alone can provide.",
+     "chunk_id": "S06-0235",
+     "core": false
+    },
+    {
+     "point": "With clustering you commonly filter or aggregate on multiple columns; partitioning is only possible on one column.",
+     "chunk_id": "S06-0235",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q33",
+   "question": "How can I reduce the cost of my BigQuery queries?",
+   "topic": "Data Warehousing",
+   "question_type": "procedural",
+   "expected_answer_points": [
+    {
+     "point": "Avoid SELECT * and name only the columns you need.",
+     "chunk_id": "S06-0242",
+     "core": true
+    },
+    {
+     "point": "BigQuery stores data columnar, so when you name the columns it reads only those columns.",
+     "chunk_id": "S06-0242",
+     "core": false
+    },
+    {
+     "point": "Price your queries before running them, using the estimate shown in the query editor.",
+     "chunk_id": "S06-0242",
+     "core": true
+    },
+    {
+     "point": "Use clustered or partitioned tables, which let BigQuery skip large parts of the table.",
+     "chunk_id": "S06-0242",
+     "core": true
+    },
+    {
+     "point": "The cheaper query is usually the one that reads less data.",
+     "chunk_id": "S06-0241",
+     "core": false
+    },
+    {
+     "point": "Use streaming inserts with caution: they can increase your cost drastically.",
+     "chunk_id": "S06-0243",
+     "core": false,
+     "outside_relevant_set": true
+    },
+    {
+     "point": "Materialize query results in stages: run a reused query (e.g. a CTE) once, store the result in a table and use that table in the following steps.",
+     "chunk_id": "S06-0243",
+     "core": false,
+     "outside_relevant_set": true
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Q33's relevant_chunk_ids (S06-0241, S06-0242) miss S06-0243, which holds the other two of the 'five habits'; those two points cite S06-0243 and are marked outside_relevant_set."
+  },
+  {
+   "id": "Q34",
+   "question": "How does Kimball's restaurant analogy describe the areas of a data warehouse?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Staging area (the pantry): where raw data lands; not meant for business users.",
+     "chunk_id": "S06-0325",
+     "core": true
+    },
+    {
+     "point": "Processing area (the kitchen): where raw data gets transformed into proper data models.",
+     "chunk_id": "S06-0325",
+     "core": true
+    },
+    {
+     "point": "Presentation area (the dining hall): the final, polished output that business stakeholders see and interact with.",
+     "chunk_id": "S06-0325",
+     "core": true
+    },
+    {
+     "point": "The processing area is limited to the data engineers and analytics engineers, and its focus is on efficiency and following standards.",
+     "chunk_id": "S06-0325",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q35",
+   "question": "How should models be organised into staging, intermediate and marts folders in a dbt project?",
+   "topic": "Data Warehousing",
+   "question_type": "procedural",
+   "type_note": "Asks how to organise a project; could also be read as conceptual (what each folder is for).",
+   "expected_answer_points": [
+    {
+     "point": "staging/ holds staging models: a 1:1 copy of each source table with only minimal cleaning (e.g. fixing data types, renaming columns).",
+     "chunk_id": "S06-0355",
+     "core": true
+    },
+    {
+     "point": "staging/ also holds the source definitions that tell dbt where the raw data lives in the database.",
+     "chunk_id": "S06-0355",
+     "core": false
+    },
+    {
+     "point": "intermediate/ holds everything that is not raw and not ready to expose to end users, e.g. complex joins, heavy-duty cleaning, data quality processing.",
+     "chunk_id": "S06-0356",
+     "core": true
+    },
+    {
+     "point": "marts/ holds the final, consumption-ready tables for end users.",
+     "chunk_id": "S06-0357",
+     "core": true
+    },
+    {
+     "point": "In a well-governed project only marts tables should be exposed to BI tools, analysts and business stakeholders.",
+     "chunk_id": "S06-0357",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q36",
+   "question": "What is the difference between dbt Core and dbt Cloud?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "dbt Core is open source and free.",
+     "chunk_id": "S06-0333",
+     "core": true
+    },
+    {
+     "point": "dbt Core is installed locally and run with commands from the terminal.",
+     "chunk_id": "S06-0333",
+     "core": true
+    },
+    {
+     "point": "With dbt Core you are responsible for setting up the dev environment, orchestrating production runs, hosting documentation and managing logs and metadata.",
+     "chunk_id": "S06-0333",
+     "core": false
+    },
+    {
+     "point": "dbt Cloud is a SaaS product that runs dbt Core under the hood.",
+     "chunk_id": "S06-0334",
+     "core": true
+    },
+    {
+     "point": "dbt Cloud gives you a web-based IDE, environment management, built-in orchestration, hosted documentation, and logging and observability.",
+     "chunk_id": "S06-0334",
+     "core": true
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q37",
+   "question": "Why are column-oriented databases a good fit for analytics?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "In a column-oriented database, the data for each column is stored together.",
+     "chunk_id": "S05-0171",
+     "core": true
+    },
+    {
+     "point": "Querying a subset of columns is more efficient because the database doesn't need to read columns that aren't relevant.",
+     "chunk_id": "S05-0173",
+     "core": true
+    },
+    {
+     "point": "Column-oriented storage makes aggregations over columns much faster.",
+     "chunk_id": "S06-0254",
+     "core": true
+    },
+    {
+     "point": "Columnar data can be compressed further, which improves storage and queries.",
+     "chunk_id": "S05-0173",
+     "core": false
+    },
+    {
+     "point": "Column-oriented databases are typically less efficient when inserting data.",
+     "chunk_id": "S05-0174",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q38",
+   "question": "What is the One Big Table approach to data modelling?",
+   "topic": "Data Warehousing",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "One big table (OBT) joins all of the data necessary for analytics into wide denormalized tables.",
+     "chunk_id": "S05-0099",
+     "core": true
+    },
+    {
+     "point": "OBT increases query performance by removing the need for joins.",
+     "chunk_id": "S05-0100",
+     "core": true
+    },
+    {
+     "point": "OBT is simple to query.",
+     "chunk_id": "S05-0100",
+     "core": false
+    },
+    {
+     "point": "OBT is usually combined with or built on top of other techniques such as a Dimensional Model or Data Vault.",
+     "chunk_id": "S05-0099",
+     "core": false
+    },
+    {
+     "point": "OBT does not adapt to changes well: adding new data sources requires rebuilding the table.",
+     "chunk_id": "S05-0100",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q39",
+   "question": "What is an external table in BigQuery and why does it show zero rows?",
+   "topic": "Data Warehousing",
+   "question_type": "conceptual",
+   "type_note": "First half (what an external table is) is definitional.",
+   "expected_answer_points": [
+    {
+     "point": "With an external table, the data itself stays in Cloud Storage and BigQuery keeps only the metadata.",
+     "chunk_id": "S06-0214",
+     "core": true
+    },
+    {
+     "point": "BigQuery cannot determine an external table's rows or size, because the data is not inside BigQuery but in an external system (Google Cloud Storage).",
+     "chunk_id": "S06-0216",
+     "core": true
+    },
+    {
+     "point": "The table details show long-term storage 0 bytes, table size 0 bytes and 0 rows.",
+     "chunk_id": "S06-0216",
+     "core": false
+    },
+    {
+     "point": "BigQuery reads the column names of the CSVs and works out the types and nullable columns, so you do not have to define the schema.",
+     "chunk_id": "S06-0216",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q40",
+   "question": "What is an operational data store?",
+   "topic": "Data Warehousing",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "An operational data store (ODS) is a staging area that provides query facilities.",
+     "chunk_id": "S04-0199",
+     "core": true
+    },
+    {
+     "point": "An ODS is good for analysis tools that need data that are closer to real time.",
+     "chunk_id": "S04-0199",
+     "core": true
+    },
+    {
+     "point": "More complex analyses are still conducted on the actual data warehouse.",
+     "chunk_id": "S04-0199",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Thin: all three relevant chunks repeat one short definition; only S04-0199 adds detail, so only 3 points are possible."
+  },
+  {
+   "id": "Q41",
+   "question": "What is business intelligence and how does it use the data warehouse?",
+   "topic": "Data Warehousing",
+   "question_type": "definitional",
+   "type_note": "Second half (how BI uses the warehouse) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "Business intelligence (BI) is the set of activities, techniques and tools aimed at understanding patterns in past data to predict the future.",
+     "chunk_id": "S04-0209",
+     "core": true
+    },
+    {
+     "point": "The main goal of the data warehouse is to support decision-making, which needs intelligent tools.",
+     "chunk_id": "S04-0209",
+     "core": true
+    },
+    {
+     "point": "Business intelligence analyzes the data to help in making decisions.",
+     "chunk_id": "S04-0207",
+     "core": false
+    },
+    {
+     "point": "BI uses data for marketing and targeted sales in particular.",
+     "chunk_id": "S04-0207",
+     "core": false
+    },
+    {
+     "point": "Modern BI is facilitated through tools such as Tableau, ClickView and Microsoft Power BI.",
+     "chunk_id": "S04-0209",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q42",
+   "question": "What are seeds in dbt and when should you use them?",
+   "topic": "Data Warehousing",
+   "question_type": "definitional",
+   "type_note": "Second half (when to use them) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "Seeds are a way to upload a CSV file and make it available as a dbt model.",
+     "chunk_id": "S06-0389",
+     "core": true
+    },
+    {
+     "point": "Seeds are useful for lookup tables, quick experiments or prototypes, and showing a stakeholder something before fully committing to a data load.",
+     "chunk_id": "S06-0352",
+     "core": true
+    },
+    {
+     "point": "Use seeds when you don't have the right permissions, or the data is expected to change frequently during experimentation.",
+     "chunk_id": "S06-0352",
+     "core": true
+    },
+    {
+     "point": "Seeds are considered a quick-and-dirty approach; if you have the option, it's better to load data properly at the source.",
+     "chunk_id": "S06-0352",
+     "core": true
+    },
+    {
+     "point": "You drop the CSV into the seeds/ directory and run dbt seed to load it.",
+     "chunk_id": "S06-0389",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q43",
+   "question": "Which dbt model calculates monthly revenue per pickup zone, and what does it group by?",
+   "topic": "Data Warehousing",
+   "question_type": "definitional",
+   "type_note": "A factual lookup (which model, which GROUP BY); definitional is the closest type.",
+   "expected_answer_points": [
+    {
+     "point": "The model is fct_monthly_zone_revenue.",
+     "chunk_id": "S06-0549",
+     "core": true,
+     "note": "The name appears in the chunk's section label ('fct_monthly_zone_revenue: select'), not in its code text; the RAG prompt (settings.CONTEXT_CHUNK_TEMPLATE) does pass the section label to the model."
+    },
+    {
+     "point": "It groups by pickup_zone, revenue_month and service_type.",
+     "chunk_id": "S06-0549",
+     "core": true
+    },
+    {
+     "point": "It is a data mart for monthly revenue analysis by pickup zone and service type, optimized for business reporting and dashboards.",
+     "chunk_id": "S06-0549",
+     "core": false
+    },
+    {
+     "point": "It sums revenue columns such as fare_amount, tip_amount and total_amount, and counts trips (total_monthly_trips).",
+     "chunk_id": "S06-0549",
+     "core": false
+    },
+    {
+     "point": "It reads from the fct_trips model via ref('fct_trips').",
+     "chunk_id": "S06-0549",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Depends on literal code identifiers in one code chunk; the model name fct_monthly_zone_revenue appears only in the chunk's file/section label, not in the code text."
+  },
+  {
+   "id": "Q44",
+   "question": "What is an RDD in Spark?",
+   "topic": "Data Processing",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "RDDs (Resilient Distributed Datasets) are distributed data structures that allow processed data to be distributed over several computers.",
+     "chunk_id": "S03-0042",
+     "core": true
+    },
+    {
+     "point": "RDDs are immutable: once created, the RDD data contents do not change.",
+     "chunk_id": "S03-0042",
+     "core": true
+    },
+    {
+     "point": "To implement fault tolerance, RDD partitions record lineage: a recipe to recompute the partition from the parent RDDs and the operation used to generate it.",
+     "chunk_id": "S03-0042",
+     "core": true
+    },
+    {
+     "point": "The framework stores RDDs in data partitions, and one thread can process each partition on its own.",
+     "chunk_id": "S03-0042",
+     "core": false
+    },
+    {
+     "point": "Unlike a DataFrame, an RDD has no schema: it is just a distributed collection of objects.",
+     "chunk_id": "S06-0785",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q45",
+   "question": "What is the difference between narrow and wide dependencies in Spark?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "In narrow dependencies, the data partition from an input RDD can be scheduled on the same physical machine as the output RDD ('pipelining').",
+     "chunk_id": "S03-0059",
+     "core": true
+    },
+    {
+     "point": "RDD operations with only narrow dependencies can be done without any network traffic.",
+     "chunk_id": "S03-0059",
+     "core": true
+    },
+    {
+     "point": "Wide dependencies require all RDD partitions at the previous level of the lineage to be inputs to computing an RDD partition.",
+     "chunk_id": "S03-0059",
+     "core": true
+    },
+    {
+     "point": "Wide dependencies require sending RDD data over the network, an operation called the 'shuffle'.",
+     "chunk_id": "S03-0059",
+     "core": true
+    },
+    {
+     "point": "Shuffles are unavoidable for applications needing, e.g., sorting of the output data.",
+     "chunk_id": "S03-0059",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q46",
+   "question": "Why did Spark introduce DataFrames when it already had RDDs?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "RDDs are operated by arbitrary user-defined functions in Scala/Java/Python, so optimizing them is very hard.",
+     "chunk_id": "S03-0067",
+     "core": true
+    },
+    {
+     "point": "DataFrames allow only a limited number of native operations, which lets the Spark SQL optimizer rewrite user code into equivalent but faster code.",
+     "chunk_id": "S03-0067",
+     "core": true
+    },
+    {
+     "point": "A DataFrame follows a specific structure: it has a schema.",
+     "chunk_id": "S06-0785",
+     "core": true
+    },
+    {
+     "point": "DataFrame operations can also be implemented in a compiled fashion.",
+     "chunk_id": "S03-0067",
+     "core": false
+    },
+    {
+     "point": "DataFrames appeared later as another layer of abstraction on top of RDDs, with a nice API.",
+     "chunk_id": "S06-0785",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q47",
+   "question": "How does the classic MapReduce word count example work?",
+   "topic": "Data Processing",
+   "question_type": "procedural",
+   "type_note": "Asks how it works; answered as the sequence of Map, Shuffle and Reduce steps (could also be read as conceptual).",
+   "expected_answer_points": [
+    {
+     "point": "The Map function reads in words one at a time and outputs (word, 1) for each parsed word.",
+     "chunk_id": "S03-0039",
+     "core": true
+    },
+    {
+     "point": "The Shuffle phase between Map and Reduce creates a list of values associated with each key, e.g. (Hadoop, (1, 1)).",
+     "chunk_id": "S03-0039",
+     "core": true
+    },
+    {
+     "point": "The Reduce function sums the numbers in the list for each key and outputs (word, count) pairs, e.g. (Hadoop, 2).",
+     "chunk_id": "S03-0039",
+     "core": true
+    },
+    {
+     "point": "The output of the Reduce function is the output of the MapReduce job.",
+     "chunk_id": "S03-0039",
+     "core": false
+    },
+    {
+     "point": "The example input file is 'Hello World Bye World / Hello Hadoop Goodbye Hadoop'.",
+     "chunk_id": "S03-0038",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q48",
+   "question": "What is the difference between transformations and actions in Spark?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Transformations are lazy: they transform the data (selecting columns, filtering rows, applying a function to a column) but are not executed immediately.",
+     "chunk_id": "S06-0704",
+     "core": true
+    },
+    {
+     "point": "Actions are eager: they trigger the evaluation.",
+     "chunk_id": "S06-0704",
+     "core": true
+    },
+    {
+     "point": "Spark just records the sequence of transformations; when an action such as show() is called, the whole chain is evaluated.",
+     "chunk_id": "S06-0704",
+     "core": false
+    },
+    {
+     "point": "RDD transformations build a DAG of dependencies between RDD partitions but do not yet start processing.",
+     "chunk_id": "S03-0051",
+     "core": false
+    },
+    {
+     "point": "Running select or filter alone starts no job in the Spark UI; a job appears only when .show() is added.",
+     "chunk_id": "S06-0703",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q49",
+   "question": "What do the driver, master and executors do in a Spark cluster?",
+   "topic": "Data Processing",
+   "question_type": "definitional",
+   "type_note": "Asks what each component does; partly conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "The driver is the thing that submits the job, e.g. an Airflow task that runs spark-submit, or your laptop.",
+     "chunk_id": "S06-0752",
+     "core": true
+    },
+    {
+     "point": "The master's role is coordination: it knows what jobs are running.",
+     "chunk_id": "S06-0747",
+     "core": true
+    },
+    {
+     "point": "Executors are the machines that do the actual computation.",
+     "chunk_id": "S06-0752",
+     "core": true
+    },
+    {
+     "point": "When a job is submitted, the master decides which executors will work on it and sends them instructions.",
+     "chunk_id": "S06-0748",
+     "core": false
+    },
+    {
+     "point": "If an executor goes away, the master knows about it and assigns its tasks to another executor.",
+     "chunk_id": "S06-0748",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q50",
+   "question": "How does a Kafka consumer group keep track of which messages it has already read?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "group_id identifies the consumer group, and Kafka tracks how far each group has read.",
+     "chunk_id": "S06-0911",
+     "core": true
+    },
+    {
+     "point": "Restarting with the same group ID continues where it left off.",
+     "chunk_id": "S06-0911",
+     "core": true
+    },
+    {
+     "point": "Consumers track their offset (how far they've read).",
+     "chunk_id": "S05-0147",
+     "core": true
+    },
+    {
+     "point": "Each consumer group tracks its offsets independently, so two different groups each read all messages.",
+     "chunk_id": "S06-0915",
+     "core": false
+    },
+    {
+     "point": "auto_offset_reset='earliest' starts reading from the beginning of the topic; without it, new consumers default to latest and only see new messages.",
+     "chunk_id": "S06-0911",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q51",
+   "question": "What is the difference between tumbling, sliding and session windows?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Tumbling windows are fixed-size and non-overlapping: every event belongs to exactly one window.",
+     "chunk_id": "S06-0962",
+     "core": true
+    },
+    {
+     "point": "Sliding windows are fixed-size and overlapping: an event can belong to multiple windows.",
+     "chunk_id": "S06-0963",
+     "core": true
+    },
+    {
+     "point": "Session windows are dynamic windows based on inactivity gaps: the window closes after a specified amount of inactivity, not at a specified time.",
+     "chunk_id": "S06-0965",
+     "core": true
+    },
+    {
+     "point": "Tumbling window use case: counting trips per hour, daily revenue summaries.",
+     "chunk_id": "S06-0962",
+     "core": false
+    },
+    {
+     "point": "Session window use case: grouping user behavior, e.g. all events within a session separated by a 30-minute inactivity gap.",
+     "chunk_id": "S06-0965",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q52",
+   "question": "What does a watermark do in Flink stream processing?",
+   "topic": "Data Processing",
+   "question_type": "definitional",
+   "type_note": "Asks what a watermark does; partly conceptual (how it works).",
+   "expected_answer_points": [
+    {
+     "point": "The watermark is the trigger that tells Flink when to publish window results.",
+     "chunk_id": "S06-0950",
+     "core": true
+    },
+    {
+     "point": "When the watermark passes the end of a window, Flink publishes that window's results.",
+     "chunk_id": "S06-0951",
+     "core": true
+    },
+    {
+     "point": "The watermark stays a set time (here 5 seconds) behind the latest event timestamp Flink has seen; that delay is patience for events that arrive a few seconds late.",
+     "chunk_id": "S06-0951",
+     "core": true
+    },
+    {
+     "point": "Without a trigger, Flink would accumulate data forever and never write anything.",
+     "chunk_id": "S06-0949",
+     "core": false
+    },
+    {
+     "point": "A larger watermark means more patience for late events but a longer wait before seeing results (latency vs completeness).",
+     "chunk_id": "S06-0955",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q53",
+   "question": "What is the Lambda architecture for data processing?",
+   "topic": "Data Processing",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "Lambda architecture uses batch processing to create accurate views of large data sets.",
+     "chunk_id": "S05-0025",
+     "core": true
+    },
+    {
+     "point": "It uses real-time stream processing to provide views of live data.",
+     "chunk_id": "S05-0025",
+     "core": true
+    },
+    {
+     "point": "The results from both are merged and presented together (serving layer).",
+     "chunk_id": "S05-0025",
+     "core": true
+    },
+    {
+     "point": "It is designed to strike a balance between low latency, high throughput and fault tolerance.",
+     "chunk_id": "S05-0025",
+     "core": false
+    },
+    {
+     "point": "Its disadvantage is duplicated code/logic for both batch and real-time views.",
+     "chunk_id": "S05-0026",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q54",
+   "question": "What is the difference between concurrent and parallel batch processing?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Concurrent batch processing runs batches partially overlapping in time.",
+     "chunk_id": "S05-0123",
+     "core": true
+    },
+    {
+     "point": "Parallel batch processing schedules entire batches in parallel instead of overlapping parts of batches over time.",
+     "chunk_id": "S05-0124",
+     "core": true
+    },
+    {
+     "point": "Concurrent batch processing gives the illusion of parallelism without requiring more than a single CPU core.",
+     "chunk_id": "S05-0123",
+     "core": true
+    },
+    {
+     "point": "Parallel batch processing takes advantage of relatively cheap multicore machines to multitask effectively.",
+     "chunk_id": "S05-0124",
+     "core": false
+    },
+    {
+     "point": "Concurrent batch processing must be designed with fault tolerance in mind: one batch failure could cause a domino effect on other batches.",
+     "chunk_id": "S05-0123",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q55",
+   "question": "What is Dataproc and how do you submit a Spark job to it?",
+   "topic": "Data Processing",
+   "question_type": "procedural",
+   "type_note": "First half (what Dataproc is) is definitional.",
+   "expected_answer_points": [
+    {
+     "point": "Dataproc is Google Cloud's managed Spark service: it creates the master and workers, and you only submit jobs to it.",
+     "chunk_id": "S06-0843",
+     "core": true
+    },
+    {
+     "point": "Upload the job script to a bucket Dataproc can read, e.g. into a code folder (gsutil cp).",
+     "chunk_id": "S06-0847",
+     "core": true
+    },
+    {
+     "point": "A job can be submitted in three ways: the web UI, the Google Cloud SDK (gcloud), and the REST API.",
+     "chunk_id": "S06-0849",
+     "core": true
+    },
+    {
+     "point": "For production, the web UI is not used: you cannot easily submit a job from Airflow by clicking buttons.",
+     "chunk_id": "S06-0849",
+     "core": false
+    },
+    {
+     "point": "Submitting needs the cluster name, the Python file and the arguments.",
+     "chunk_id": "S06-0849",
+     "core": false
+    },
+    {
+     "point": "The command is gcloud dataproc jobs submit pyspark with --cluster, --region and the script path; everything after the double minus (--) is passed to the job itself as its arguments.",
+     "chunk_id": "S06-0850",
+     "core": false,
+     "outside_relevant_set": true
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Q55's relevant_chunk_ids (S06-0843, S06-0847, S06-0849) miss S06-0850, which holds the actual gcloud submit command; that point cites S06-0850 and is marked outside_relevant_set."
+  },
+  {
+   "id": "Q56",
+   "question": "How does the Spark SQL job script get its input and output paths?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "The input and output paths come from the command line, using argparse, instead of being hardcoded.",
+     "chunk_id": "S06-0838",
+     "core": true
+    },
+    {
+     "point": "Three required arguments are defined: --input_green, --input_yellow and --output.",
+     "chunk_id": "S06-0838",
+     "core": true
+    },
+    {
+     "point": "parser.parse_args() is called and the parsed values (args.input_green, args.input_yellow, args.output) replace the hardcoded paths.",
+     "chunk_id": "S06-0838",
+     "core": true
+    },
+    {
+     "point": "This lets the same job run for any period, e.g. one month or one year.",
+     "chunk_id": "S06-0838",
+     "core": false
+    },
+    {
+     "point": "The input paths are then read with spark.read.parquet(input_green) and spark.read.parquet(input_yellow).",
+     "chunk_id": "S06-0867",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Depends on literal code identifiers (the argparse flags --input_green, --input_yellow, --output)."
+  },
+  {
+   "id": "Q57",
+   "question": "How does Spark join a large table with a small table efficiently?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Spark uses a broadcast join: it sends a full copy of the small table to every executor.",
+     "chunk_id": "S06-0781",
+     "core": true
+    },
+    {
+     "point": "Each executor processes its partition of the big table and does the join in memory by looking up the small table.",
+     "chunk_id": "S06-0781",
+     "core": true
+    },
+    {
+     "point": "No reshuffling is needed, so it is just one stage and much faster than a sort merge join.",
+     "chunk_id": "S06-0782",
+     "core": true
+    },
+    {
+     "point": "Two large tables use a sort merge join instead: add the key, reshuffle so records with the same key end up in the same partition, then combine them.",
+     "chunk_id": "S06-0782",
+     "core": false
+    },
+    {
+     "point": "The execution plan shows a BroadcastExchange.",
+     "chunk_id": "S06-0781",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q58",
+   "question": "How does the Flink aggregation job count trips per pickup location for each hour?",
+   "topic": "Data Processing",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "It applies TUMBLE(TABLE source, DESCRIPTOR(event_timestamp), INTERVAL '1' HOUR) to the Kafka source table.",
+     "chunk_id": "S06-0948",
+     "core": true
+    },
+    {
+     "point": "It groups by window_start and PULocationID.",
+     "chunk_id": "S06-0948",
+     "core": true
+    },
+    {
+     "point": "It counts the trips with COUNT(*) AS num_trips.",
+     "chunk_id": "S06-0948",
+     "core": true
+    },
+    {
+     "point": "The TUMBLE function creates fixed-size, non-overlapping windows, and DESCRIPTOR(event_timestamp) must reference the column with the WATERMARK defined on it.",
+     "chunk_id": "S06-0956",
+     "core": false
+    },
+    {
+     "point": "It also sums SUM(total_amount) AS total_revenue and writes the results with INSERT INTO the aggregated sink table.",
+     "chunk_id": "S06-0948",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Depends on literal code (the Flink SQL in the job); not in the original literal-identifier list, but answered from code."
+  },
+  {
+   "id": "Q59",
+   "question": "What does the ROW_NUMBER window function do, and how does PARTITION BY change it?",
+   "topic": "SQL",
+   "question_type": "definitional",
+   "type_note": "Second half (how PARTITION BY changes it) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "ROW_NUMBER() displays the number of a given row, starting at 1 and numbering rows according to the ORDER BY part of the window statement.",
+     "chunk_id": "S06-0471",
+     "core": true
+    },
+    {
+     "point": "Using PARTITION BY makes the counting begin at 1 again in each partition.",
+     "chunk_id": "S06-0471",
+     "core": true
+    },
+    {
+     "point": "PARTITION BY divides the result set into groups; ORDER BY defines the order of processing rows within the partition.",
+     "chunk_id": "S06-0470",
+     "core": false
+    },
+    {
+     "point": "Common uses: removing duplicates, ranking data with unique row numbers, and selecting the latest record per category.",
+     "chunk_id": "S06-0471",
+     "core": false
+    },
+    {
+     "point": "Example: ROW_NUMBER() OVER (PARTITION BY PULocationID ORDER BY total_amount DESC) AS ranking.",
+     "chunk_id": "S06-0473",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Known literal-identifier question: leans on the ROW_NUMBER / PARTITION BY syntax."
+  },
+  {
+   "id": "Q60",
+   "question": "When is a table in first normal form?",
+   "topic": "SQL",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "In first normal form, only single values are permitted at the intersection of each row and column.",
+     "chunk_id": "S01-0172",
+     "core": true
+    },
+    {
+     "point": "Hence, in 1NF there are no repeating groups.",
+     "chunk_id": "S01-0172",
+     "core": true
+    },
+    {
+     "point": "In 1NF every column must be uniquely named.",
+     "chunk_id": "S04-0103",
+     "core": true
+    },
+    {
+     "point": "To normalize a relation that contains a repeating group, remove the repeating group and form two new relations.",
+     "chunk_id": "S01-0172",
+     "core": false
+    },
+    {
+     "point": "The PK of the new relation combines the PK of the original relation with an attribute from the new relation (e.g. StudentNo and CourseNo).",
+     "chunk_id": "S01-0173",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q61",
+   "question": "What is the difference between second normal form and third normal form?",
+   "topic": "SQL",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Tables in 2NF must be in 1NF and not have any partial dependency.",
+     "chunk_id": "S04-0103",
+     "core": true
+    },
+    {
+     "point": "If the relation has a composite PK, each non-key attribute must be fully dependent on the entire PK and not on a subset of it.",
+     "chunk_id": "S01-0175",
+     "core": true
+    },
+    {
+     "point": "To be in 3NF, the relation must be in 2NF and all transitive dependencies must be removed.",
+     "chunk_id": "S01-0177",
+     "core": true
+    },
+    {
+     "point": "In 3NF, a non-key attribute may not be functionally dependent on another non-key attribute.",
+     "chunk_id": "S01-0177",
+     "core": true
+    },
+    {
+     "point": "A 1NF relation is automatically in 2NF if, and only if, the PK comprises a single attribute.",
+     "chunk_id": "S01-0175",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q62",
+   "question": "What is a functional dependency between attributes?",
+   "topic": "SQL",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "A functional dependency (FD) is a relationship between two attributes, typically between the PK and other non-key attributes within a table.",
+     "chunk_id": "S01-0158",
+     "core": true
+    },
+    {
+     "point": "Attribute Y is functionally dependent on attribute X if, for every valid instance of X, that value of X uniquely determines the value of Y (written X -> Y).",
+     "chunk_id": "S01-0158",
+     "core": true
+    },
+    {
+     "point": "The left side of the FD is called the determinant, and the right side is the dependent.",
+     "chunk_id": "S01-0158",
+     "core": true
+    },
+    {
+     "point": "Example: SIN determines Name, Address and Birthdate.",
+     "chunk_id": "S01-0158",
+     "core": false
+    },
+    {
+     "point": "FDs can be used to help normalize relational schemas.",
+     "chunk_id": "S04-0101",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q63",
+   "question": "What is a weak entity in an entity relationship model?",
+   "topic": "SQL",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "A weak entity cannot be uniquely identified based on its attributes alone and must rely on a strong entity to provide the context necessary for identification.",
+     "chunk_id": "S04-0110",
+     "core": true
+    },
+    {
+     "point": "A weak entity cannot exist without a relationship with another entity.",
+     "chunk_id": "S01-0086",
+     "core": true
+    },
+    {
+     "point": "Its primary key is derived from the primary key of the parent entity.",
+     "chunk_id": "S01-0086",
+     "core": true
+    },
+    {
+     "point": "Example: an employee's dependent (for health insurance) is a weak entity, and the employee's ID is needed to fully identify the dependent.",
+     "chunk_id": "S04-0110",
+     "core": false
+    },
+    {
+     "point": "An entity is strong if it can exist apart from all of its related entities.",
+     "chunk_id": "S01-0086",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q64",
+   "question": "How is a many-to-many relationship implemented in a relational database?",
+   "topic": "SQL",
+   "question_type": "procedural",
+   "type_note": "Asks how something is implemented; could also be read as conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "A many-to-many (M:N) relationship cannot be implemented as such in the relational model.",
+     "chunk_id": "S01-0104",
+     "core": true
+    },
+    {
+     "point": "It is implemented by breaking it up into a set of 1:M relationships.",
+     "chunk_id": "S01-0104",
+     "core": true
+    },
+    {
+     "point": "It involves the implementation of a composite entity (bridge entity).",
+     "chunk_id": "S01-0105",
+     "core": true
+    },
+    {
+     "point": "The composite entity table must contain at least the primary keys of the original tables.",
+     "chunk_id": "S01-0105",
+     "core": true
+    },
+    {
+     "point": "The combination of these foreign keys forms the primary key of the relationship relation.",
+     "chunk_id": "S04-0113",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q65",
+   "question": "What is the difference between DDL and DML in SQL?",
+   "topic": "SQL",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "SQL as a data definition language (DDL) is used to create the database and table structures.",
+     "chunk_id": "S01-0224",
+     "core": true
+    },
+    {
+     "point": "The SQL data manipulation language (DML) is used to query and modify database data.",
+     "chunk_id": "S01-0248",
+     "core": true
+    },
+    {
+     "point": "The DML statements are SELECT, INSERT, UPDATE and DELETE.",
+     "chunk_id": "S01-0248",
+     "core": false
+    },
+    {
+     "point": "SQL commands are also grouped as DQL (data query language, SELECT) and DCL (data control language, e.g. GRANT).",
+     "chunk_id": "S04-0051",
+     "core": false
+    },
+    {
+     "point": "DDL is used to create, update and delete storage structures in a database management system.",
+     "chunk_id": "S04-0051",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Accept both groupings: S01-0248 counts SELECT as DML, while S04-0051 gives it its own category, DQL. S04-0051 is also a garbled table extract."
+  },
+  {
+   "id": "Q66",
+   "question": "What is the difference between WHERE and HAVING in a query?",
+   "topic": "SQL",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "WHERE introduces a condition on individual rows.",
+     "chunk_id": "S05-0286",
+     "core": true
+    },
+    {
+     "point": "HAVING introduces a condition on aggregations, i.e. results such as COUNT(), SUM(), MAX() or MIN() produced from multiple rows.",
+     "chunk_id": "S05-0286",
+     "core": true
+    },
+    {
+     "point": "WHERE is used before the GROUP BY clause; HAVING is used after it.",
+     "chunk_id": "S05-0286",
+     "core": true
+    },
+    {
+     "point": "HAVING can include an aggregate function; WHERE cannot.",
+     "chunk_id": "S01-0260",
+     "core": false
+    },
+    {
+     "point": "The HAVING clause behaves like the WHERE clause, but is applicable to groups.",
+     "chunk_id": "S01-0260",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q67",
+   "question": "What is the difference between an INNER JOIN and a LEFT OUTER JOIN?",
+   "topic": "SQL",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "An INNER JOIN returns only the rows that have matching values, i.e. data that appears in both tables.",
+     "chunk_id": "S05-0282",
+     "core": true
+    },
+    {
+     "point": "A left outer join specifies that all left outer rows be returned.",
+     "chunk_id": "S01-0283",
+     "core": true
+    },
+    {
+     "point": "A LEFT JOIN gives the matching rows between both tables, and shows null values where records do not match.",
+     "chunk_id": "S05-0282",
+     "core": true
+    },
+    {
+     "point": "An inner join connects two tables on a column with the same data type.",
+     "chunk_id": "S01-0283",
+     "core": false
+    },
+    {
+     "point": "A join compares the values in specified columns row by row and combines rows with qualifying values into a new row.",
+     "chunk_id": "S01-0277",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "The source wording is muddled: S05-0282 ('no records match from the left table, it shows those records with null values') and S01-0283 ('all left outer rows be returned'). Accept the standard definition as correct: a LEFT JOIN returns all rows from the left table, with nulls where the right table has no match."
+  },
+  {
+   "id": "Q68",
+   "question": "How do indexes make database queries faster?",
+   "topic": "SQL",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "An index holds the field being sorted and points from each record to the corresponding record where the data are stored.",
+     "chunk_id": "S04-0124",
+     "core": true
+    },
+    {
+     "point": "Without it, the system moves sequentially record by record, which takes a long time for a record at the end.",
+     "chunk_id": "S04-0123",
+     "core": true
+    },
+    {
+     "point": "Searching sorted data is faster: finding 'Andy' takes two comparisons instead of five.",
+     "chunk_id": "S04-0123",
+     "core": true
+    },
+    {
+     "point": "Indexing is generally implemented using a binary tree, B-tree or B+ tree; B+ trees are more common in database systems.",
+     "chunk_id": "S04-0125",
+     "core": false
+    },
+    {
+     "point": "An index is created with CREATE INDEX index_name ON table_name (column1, ...).",
+     "chunk_id": "S04-0125",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q69",
+   "question": "What is the difference between a view and a materialized view?",
+   "topic": "SQL",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "A view is a virtual table based on the results of a SQL statement; it does not physically exist in the database.",
+     "chunk_id": "S05-0288",
+     "core": true
+    },
+    {
+     "point": "A materialized view is a snapshot of a query saved as a physical object within the database.",
+     "chunk_id": "S05-0288",
+     "core": true
+    },
+    {
+     "point": "A view is slower to query; a materialized view is faster to query.",
+     "chunk_id": "S05-0289",
+     "core": true
+    },
+    {
+     "point": "A materialized view needs to be updated as new or updated data arrive in the underlying table; a view needs no additional maintenance.",
+     "chunk_id": "S05-0289",
+     "core": false
+    },
+    {
+     "point": "If the underlying table is dropped, a view will no longer work, but a materialized view will continue to work.",
+     "chunk_id": "S05-0289",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q70",
+   "question": "What is the difference between logical and physical data independence?",
+   "topic": "SQL",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Logical data independence is the ability to change the logical schema without changing the external schema or user view.",
+     "chunk_id": "S01-0056",
+     "core": true
+    },
+    {
+     "point": "Physical data independence is the immunity of the internal model to changes in the physical model: the logical schema stays unchanged when file organization, storage structures, storage devices or indexing strategy change.",
+     "chunk_id": "S01-0057",
+     "core": true
+    },
+    {
+     "point": "Data independence refers to the immunity of user applications to changes made in the definition and organization of data.",
+     "chunk_id": "S01-0055",
+     "core": false
+    },
+    {
+     "point": "Example of logical data independence: adding or removing entities, attributes or relationships without changing existing external schemas or rewriting application programs.",
+     "chunk_id": "S01-0056",
+     "core": false
+    },
+    {
+     "point": "Physical data independence hides the details of the storage structure from user applications.",
+     "chunk_id": "S01-0057",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "S04-0053 describes logical data independence differently ('separates any changes in the data from the data format'); the key uses S01's definition."
+  },
+  {
+   "id": "Q71",
+   "question": "What is a candidate key?",
+   "topic": "SQL",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "A candidate key is a simple or composite key that is unique and minimal.",
+     "chunk_id": "S01-0095",
+     "core": true
+    },
+    {
+     "point": "It is unique because no two rows in a table may have the same value at any time.",
+     "chunk_id": "S01-0095",
+     "core": true
+    },
+    {
+     "point": "It is minimal because every column is necessary in order to attain uniqueness.",
+     "chunk_id": "S01-0095",
+     "core": true
+    },
+    {
+     "point": "Either one of the candidate keys can be selected as the primary key.",
+     "chunk_id": "S04-0077",
+     "core": false
+    },
+    {
+     "point": "Alternate keys are all candidate keys not chosen as the primary key.",
+     "chunk_id": "S01-0109",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q72",
+   "question": "What is Docker Compose and why use it instead of starting containers one by one?",
+   "topic": "Data Pipelines",
+   "question_type": "definitional",
+   "type_note": "Second half (why use it) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "docker-compose launches multiple containers using a single configuration file.",
+     "chunk_id": "S06-0061",
+     "core": true
+    },
+    {
+     "point": "This means you don't have to run multiple complex docker run commands separately.",
+     "chunk_id": "S06-0061",
+     "core": true
+    },
+    {
+     "point": "You don't have to specify a network: every container (service) runs in the same network and the containers can find each other by name.",
+     "chunk_id": "S06-0063",
+     "core": true
+    },
+    {
+     "point": "Docker Compose uses YAML files.",
+     "chunk_id": "S06-0061",
+     "core": false
+    },
+    {
+     "point": "Benefits: a single command to start all services, automatic network creation, easy configuration management and declarative infrastructure.",
+     "chunk_id": "S06-0067",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q73",
+   "question": "What is Kestra?",
+   "topic": "Data Pipelines",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "Kestra is an orchestration platform that enables engineers to manage business-critical workflows.",
+     "chunk_id": "S06-0133",
+     "core": true
+    },
+    {
+     "point": "Kestra is open-source and infinitely scalable.",
+     "chunk_id": "S06-0133",
+     "core": false
+    },
+    {
+     "point": "Workflows can be built with Flow code (YAML), no-code, or the AI Copilot.",
+     "chunk_id": "S06-0133",
+     "core": true
+    },
+    {
+     "point": "Kestra has 1000+ plugins to integrate with other tools.",
+     "chunk_id": "S06-0133",
+     "core": false
+    },
+    {
+     "point": "Kestra supports schedule or event based triggers.",
+     "chunk_id": "S06-0133",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q74",
+   "question": "How do you backfill historical data with a scheduled workflow?",
+   "topic": "Data Pipelines",
+   "question_type": "procedural",
+   "expected_answer_points": [
+    {
+     "point": "Schedule the pipeline (e.g. to run daily at 9 AM UTC) and backfill it to run on historical data.",
+     "chunk_id": "S06-0154",
+     "core": true
+    },
+    {
+     "point": "You can backfill historical data directly from the Kestra UI.",
+     "chunk_id": "S06-0164",
+     "core": true
+    },
+    {
+     "point": "Given the large dataset, the local example backfills only the green taxi data for 2019.",
+     "chunk_id": "S06-0154",
+     "core": false
+    },
+    {
+     "point": "In the cloud, with scalable storage and compute, the entire yellow and green dataset can be backfilled without running out of resources on the local machine.",
+     "chunk_id": "S06-0164",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Thin: the chunks say backfills are run from the Kestra UI but give no steps; the flow YAML files are only linked. The neighbouring chunks (S06-0155 to S06-0157) do not contain backfill steps either, so the key is thin because the source is thin."
+  },
+  {
+   "id": "Q75",
+   "question": "How can a simple data pipeline be scheduled with cron?",
+   "topic": "Data Pipelines",
+   "question_type": "procedural",
+   "expected_answer_points": [
+    {
+     "point": "For simple pipelines, Cron is one of the most commonly used tools to schedule a pipeline to run.",
+     "chunk_id": "S05-0108",
+     "core": true
+    },
+    {
+     "point": "You install it onto the server where you want your script to run.",
+     "chunk_id": "S05-0108",
+     "core": true
+    },
+    {
+     "point": "You use cron syntax to tell it when to run.",
+     "chunk_id": "S05-0108",
+     "core": true
+    },
+    {
+     "point": "For more advanced pipelines with multiple dependent steps, a workflow orchestrator (Airflow, Prefect, Dagster) is more appropriate.",
+     "chunk_id": "S05-0108",
+     "core": false
+    },
+    {
+     "point": "A pipeline can be as simple as a script running on your computer automated with Cron or Windows task scheduler.",
+     "chunk_id": "S05-0104",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q76",
+   "question": "What does it mean for a data pipeline to be idempotent?",
+   "topic": "Data Pipelines",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "Idempotence means that if you execute a data pipeline multiple times with the same input, the output will stay the same.",
+     "chunk_id": "S05-0229",
+     "core": true
+    },
+    {
+     "point": "An idempotent pipeline keeps data duplicate-free.",
+     "chunk_id": "S05-0229",
+     "core": false
+    },
+    {
+     "point": "Idempotence can remove stale data and saves on storage and cost.",
+     "chunk_id": "S05-0229",
+     "core": false
+    },
+    {
+     "point": "Making pipelines idempotent is listed as a general data pipeline best practice.",
+     "chunk_id": "S05-0271",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Thin: the chunks contain only a one-sentence definition, so the definition is the single core point."
+  },
+  {
+   "id": "Q77",
+   "question": "What do the terraform init, plan and apply commands do?",
+   "topic": "Data Pipelines",
+   "question_type": "definitional",
+   "type_note": "Asks what each command does; a complete set of three commands, one core point each.",
+   "expected_answer_points": [
+    {
+     "point": "terraform init initializes and configures the backend, installs plugins/providers, and checks out an existing configuration from version control.",
+     "chunk_id": "S06-0092",
+     "core": true
+    },
+    {
+     "point": "terraform plan previews local changes against a remote state and proposes an execution plan.",
+     "chunk_id": "S06-0092",
+     "core": true
+    },
+    {
+     "point": "terraform apply asks for approval of the proposed plan and applies the changes to the cloud.",
+     "chunk_id": "S06-0092",
+     "core": true
+    },
+    {
+     "point": "terraform destroy removes your stack from the cloud.",
+     "chunk_id": "S06-0092",
+     "core": false
+    },
+    {
+     "point": "In the example, plan and apply are run with -var=\"project=<your-gcp-project-id>\".",
+     "chunk_id": "S06-0123",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Known literal-identifier question: the answer is the meaning of three CLI commands."
+  },
+  {
+   "id": "Q78",
+   "question": "How does the upload script send a local file to a Google Cloud Storage bucket?",
+   "topic": "Data Pipelines",
+   "question_type": "procedural",
+   "type_note": "Asks how the script works; answered as the sequence of calls it makes.",
+   "expected_answer_points": [
+    {
+     "point": "It creates a client with storage.Client().",
+     "chunk_id": "S06-0302",
+     "core": true
+    },
+    {
+     "point": "It gets the bucket with client.bucket(bucket) and a blob (object) with bucket.blob(object_name).",
+     "chunk_id": "S06-0302",
+     "core": true
+    },
+    {
+     "point": "It uploads the file with blob.upload_from_filename(local_file).",
+     "chunk_id": "S06-0302",
+     "core": true
+    },
+    {
+     "point": "The bucket name comes from the GCP_GCS_BUCKET environment variable (loaded from .env), with a default value.",
+     "chunk_id": "S06-0302",
+     "core": false
+    },
+    {
+     "point": "Another version of the script retries the upload up to max_retries times and verifies the upload.",
+     "chunk_id": "S06-0314",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Depends on literal code identifiers (google.cloud.storage calls) from code chunks."
+  },
+  {
+   "id": "Q79",
+   "question": "How do you load a large CSV file into Postgres in chunks with pandas?",
+   "topic": "Data Pipelines",
+   "question_type": "procedural",
+   "expected_answer_points": [
+    {
+     "point": "Read the CSV with pd.read_csv(..., iterator=True, chunksize=100000) to get an iterator over chunks.",
+     "chunk_id": "S06-0040",
+     "core": true
+    },
+    {
+     "point": "Create the table first with df.head(n=0).to_sql(..., if_exists='replace'), which creates the table without adding any data.",
+     "chunk_id": "S06-0039",
+     "core": true
+    },
+    {
+     "point": "Insert each chunk with df_chunk.to_sql(name=..., con=engine, if_exists='append').",
+     "chunk_id": "S06-0041",
+     "core": true
+    },
+    {
+     "point": "The data is inserted in batches with an iterator because we don't want to insert it all at once.",
+     "chunk_id": "S06-0040",
+     "core": false
+    },
+    {
+     "point": "In the complete loop, the table schema is created from the first chunk, then every chunk is appended.",
+     "chunk_id": "S06-0042",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Depends on literal code identifiers (pandas read_csv / to_sql arguments) from code snippets."
+  },
+  {
+   "id": "Q80",
+   "question": "What is Bruin and what problem does it solve?",
+   "topic": "Data Pipelines",
+   "question_type": "definitional",
+   "type_note": "Second half (what problem it solves) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "Bruin is an end-to-end data platform that combines ingestion, transformations, orchestration, data quality checks, metadata and lineage into a single tool.",
+     "chunk_id": "S06-0554",
+     "core": true
+    },
+    {
+     "point": "Instead of using five or six separately configured tools, Bruin keeps code logic, configurations, dependencies and quality checks in the same place.",
+     "chunk_id": "S06-0554",
+     "core": true
+    },
+    {
+     "point": "Bruin brings these together so you don't need to be a DevOps person, data infrastructure engineer and data architect just to build a pipeline.",
+     "chunk_id": "S06-0555",
+     "core": true
+    },
+    {
+     "point": "A typical data stack involves ingestion, transformations, orchestration, and data quality and governance.",
+     "chunk_id": "S06-0555",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q81",
+   "question": "What is the difference between MCAR, MAR and MNAR missing data?",
+   "topic": "Data Cleaning",
+   "question_type": "conceptual",
+   "type_note": "Asks for the complete set of three missing-data types: one core point per type, plus one example each.",
+   "expected_answer_points": [
+    {
+     "point": "MCAR (missing completely at random) data is missing data not related to any other variables, with no underlying cause for its absence.",
+     "chunk_id": "S02-0270",
+     "core": true
+    },
+    {
+     "point": "MAR (missing at random) data is missing data related to other variables but not to any unknown or unmeasured variables.",
+     "chunk_id": "S02-0271",
+     "core": true
+    },
+    {
+     "point": "MNAR (missing not at random) data is missing in a way that depends on unobserved data.",
+     "chunk_id": "S02-0361",
+     "core": true
+    },
+    {
+     "point": "MCAR example: respondents accidentally skip an income question, and the missing income is not related to the driving-habit variables being collected.",
+     "chunk_id": "S02-0270",
+     "core": false
+    },
+    {
+     "point": "MAR example: older respondents skip a memory question, so the missing data is related to the observed variable age.",
+     "chunk_id": "S02-0271",
+     "core": false
+    },
+    {
+     "point": "MNAR example: respondents with high credit card debt are less likely to answer, so the missing information is related to the unobserved debt levels.",
+     "chunk_id": "S02-0272",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "S02-0272 contradicts itself: it defines MNAR as depending 'on observed data but not on unobserved data', but its example and the glossary (S02-0361) say it depends on unobserved data; the key uses the glossary definition."
+  },
+  {
+   "id": "Q82",
+   "question": "How should outliers in a dataset be handled?",
+   "topic": "Data Cleaning",
+   "question_type": "procedural",
+   "expected_answer_points": [
+    {
+     "point": "One approach is to delete the outliers from the dataset, but this can lead to a loss of valuable information.",
+     "chunk_id": "S02-0274",
+     "core": true
+    },
+    {
+     "point": "Another option is to deal with the outliers as an individual group and analyze them separately from the rest of the data.",
+     "chunk_id": "S02-0274",
+     "core": true
+    },
+    {
+     "point": "Use robust statistical methods that are not affected by extreme values, e.g. the median instead of the mean and nonparametric instead of parametric tests.",
+     "chunk_id": "S02-0275",
+     "core": true
+    },
+    {
+     "point": "An outlier can be replaced with a median, calculated in the book's example by taking the mean of the points before and after the outlier.",
+     "chunk_id": "S02-0278",
+     "core": false
+    },
+    {
+     "point": "After handling outliers, validate the results, e.g. through cross-validation or comparing the results to external data sources.",
+     "chunk_id": "S02-0275",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "S02-0278's wording is self-contradictory ('replace it with median, calculated by taking the mean of the points before and after'); that point is optional."
+  },
+  {
+   "id": "Q83",
+   "question": "What does data standardization mean when preparing data for analysis?",
+   "topic": "Data Cleaning",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "Data standardization is the process of systematically transforming collected information into a consistent and manageable format.",
+     "chunk_id": "S02-0280",
+     "core": true
+    },
+    {
+     "point": "Data standardization transforms data into a common scale or range to help remove any unit differences or variations in magnitude.",
+     "chunk_id": "S02-0358",
+     "core": true
+    },
+    {
+     "point": "The first step is to establish guidelines and rules for formatting and structuring the data, e.g. conventions for naming, data types and formatting.",
+     "chunk_id": "S02-0284",
+     "core": false
+    },
+    {
+     "point": "Example: making sure key data elements are consistently formatted in all data sources, e.g. the same date format everywhere.",
+     "chunk_id": "S02-0287",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "The source gives two different definitions (consistent format in S02-0280 vs common scale/range in S02-0358); accept either."
+  },
+  {
+   "id": "Q84",
+   "question": "What is binning, or data discretization?",
+   "topic": "Data Cleaning",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "Data discretization is the process of converting continuous data into discrete categories or intervals.",
+     "chunk_id": "S02-0357",
+     "core": true
+    },
+    {
+     "point": "Discretization is done to allow for easier analysis and processing of the data.",
+     "chunk_id": "S02-0357",
+     "core": true
+    },
+    {
+     "point": "Binning means turning continuous data into bins (discrete categories), e.g. body mass index turned into underweight, normal weight, overweight, while the underlying height and weight stay continuous.",
+     "chunk_id": "S07-0003",
+     "core": false
+    },
+    {
+     "point": "Example: binning individual ages into age groups of 10 years (0-10, 10-20, 20-30, ...).",
+     "chunk_id": "S02-0298",
+     "core": false
+    },
+    {
+     "point": "Data discretization is one of the data cleaning and preprocessing steps and can help facilitate analysis.",
+     "chunk_id": "S02-0265",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q85",
+   "question": "What is database normalization trying to achieve?",
+   "topic": "Data Cleaning",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Normalization is the process of organizing data in a database to reduce redundancy and improve data integrity.",
+     "chunk_id": "S05-0097",
+     "core": true
+    },
+    {
+     "point": "One goal is to be able to characterize the level of redundancy in a relational schema.",
+     "chunk_id": "S01-0171",
+     "core": true
+    },
+    {
+     "point": "Another goal is to provide mechanisms for transforming schemas in order to remove redundancy.",
+     "chunk_id": "S01-0171",
+     "core": true
+    },
+    {
+     "point": "Higher normal forms have less redundancy and, as a result, fewer update problems.",
+     "chunk_id": "S01-0171",
+     "core": false
+    },
+    {
+     "point": "Normalization is particularly important for OLTP systems, where inserts, updates and deletes occur rapidly.",
+     "chunk_id": "S05-0097",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q86",
+   "question": "What is change data capture and when is it used?",
+   "topic": "Data Cleaning",
+   "question_type": "definitional",
+   "type_note": "Second half (when it is used) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "Change data capture (CDC) is an incremental ingestion technique that captures changes from database transaction logs using CDC software.",
+     "chunk_id": "S05-0036",
+     "core": true
+    },
+    {
+     "point": "It tracks when records are inserted, updated and deleted, along with the data itself.",
+     "chunk_id": "S05-0036",
+     "core": true
+    },
+    {
+     "point": "CDC is typically used to replicate data that is overwritten to another database, e.g. from an operational database to a data warehouse.",
+     "chunk_id": "S05-0039",
+     "core": true
+    },
+    {
+     "point": "Other uses: replicating changes into Kafka in a microservices architecture, and upgrading or migrating a database with minimal downtime.",
+     "chunk_id": "S05-0039",
+     "core": false
+    },
+    {
+     "point": "CDC is widely used because of its efficiency and minimal impact on source systems.",
+     "chunk_id": "S05-0036",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q87",
+   "question": "What are the five Vs of big data?",
+   "topic": "Big Data",
+   "question_type": "definitional",
+   "type_note": "Asks for the complete set of five Vs: one core point per V.",
+   "expected_answer_points": [
+    {
+     "point": "Volume: the amount of data (data at rest).",
+     "chunk_id": "S04-0214",
+     "core": true
+    },
+    {
+     "point": "Velocity: the speed at which data comes in and goes out (data in motion).",
+     "chunk_id": "S04-0214",
+     "core": true
+    },
+    {
+     "point": "Variety: the range of data types and sources that are used (data in its many forms).",
+     "chunk_id": "S04-0214",
+     "core": true
+    },
+    {
+     "point": "Veracity: the uncertainty of the data (data in doubt).",
+     "chunk_id": "S04-0214",
+     "core": true
+    },
+    {
+     "point": "Value: the actual value derived using the total cost of ownership (TCO) and return on investment (ROI) of the data.",
+     "chunk_id": "S04-0214",
+     "core": true
+    },
+    {
+     "point": "Another source lists only three Vs for big data: velocity, volume and variety.",
+     "chunk_id": "S07-0007",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q88",
+   "question": "What does the CAP theorem say about distributed databases?",
+   "topic": "Big Data",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "It is impossible for a distributed system to satisfy all three CAP properties at the same time: consistency, availability and partition tolerance.",
+     "chunk_id": "S03-0089",
+     "core": true
+    },
+    {
+     "point": "Because it is impossible to have all three, you have to choose two of them: CA, CP or AP.",
+     "chunk_id": "S03-0090",
+     "core": true
+    },
+    {
+     "point": "Consistency: every read receives the most recent write or an error; availability: every request receives a non-error response; partition tolerance: the system keeps operating despite messages dropped or delayed between nodes.",
+     "chunk_id": "S05-0212",
+     "core": false
+    },
+    {
+     "point": "CA is a non-distributed (centralized) database; CP cannot be modified when the network splits; AP can become inconsistent when the network splits.",
+     "chunk_id": "S03-0090",
+     "core": false
+    },
+    {
+     "point": "It was a conjecture by Eric Brewer (PODC 2000), proved as a theorem by Gilbert and Lynch in 2002.",
+     "chunk_id": "S03-0089",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q89",
+   "question": "What does eventual consistency mean in NoSQL databases?",
+   "topic": "Big Data",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "NoSQL DBMSs are not ACID compliant and data consistency is not guaranteed; they provide eventual consistency instead.",
+     "chunk_id": "S04-0173",
+     "core": true
+    },
+    {
+     "point": "When old data are getting overwritten, results that are a little wrong are temporarily returned.",
+     "chunk_id": "S04-0173",
+     "core": true
+    },
+    {
+     "point": "Eventually consistent datastores value availability over data consistency.",
+     "chunk_id": "S03-0114",
+     "core": true
+    },
+    {
+     "point": "It does not work where data consistency is necessary, such as financial transactions, but is fine for tasks that require speed rather than pinpoint accuracy.",
+     "chunk_id": "S04-0173",
+     "core": false
+    },
+    {
+     "point": "BASE (basically available, soft state, eventually consistent) is a synonym for the same approach.",
+     "chunk_id": "S03-0114",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "S04-0182 says NoSQL databases are 'categorized as eventual consistency because it guarantees up-to-date information', which contradicts S04-0173; the key uses S04-0173 and S03-0114."
+  },
+  {
+   "id": "Q90",
+   "question": "What are the main types of NoSQL databases?",
+   "topic": "Big Data",
+   "question_type": "definitional",
+   "type_note": "Asks for the complete set of NoSQL types: one core point per type.",
+   "expected_answer_points": [
+    {
+     "point": "Document databases (document stores).",
+     "chunk_id": "S04-0062",
+     "core": true
+    },
+    {
+     "point": "Graph databases.",
+     "chunk_id": "S04-0062",
+     "core": true
+    },
+    {
+     "point": "Key-value stores.",
+     "chunk_id": "S04-0062",
+     "core": true
+    },
+    {
+     "point": "Column-oriented databases.",
+     "chunk_id": "S04-0062",
+     "core": true
+    },
+    {
+     "point": "NoSQL databases store data in flexible formats, enabling scalability and schema-less design for diverse data types.",
+     "chunk_id": "S05-0177",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q91",
+   "question": "How do shared-memory, shared-disk and shared-nothing database architectures differ?",
+   "topic": "Big Data",
+   "question_type": "conceptual",
+   "type_note": "Asks for a complete set of three architectures: one core point each.",
+   "expected_answer_points": [
+    {
+     "point": "Shared-memory: multiple interconnected processors that run the DBMS software share the same central storage and secondary storage.",
+     "chunk_id": "S04-0143",
+     "core": true
+    },
+    {
+     "point": "Shared-disk: each processor has its own central storage but shares secondary storage with other processors using NAS or SAN.",
+     "chunk_id": "S04-0144",
+     "core": true
+    },
+    {
+     "point": "Shared-nothing: each processor has its own central storage and hard disk units, and data sharing occurs through the processors communicating over the network.",
+     "chunk_id": "S04-0144",
+     "core": true
+    },
+    {
+     "point": "Federated databases use nodes in a shared-nothing architecture, each running an independent DBMS instance.",
+     "chunk_id": "S04-0145",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q92",
+   "question": "What is a key-value store, and what are some examples?",
+   "topic": "Big Data",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "A key-value store is a simple database that stores only key-value pairs and provides basic functionality for retrieving the value associated with a known key.",
+     "chunk_id": "S04-0174",
+     "core": true
+    },
+    {
+     "point": "A unique primary key is used to access a data item, which is usually a binary blob.",
+     "chunk_id": "S03-0109",
+     "core": true
+    },
+    {
+     "point": "Examples: Redis, Riak, Apache Cassandra (partially) and Scalaris.",
+     "chunk_id": "S03-0109",
+     "core": true
+    },
+    {
+     "point": "Further examples: Redis, DynamoDB and Cosmos DB.",
+     "chunk_id": "S04-0174",
+     "core": false
+    },
+    {
+     "point": "Some key-value stores use only RAM (as memcached replacements); others also persist data to disk.",
+     "chunk_id": "S03-0110",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q93",
+   "question": "How does the dbt intermediate trips model remove duplicate trips?",
+   "topic": "Data Quality",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "It uses QUALIFY ROW_NUMBER() OVER (PARTITION BY vendor_id, pickup_datetime, pickup_location_id, service_type ORDER BY dropoff_datetime) = 1.",
+     "chunk_id": "S06-0543",
+     "core": true
+    },
+    {
+     "point": "If multiple trips match (same vendor, second, location and service), it keeps the first one.",
+     "chunk_id": "S06-0543",
+     "core": true
+    },
+    {
+     "point": "It generates a surrogate trip_id with dbt_utils.generate_surrogate_key over vendor_id, pickup_datetime, pickup_location_id and service_type.",
+     "chunk_id": "S06-0542",
+     "core": false
+    },
+    {
+     "point": "The model also enriches trips with the payment type description from the payment_type_lookup seed.",
+     "chunk_id": "S06-0542",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "Depends on literal code identifiers (the dbt SQL of int_trips) from code chunks."
+  },
+  {
+   "id": "Q94",
+   "question": "What is data governance?",
+   "topic": "Data Quality",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "Data governance is the set of clear roles, policies and responsibilities that enables a business to manage and safeguard data quality using internally set rules and policies.",
+     "chunk_id": "S04-0028",
+     "core": true
+    },
+    {
+     "point": "It is the set of policies and procedures that ensure the data used in an organization is of high quality throughout its lifecycle (input, storage, transformation, access and deletion).",
+     "chunk_id": "S05-0065",
+     "core": true
+    },
+    {
+     "point": "It focuses on establishing responsibility for data throughout the complete lifecycle of data.",
+     "chunk_id": "S05-0258",
+     "core": true
+    },
+    {
+     "point": "Data governance is not a 'set it and forget it' system, and completely automating it is not recommended.",
+     "chunk_id": "S05-0258",
+     "core": false
+    },
+    {
+     "point": "Data compliance is the related concept that aligns data practices with external legal requirements and industry standards, e.g. GDPR.",
+     "chunk_id": "S04-0028",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q95",
+   "question": "What is a data contract between data producers and consumers?",
+   "topic": "Data Quality",
+   "question_type": "definitional",
+   "expected_answer_points": [
+    {
+     "point": "A data contract is a formal agreement between data producers and data consumers.",
+     "chunk_id": "S05-0060",
+     "core": true
+    },
+    {
+     "point": "It defines the structure, schema, semantics, quality rules and Service Level Agreements (SLAs) for data exchanged between systems.",
+     "chunk_id": "S05-0060",
+     "core": true
+    },
+    {
+     "point": "Like API contracts, data contracts establish explicit interfaces to prevent unexpected breaking changes in downstream pipelines.",
+     "chunk_id": "S05-0060",
+     "core": true
+    },
+    {
+     "point": "dbt model contracts apply the idea: agree with the stakeholder on the output dataset (column names, types, freshness) and the contract enforces it automatically.",
+     "chunk_id": "S06-0427",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q96",
+   "question": "What is the difference between discrete and continuous data?",
+   "topic": "Data Quality",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "With continuous data, the values can be any number, chosen from an infinite set of numbers.",
+     "chunk_id": "S02-0054",
+     "core": true
+    },
+    {
+     "point": "With discrete data, the values follow a specific precision, which makes the set of possible values finite.",
+     "chunk_id": "S02-0054",
+     "core": true
+    },
+    {
+     "point": "Discrete data can be counted; continuous data is measured.",
+     "chunk_id": "S07-0003",
+     "core": false
+    },
+    {
+     "point": "Whether data is continuous or discrete depends on the context, e.g. class size becomes discrete if classes are capped at 200 seats.",
+     "chunk_id": "S02-0055",
+     "core": false
+    },
+    {
+     "point": "Examples: continuous - height, weight, age, temperature, money; discrete - a 1-to-5 survey rating, the number of hip replacements performed.",
+     "chunk_id": "S07-0003",
+     "core": false
+    }
+   ],
+   "needs_review": true,
+   "review_note": "S07-0003 is a garbled table (both columns say 'can take on any value over a range'), and S02-0055 calls class-size head counts continuous; the key uses the clear S02-0054 definitions. The 'counted vs measured' point comes from that garbled S07-0003 table, so it is optional."
+  },
+  {
+   "id": "Q97",
+   "question": "What is the difference between structured and unstructured data?",
+   "topic": "Data Quality",
+   "question_type": "conceptual",
+   "expected_answer_points": [
+    {
+     "point": "Structured data are organized into a formatted database and have relational keys (e.g. relational data).",
+     "chunk_id": "S04-0054",
+     "core": true
+    },
+    {
+     "point": "Unstructured data are not organized in a formatted database and do not have organized properties (e.g. PDF).",
+     "chunk_id": "S04-0054",
+     "core": true
+    },
+    {
+     "point": "Structured datasets are organized in a tabular format with clearly defined fields and relationships; unstructured data lacks a fixed schema.",
+     "chunk_id": "S02-0062",
+     "core": true
+    },
+    {
+     "point": "Unstructured data is often text, images, videos, audio recordings or other content that doesn't fit neatly into rows and columns.",
+     "chunk_id": "S02-0062",
+     "core": false
+    },
+    {
+     "point": "Semistructured data (e.g. XML) are not organized in a formatted database but have some organized properties.",
+     "chunk_id": "S04-0054",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q98",
+   "question": "What are the bronze, silver and gold layers of a medallion architecture?",
+   "topic": "ETL/ELT",
+   "question_type": "definitional",
+   "type_note": "Asks for the complete set of three layers: one core point per layer.",
+   "expected_answer_points": [
+    {
+     "point": "Bronze: the initial point for data ingestion and storage; data is saved without processing or transformation.",
+     "chunk_id": "S05-0029",
+     "core": true
+    },
+    {
+     "point": "Silver: tables are cleaned, filtered or transformed into a more usable format, with light modifications rather than aggregations or enrichments.",
+     "chunk_id": "S05-0030",
+     "core": true
+    },
+    {
+     "point": "Gold: data is refined to meet specific business and analytics requirements, e.g. aggregated or enriched, and is ready for downstream teams.",
+     "chunk_id": "S05-0031",
+     "core": true
+    },
+    {
+     "point": "A medallion architecture is a data design pattern, coined by Databricks, that logically organizes data in a lakehouse to incrementally improve data quality as it flows through the layers.",
+     "chunk_id": "S05-0028",
+     "core": false
+    },
+    {
+     "point": "Medallion architectures are sometimes referred to as 'multi-hop' architectures.",
+     "chunk_id": "S05-0028",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q99",
+   "question": "What is data ingestion, and how does batch ingestion differ from streaming ingestion?",
+   "topic": "ETL/ELT",
+   "question_type": "definitional",
+   "type_note": "Second half (how batch differs from streaming) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "Data ingestion is the process of extracting and importing data from various sources into a destination system where it can be stored, transformed and analyzed.",
+     "chunk_id": "S05-0040",
+     "core": true
+    },
+    {
+     "point": "Batch ingestion processes data in scheduled intervals; real-time/streaming ingestion processes data continuously as it arrives.",
+     "chunk_id": "S05-0040",
+     "core": true
+    },
+    {
+     "point": "Batch ingestion has higher latency (minutes to hours), is more efficient for large volumes, is easiest to implement and debug, and has lower infrastructure costs.",
+     "chunk_id": "S05-0044",
+     "core": true
+    },
+    {
+     "point": "Streaming ingestion has low latency (seconds to milliseconds), is more complex to implement, has higher infrastructure costs, and enables real-time analytics.",
+     "chunk_id": "S05-0045",
+     "core": true
+    },
+    {
+     "point": "Micro-batch ingestion is a hybrid approach that processes small batches of data at frequent intervals.",
+     "chunk_id": "S05-0045",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  },
+  {
+   "id": "Q100",
+   "question": "What is data integration and why do organisations need it?",
+   "topic": "ETL/ELT",
+   "question_type": "definitional",
+   "type_note": "Second half (why organisations need it) is conceptual.",
+   "expected_answer_points": [
+    {
+     "point": "Data integration aims to provide a unified view and/or unified access over heterogeneous, and possibly distributed, data sources.",
+     "chunk_id": "S04-0212",
+     "core": true
+    },
+    {
+     "point": "Traditionally, departments have independent data and systems (silos) that do not share resources, which makes it hard to answer queries or check updates.",
+     "chunk_id": "S04-0216",
+     "core": true
+    },
+    {
+     "point": "Data integration provides a consistent view of all organization data, which is required to start the convergence of analytical and operational data.",
+     "chunk_id": "S04-0216",
+     "core": true
+    },
+    {
+     "point": "The emergence of BI and analytics triggered the need to consolidate data into a data warehouse.",
+     "chunk_id": "S04-0212",
+     "core": false
+    },
+    {
+     "point": "Integration patterns include data consolidation, data federation and data propagation; using ETL to integrate data into a data warehouse is data consolidation.",
+     "chunk_id": "S04-0216",
+     "core": false
+    }
+   ],
+   "needs_review": false
+  }
+ ]
+}
