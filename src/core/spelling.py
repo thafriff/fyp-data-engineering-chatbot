@@ -19,6 +19,7 @@ from config import settings
 
 # Letters-only words (an apostrophe inside is allowed: "what's"); everything else is left exactly as typed.
 _WORD = re.compile(r"[A-Za-z]+(?:'[A-Za-z]+)?")
+WORD = _WORD      # shared with search_text.py, so the typed and corrected words line up one to one
 
 
 class SpellCorrector:

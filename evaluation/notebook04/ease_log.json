@@ -1,0 +1,343 @@
+{
+ "meta": {
+  "purpose": "Table 3.9 Ease of Implementation evidence (plan section 2.8). Recorded while integrating each model, timestamped, before any scoring; never reconstructed afterwards.",
+  "field_guide": {
+   "package": "SDK used",
+   "langchain_integration": "name of the LangChain chat-model package if one exists (for information; LangChain is not used)",
+   "setup_steps": "account, API key, billing, region or model-access request",
+   "adapter_lines": "lines of model-specific code beyond the shared adapter",
+   "special_handling": "e.g. temperature not accepted, thinking parameter, safety filter, message-format differences",
+   "trial_errors": "objects: {question, error, minutes_to_fix}",
+   "access_blockers": "e.g. waitlist, Enterprise-only",
+   "score": "1-5 from the rule in plan section 2.8"
+  }
+ },
+ "models": {
+  "gpt-4o": {
+   "logged_at": null,
+   "host_used": null,
+   "package": null,
+   "package_version": null,
+   "langchain_integration": null,
+   "setup_steps": [],
+   "adapter_lines": null,
+   "special_handling": [],
+   "trial_questions": [
+    "Q01",
+    "Q02",
+    "Q03"
+   ],
+   "trial_errors": [],
+   "access_blockers": [],
+   "score": null
+  },
+  "gemini-3.8-flash": {
+   "logged_at": "2026-11-07T15:03:15+00:00",
+   "host_used": "Gemini API (Google AI Studio), default endpoint",
+   "package": "google-genai",
+   "package_version": "2.28.0",
+   "langchain_integration": "langchain-google-genai (4.4.0 installed for ragas); not used, because LangChain is not used (Report TODO 27)",
+   "setup_steps": [
+    "Google AI Studio account and API key; GOOGLE_API_KEY saved in .env by the author (file saved 2026-11-04)",
+    "No model-access request, waitlist or region step: the key lists gemini-3.8-flash exactly (models API, no tokens, 2026-11-07T09:18Z)",
+    "Free tier or billing: not visible from the API; the author confirms in AI Studio whether the key's project has billing enabled"
+   ],
+   "adapter_lines": "24 lines in providers.py (68-74 request, 125-127 client, 184-197 response), shared with gemma-4-31b-it; no code written for this model alone",
+   "special_handling": [
+    "Thinking cannot be disabled: thinking_level LOW, the lowest level the Gemini docs list for this model",
+    "Reasoning allowance of 1,200 tokens on top of the 800-token answer cap (output budget 2,000), an assumption made before measurement",
+    "Thinking tokens are reported apart (thoughts_token_count) and billed as output; the adapter adds them to output tokens"
+   ],
+   "trial_questions": [
+    "Q01",
+    "Q02",
+    "Q03"
+   ],
+   "trial_errors": [],
+   "access_blockers": [],
+   "score": null,
+   "pre_trial_checks": [
+    [
+     {
+      "at": "2026-11-05T15:14:35Z",
+      "check": "one trivial request (connectivity)",
+      "result": "503 UNAVAILABLE 'This model is currently experiencing high demand' after 9.78 s"
+     },
+     {
+      "at": "2026-11-05T15:39Z",
+      "check": "one trivial request (connectivity), 45 s after the model list",
+      "result": "503 UNAVAILABLE, same message, after 72.47 s"
+     },
+     {
+      "at": "2026-11-07T09:18:12Z",
+      "check": "models API list (no tokens)",
+      "result": "key valid; gemini-3.8-flash listed exactly"
+     },
+     {
+      "at": "2026-11-07T15:03:15+00:00",
+      "check": "google-genai 2.28.0 retry behaviour (source read)",
+      "result": "with no retry_options the SDK makes one attempt (tenacity stop_after_attempt(1)); providers.py sets none, so the 72.47 s was one request held by the server, not SDK retries"
+     }
+    ]
+   ],
+   "trial_started_at": "2026-11-07T15:03:15+00:00",
+   "trial_completed_at": "2026-11-07T15:11:40+00:00",
+   "trial_outcome": "Q01, Q02 and Q03 answered with no error and no code change; runner exit 0; answers saved in raw/gemini-3.8-flash.json",
+   "transient_failures": [
+    {
+     "question": "Q02",
+     "error": "503 UNAVAILABLE (high demand), 3 times",
+     "handling": "retried automatically by run_generation.py's back-off; no fix needed",
+     "minutes_to_fix": 0
+    },
+    {
+     "question": "Q03",
+     "error": "503 UNAVAILABLE (high demand), once",
+     "handling": "retried automatically by run_generation.py's back-off; no fix needed",
+     "minutes_to_fix": 0
+    }
+   ],
+   "transient_failures_note": "Recorded apart from trial_errors because they were host overload, retried by the runner, with nothing to fix. Whether they count as trial errors for the plan section 2.8 score is the author's decision.",
+   "trial_observations": [
+    "Reasoning tokens reported: 0 on all three answers at thinking_level LOW (usage thoughts_token_count). Output tokens 557, 324, 398, all finished.",
+    "Latency of the successful request: Q01 60.8 s (first attempt), Q02 83.7 s, Q03 10.9 s. The request timeout of 120 s was not reached.",
+    "Input tokens as returned by the API: 1,248, 1,195, 1,190 against the characters/4 estimates of 1,423, 1,376, 1,284 (about 0.89 times)."
+   ],
+   "trial_reruns": [
+    {
+     "started_at": "2026-11-08T08:30:25+00:00",
+     "reason": "Re-run of Q01-Q03 after the request timeout was raised from 120 s to 180 s. The timeout is resume-locked, so the author deliberately deleted the trial cache. The original trial's entries above stay as recorded."
+    },
+    {
+     "completed_at": "2026-11-08T08:52:01+00:00",
+     "request_timeout_seconds": 180,
+     "max_retries": 10,
+     "outcome": "Q01-Q03 saved after two runner passes. Pass 1: Q01 timed out at 180.0 s (kept in timed_out_attempts), Q02 and Q03 saved. Pass 2: Q01 saved.",
+     "latency_seconds": {
+      "Q01": 175.678,
+      "Q02": 126.653,
+      "Q03": 141.51
+     },
+     "timed_out_attempts": 1,
+     "temporary_failure_retries": {
+      "Q02": 1,
+      "Q03": 1
+     },
+     "failed_attempt_seconds": {
+      "Q02": 178.25,
+      "Q03": 178.05
+     },
+     "rate_limit_retries": 0,
+     "transient_only": true
+    },
+    {
+     "started_at": "2026-11-11T11:14:56+00:00",
+     "reason": "Fresh Q01-Q03 trial on the free tier after the spelling hint was narrowed and the resume guard made per-item (2026-11-11, before any candidate result). Q01-Q03 prompts are unchanged, so the per-item guard would have kept the earlier answers; re-run at the author's request, which also adds per-call timestamps. Earlier caches kept in the scratchpad backup."
+    },
+    {
+     "completed_at": "2026-11-11T11:19:19+00:00",
+     "outcome": "Q01-Q03 saved in one pass, no failed attempts; the second pass reported 3 already done (per-item resume rule).",
+     "latency_seconds": {
+      "Q01": 19.388,
+      "Q02": 14.546,
+      "Q03": 12.427
+     },
+     "run_window_utc": [
+      "2026-11-11T11:15:05+00:00",
+      "2026-11-11T11:15:52+00:00"
+     ],
+     "temporary_failure_retries": 0,
+     "rate_limit_retries": 0,
+     "timed_out_attempts": 0
+    }
+   ]
+  },
+  "claude-sonnet-5-5": {
+   "logged_at": null,
+   "host_used": null,
+   "package": null,
+   "package_version": null,
+   "langchain_integration": null,
+   "setup_steps": [],
+   "adapter_lines": null,
+   "special_handling": [],
+   "trial_questions": [
+    "Q01",
+    "Q02",
+    "Q03"
+   ],
+   "trial_errors": [],
+   "access_blockers": [],
+   "score": null
+  },
+  "llama-3.3-70b-groq": {
+   "logged_at": null,
+   "host_used": null,
+   "package": null,
+   "package_version": null,
+   "langchain_integration": null,
+   "setup_steps": [],
+   "adapter_lines": null,
+   "special_handling": [],
+   "trial_questions": [
+    "Q01",
+    "Q02",
+    "Q03"
+   ],
+   "trial_errors": [],
+   "access_blockers": [
+    {
+     "event": "access_blocker",
+     "logged_at": "2026-11-05T15:40:53+00:00",
+     "observed_at_approx": "2026-11-05T15:14:35+00:00",
+     "observed_during": "connectivity check before the integration trial; one trivial request, not part of the run",
+     "host": "Groq",
+     "model_string": "llama-3.3-70b-versatile",
+     "status_code": 404,
+     "error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}",
+     "model_list_check": {
+      "checked_at": "2026-11-05T15:38:12+00:00",
+      "result": "The key lists 11 models. llama-3.3-70b-versatile is not among them. The only IDs containing 'llama' are meta-llama/llama-prompt-guard-2-22m and meta-llama/llama-prompt-guard-2-86m, which are safety classifiers with a 512-token context window, not general-purpose chat models."
+     },
+     "score_assigned": false,
+     "score_reasoning": "No Ease of Implementation score is assigned here. That score is assigned at the end of integration, and whether a host change was actually needed is still unknown: the author has not yet decided what the LLaMA slot will use."
+    }
+   ],
+   "score": null
+  },
+  "gemma-4-31b-it": {
+   "logged_at": "2026-11-07T15:11:40+00:00",
+   "host_used": "Gemini API (Google AI Studio), default endpoint",
+   "package": "google-genai",
+   "package_version": "2.28.0",
+   "langchain_integration": "langchain-google-genai (4.4.0 installed for ragas); not used, because LangChain is not used (Report TODO 27)",
+   "setup_steps": [
+    "Same Google AI Studio key as gemini-3.8-flash (GOOGLE_API_KEY); no separate account",
+    "No model-access request, waitlist or region step: the key lists gemma-4-31b-it exactly (models API, no tokens, 2026-11-07T09:18Z)",
+    "Gemma 4 is free of charge on the Gemini API per Google's pricing page (plan section 1); paid use not available"
+   ],
+   "adapter_lines": "0 of its own: it uses the same 24 Gemini API lines in providers.py (68-74, 125-127, 184-197) as gemini-3.8-flash",
+   "special_handling": [
+    "thinking_level MINIMAL, taken from the Gemma-on-Gemini-API docs page that is marked deprecated; to be confirmed in this trial",
+    "Reasoning allowance 0 (output budget 800), on the assumption that minimal thinking returns no reasoning tokens"
+   ],
+   "trial_questions": [
+    "Q01",
+    "Q02",
+    "Q03"
+   ],
+   "trial_errors": [],
+   "access_blockers": [],
+   "score": null,
+   "pre_trial_checks": [
+    [
+     {
+      "at": "2026-11-07T09:18:12Z",
+      "check": "models API list (no tokens)",
+      "result": "key valid; gemma-4-31b-it listed exactly"
+     }
+    ]
+   ],
+   "trial_started_at": "2026-11-07T15:11:41+00:00",
+   "trial_completed_at": "2026-11-07T15:20:29+00:00",
+   "trial_outcome": "Q01, Q02 and Q03 answered with no error and no code change; runner exit 0; answers saved in raw/gemma-4-31b-it.json",
+   "transient_failures": [
+    {
+     "question": "Q01",
+     "error": "temporary failure (5xx or connection; the runner records the count, not the message), 6 times; succeeded on the 7th attempt after 275 s of back-off",
+     "handling": "retried automatically by run_generation.py's back-off; no fix needed. NB04_BACKOFF_MAX_RETRIES is 6, so one more failure would have stopped the run (exit 3, state saved)",
+     "minutes_to_fix": 0
+    },
+    {
+     "question": "Q02",
+     "error": "temporary failure, once (5 s back-off)",
+     "handling": "retried automatically; no fix needed",
+     "minutes_to_fix": 0
+    }
+   ],
+   "transient_failures_note": "Recorded apart from trial_errors because they were host-side failures, retried by the runner, with nothing to fix. Whether they count as trial errors for the plan section 2.8 score is the author's decision.",
+   "trial_observations": [
+    "thinking_level MINIMAL was accepted (no 400), and the API reported 0 reasoning tokens on all three answers, so the deprecated docs' claim held in this trial.",
+    "Latency of the successful request: Q01 33.0 s, Q02 34.1 s, Q03 47.0 s. The request timeout of 120 s was not reached.",
+    "Input tokens as returned by the API: 1,248, 1,195, 1,190, identical to gemini-3.8-flash (same tokenizer). Output tokens 495, 395, 354, all finished. Cost $0: free of charge."
+   ],
+   "trial_reruns": [
+    {
+     "started_at": "2026-11-08T08:48:17+00:00",
+     "reason": "Re-run of Q01-Q03 after the request timeout was raised from 120 s to 180 s. The timeout is resume-locked, so the author deliberately deleted the trial cache. The original trial's entries above stay as recorded."
+    },
+    {
+     "completed_at": "2026-11-08T08:52:02+00:00",
+     "request_timeout_seconds": 180,
+     "max_retries": 10,
+     "outcome": "Q01-Q03 saved in one runner pass with no retries.",
+     "latency_seconds": {
+      "Q01": 37.763,
+      "Q02": 40.209,
+      "Q03": 62.703
+     },
+     "timed_out_attempts": 0,
+     "temporary_failure_retries": 0,
+     "rate_limit_retries": 0
+    },
+    {
+     "started_at": "2026-11-11T10:30:24+00:00",
+     "reason": "Re-run of Q01-Q03 after the prompt builder gained the spelling hint (2026-11-11, before any candidate result). Q01-Q03 prompts are byte-identical, but the frozen prompt set changed (Q100, G02), so the resume guard refuses the earlier cache. The earlier cache is kept in the scratchpad backup."
+    },
+    {
+     "completed_at": "2026-11-11T10:37:21+00:00",
+     "reason": "spelling hint added to the prompt builder (prompt set changed; Q01-Q03 prompts unchanged)",
+     "outcome": "Q01-Q03 saved in one runner pass. Q02 needed 4 temporary-failure retries (now recorded per call in call_log with error type and HTTP status).",
+     "latency_seconds": {
+      "Q01": 41.679,
+      "Q02": 69.398,
+      "Q03": 35.604
+     },
+     "temporary_failure_retries": {
+      "Q02": 4
+     },
+     "rate_limit_retries": 0,
+     "timed_out_attempts": 0
+    },
+    {
+     "started_at": "2026-11-11T11:16:08+00:00",
+     "reason": "Fresh Q01-Q03 trial on the free tier after the spelling hint was narrowed and the resume guard made per-item (2026-11-11, before any candidate result). Q01-Q03 prompts are unchanged, so the per-item guard would have kept the earlier answers; re-run at the author's request, which also adds per-call timestamps. Earlier caches kept in the scratchpad backup."
+    },
+    {
+     "completed_at": "2026-11-11T11:19:19+00:00",
+     "outcome": "Q01-Q03 saved in one pass, no failed attempts; the second pass reported 3 already done (per-item resume rule).",
+     "latency_seconds": {
+      "Q01": 40.257,
+      "Q02": 41.182,
+      "Q03": 39.228
+     },
+     "run_window_utc": [
+      "2026-11-11T11:16:20+00:00",
+      "2026-11-11T11:18:20+00:00"
+     ],
+     "temporary_failure_retries": 0,
+     "rate_limit_retries": 0,
+     "timed_out_attempts": 0
+    }
+   ]
+  },
+  "mistral-large-4": {
+   "logged_at": null,
+   "host_used": null,
+   "package": null,
+   "package_version": null,
+   "langchain_integration": null,
+   "setup_steps": [],
+   "adapter_lines": null,
+   "special_handling": [],
+   "trial_questions": [
+    "Q01",
+    "Q02",
+    "Q03"
+   ],
+   "trial_errors": [],
+   "access_blockers": [],
+   "score": null
+  }
+ }
+}

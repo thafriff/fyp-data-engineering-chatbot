@@ -70,10 +70,14 @@ def classify(message: str) -> str:
     return output if output in settings.INTENT_LABELS else settings.INTENT_FALLBACK_LABEL
 
 
-def route(message: str, top_score: Callable[[str], float] | None = None) -> Intent:
+def route(message: str, top_score: Callable[[str], float] | None = None,
+          clean: Callable[[str], str] | None = None) -> Intent:
     """Classify the message: small talk, unclear and emotional input get a fixed reply; anything else is a
     question that goes to retrieval. top_score(message) returns the top-1 course similarity; it is needed to
-    accept an emotional label (without it, emotional labels fall back to a question)."""
+    accept an emotional label (without it, emotional labels fall back to a question).
+    clean(message) is the pipeline's search text (RagPipeline.search_text: greetings removed, spelling corrected). The
+    obvious-question check reads it, so "hey what is olpa" is seen as "what is olap" and goes straight to retrieval
+    without the classifier. Small talk and the unclear check still read the message as typed, so "hi" stays a greeting."""
     text = _normalise(message)
 
     # Small talk first, so one-letter phrases such as "k" are not caught by the unclear check below.
@@ -86,7 +90,9 @@ def route(message: str, top_score: Callable[[str], float] | None = None) -> Inte
     if " " not in text and _is_keyboard_mash(text):
         return Intent("unclear", settings.UNCLEAR_RESPONSE)
 
-    if not settings.INTENT_CLASSIFIER_ENABLED or _is_obvious_question(message, text):
+    cleaned = clean(message) if clean else message
+    cleaned_text = _normalise(cleaned) or text
+    if not settings.INTENT_CLASSIFIER_ENABLED or _is_obvious_question(cleaned, cleaned_text):
         return Intent("question", path="question_heuristic")
 
     label = classify(message)

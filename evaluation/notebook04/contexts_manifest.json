@@ -1,0 +1,2265 @@
+{
+ "meta": {
+  "purpose": "Committable record of evaluation/notebook04/contexts.json, without its licensed chunk text. Rerun freeze_contexts.py with the frozen index and chunks.json to rebuild the contexts, then compare with these hashes.",
+  "created": "2026-11-16T10:30:18+00:00",
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "top_k": 5,
+  "similarity_threshold": 0.7,
+  "spell_correction": true,
+  "system_prompt_version": "2026-11-01 approved: scaffolding (report Section 3.9) with the excerpt-code carve-out",
+  "system_prompt_sha256": "fe8912d1ce03a65ba3ee4c46b3bbde81a4390db7dfc421129aa28afc8e615351",
+  "prompt_builder": "src.core.llm.build_messages: system prompt, 5 excerpts, the question as typed, then one spelling-hint line only when every word changed by spelling correction, other than British spellings, has 3 or more letters and appears in the retrieved excerpts (search_text.spelling_corrections; added 2026-11-11 and narrowed the same day, British spellings excluded 2026-11-16, all before any candidate result), then settings.ANSWER_REMINDER",
+  "spelling_hint_template": {
+   "line": "Note: {typos}. If so, begin your answer with \"Assuming you mean {meant},\" and answer that.",
+   "typo": "\"{typed}\" is probably a typo for \"{corrected}\"",
+   "min_letters": 3,
+   "rule": "British spellings are not typos; every other corrected word has min_letters or more and appears in the excerpts",
+   "british_variants": [
+    [
+     "is(e|ed|es|ing|er|ers|ation|ations)$",
+     "iz\\1"
+    ],
+    [
+     "ys(e|ed|es|ing|er|ers)$",
+     "yz\\1"
+    ],
+    [
+     "our",
+     "or"
+    ],
+    [
+     "tre(s|d)?$",
+     "ter\\1"
+    ],
+    [
+     "ogue(s)?$",
+     "og\\1"
+    ],
+    [
+     "ll(ed|ing|er|ers)$",
+     "l\\1"
+    ],
+    [
+     "ence$",
+     "ense"
+    ],
+    [
+     "amme(s)?$",
+     "am\\1"
+    ]
+   ]
+  },
+  "spelling_hint_items": [],
+  "baseline_check": {
+   "baseline_commit": "d7a3cae",
+   "questions_compared": 100,
+   "chunk_id_differences": [],
+   "score_differences": [],
+   "search_query_differences": [],
+   "identical": true
+  },
+  "resume_rule": "an answer cached by run_generation.py is reused only while its prompt_sha256 equals its item's"
+ },
+ "items": [
+  {
+   "id": "Q01",
+   "kind": "question",
+   "search_text": "What is the difference between OLTP and OLAP databases?",
+   "chunk_ids": [
+    "S06-0204",
+    "S06-0205",
+    "S06-0206",
+    "S04-0342",
+    "S04-0296"
+   ],
+   "scores": [
+    0.875,
+    0.8718,
+    0.807,
+    0.8032,
+    0.7706
+   ],
+   "prompt_sha256": "24b805c589a2aa962022fed9740980066d9b7de748fd9d79c44f69a155861b6e"
+  },
+  {
+   "id": "Q02",
+   "kind": "question",
+   "search_text": "How is a data lake different from a data warehouse?",
+   "chunk_ids": [
+    "S04-0204",
+    "S04-0202",
+    "S04-0203",
+    "S04-0208",
+    "S04-0200"
+   ],
+   "scores": [
+    0.8705,
+    0.8698,
+    0.8656,
+    0.8425,
+    0.8365
+   ],
+   "prompt_sha256": "8211d64f1bc8898a34f5f89529a07de9a3f0ba42b613e4cbe1e0d42c734e3110"
+  },
+  {
+   "id": "Q03",
+   "kind": "question",
+   "search_text": "What are fact tables and dimension tables?",
+   "chunk_ids": [
+    "S06-0324",
+    "S06-0375",
+    "S05-0094",
+    "S04-0193",
+    "S05-0095"
+   ],
+   "scores": [
+    0.8561,
+    0.7919,
+    0.7464,
+    0.7346,
+    0.7205
+   ],
+   "prompt_sha256": "c1b7e8ba3b00628416d892e8ea4ebd806f382d027aa3831d33622930502f2c4a"
+  },
+  {
+   "id": "Q04",
+   "kind": "question",
+   "search_text": "Why is BigQuery called serverless, and why does that matter?",
+   "chunk_ids": [
+    "S06-0209",
+    "S06-0210",
+    "S06-0216",
+    "S06-0257",
+    "S06-0242"
+   ],
+   "scores": [
+    0.803,
+    0.763,
+    0.756,
+    0.7547,
+    0.7502
+   ],
+   "prompt_sha256": "2ebd4ea5e884cf2794426cf1f1ab5c63545dcab0f8b97f83530c26e752ba8bc9"
+  },
+  {
+   "id": "Q05",
+   "kind": "question",
+   "search_text": "What is dbt used for in a data warehouse?",
+   "chunk_ids": [
+    "S06-0328",
+    "S05-0016",
+    "S06-0329",
+    "S06-0207",
+    "S05-0099"
+   ],
+   "scores": [
+    0.8407,
+    0.7903,
+    0.7743,
+    0.7714,
+    0.7687
+   ],
+   "prompt_sha256": "de226edde69c9694cb66d94cd223ab07aaf46985aa1e12f5e91912b7ac407e29"
+  },
+  {
+   "id": "Q06",
+   "kind": "question",
+   "search_text": "How is the fct_trips dbt model configured to load data incrementally?",
+   "chunk_ids": [
+    "S06-0519",
+    "S06-0399",
+    "S06-0548",
+    "S06-0458",
+    "S06-0547"
+   ],
+   "scores": [
+    0.8713,
+    0.7734,
+    0.7605,
+    0.7555,
+    0.752
+   ],
+   "prompt_sha256": "cb1f0b7bfc9f4d61eb8d1a5970d43c78d72ae9de521826f689dcfb6d80619df1"
+  },
+  {
+   "id": "Q07",
+   "kind": "question",
+   "search_text": "Why was Apache Spark created when MapReduce already existed?",
+   "chunk_ids": [
+    "S03-0040",
+    "S03-0026",
+    "S04-0248",
+    "S03-0025",
+    "S03-0023"
+   ],
+   "scores": [
+    0.8429,
+    0.8305,
+    0.8287,
+    0.8191,
+    0.7951
+   ],
+   "prompt_sha256": "983c4076874b2aae0abc941fa09b90b836a58761d90b18fd3a0643b1892f7109"
+  },
+  {
+   "id": "Q08",
+   "kind": "question",
+   "search_text": "When should I use batch processing instead of stream processing?",
+   "chunk_ids": [
+    "S05-0120",
+    "S05-0126",
+    "S05-0117",
+    "S05-0116",
+    "S06-0649"
+   ],
+   "scores": [
+    0.8724,
+    0.8491,
+    0.8322,
+    0.8243,
+    0.8207
+   ],
+   "prompt_sha256": "671f5ffc789803b98de2cfe7d3bb334b431bfc535432c579b542cc89a9f86191"
+  },
+  {
+   "id": "Q09",
+   "kind": "question",
+   "search_text": "Which libraries are built on top of Apache Spark?",
+   "chunk_ids": [
+    "S03-0025",
+    "S03-0062",
+    "S03-0040",
+    "S06-0879",
+    "S04-0248"
+   ],
+   "scores": [
+    0.8037,
+    0.7974,
+    0.7835,
+    0.7815,
+    0.7759
+   ],
+   "prompt_sha256": "5fd15ad121547180e5043febab429e2d4e61ff411a67f73c2251f94ff3da6d92"
+  },
+  {
+   "id": "Q10",
+   "kind": "question",
+   "search_text": "What does Flink handle for you that a plain Kafka consumer does not?",
+   "chunk_ids": [
+    "S06-0969",
+    "S06-0919",
+    "S06-0977",
+    "S06-0929",
+    "S06-0956"
+   ],
+   "scores": [
+    0.8632,
+    0.8103,
+    0.7836,
+    0.7579,
+    0.7514
+   ],
+   "prompt_sha256": "96757caab1920826cc5f5c7d85c8e7d51643651e1b7e4dba3a8c62e81bf7ff8e"
+  },
+  {
+   "id": "Q11",
+   "kind": "question",
+   "search_text": "How do you turn on checkpointing in a PyFlink job?",
+   "chunk_ids": [
+    "S06-0936",
+    "S06-0935",
+    "S06-0926",
+    "S06-0968",
+    "S06-0933"
+   ],
+   "scores": [
+    0.7905,
+    0.7742,
+    0.7671,
+    0.7612,
+    0.7553
+   ],
+   "prompt_sha256": "ff60937dc72f647be52c7c1fc39d3a66a0a75fd85daca2006f17ced45f3473eb"
+  },
+  {
+   "id": "Q12",
+   "kind": "question",
+   "search_text": "What is a foreign key and how does it relate to a primary key?",
+   "chunk_ids": [
+    "S01-0098",
+    "S01-0091",
+    "S01-0090",
+    "S05-0101",
+    "S01-0111"
+   ],
+   "scores": [
+    0.838,
+    0.8259,
+    0.8052,
+    0.8017,
+    0.7976
+   ],
+   "prompt_sha256": "3a4a70a951f356e7dcdf471ad07cbc8a29ea5f56b6181f06b5f96dd013a375bb"
+  },
+  {
+   "id": "Q13",
+   "kind": "question",
+   "search_text": "What do the ACID properties of a database transaction mean?",
+   "chunk_ids": [
+    "S03-0087",
+    "S04-0074",
+    "S04-0071",
+    "S04-0136",
+    "S04-0137"
+   ],
+   "scores": [
+    0.8711,
+    0.8672,
+    0.8259,
+    0.7874,
+    0.7834
+   ],
+   "prompt_sha256": "a4122969b19233b4278fb54775d904fc5e2fe1e365f6acd65df3a118f7862504"
+  },
+  {
+   "id": "Q14",
+   "kind": "question",
+   "search_text": "What is a common table expression (CTE) in SQL?",
+   "chunk_ids": [
+    "S06-0481",
+    "S06-0482",
+    "S05-0287",
+    "S06-0484",
+    "S06-0468"
+   ],
+   "scores": [
+    0.9013,
+    0.878,
+    0.7671,
+    0.7372,
+    0.7296
+   ],
+   "prompt_sha256": "48bb48fad90d2ebc3f61f7dfb8f2c8a2be5d6ae434569b7ee91691ff5808a708"
+  },
+  {
+   "id": "Q15",
+   "kind": "question",
+   "search_text": "In what order does SQL execute the clauses of a query?",
+   "chunk_ids": [
+    "S05-0280",
+    "S05-0281",
+    "S01-0257",
+    "S05-0290",
+    "S05-0287"
+   ],
+   "scores": [
+    0.84,
+    0.7918,
+    0.7544,
+    0.7473,
+    0.7434
+   ],
+   "prompt_sha256": "223bda83abea1ef6592a86683384ac4fe4e36d560000ae1df1f280e8eada23e1"
+  },
+  {
+   "id": "Q16",
+   "kind": "question",
+   "search_text": "When is a table in Boyce-Codd normal form?",
+   "chunk_ids": [
+    "S04-0336",
+    "S01-0172",
+    "S01-0184",
+    "S01-0179",
+    "S04-0102"
+   ],
+   "scores": [
+    0.7991,
+    0.7793,
+    0.7729,
+    0.7571,
+    0.7361
+   ],
+   "prompt_sha256": "232d4c427ec02feabe68e9edfdf10f5d9566d226c6e01ec6e667d4a70d6d2164"
+  },
+  {
+   "id": "Q17",
+   "kind": "question",
+   "search_text": "What is a data pipeline?",
+   "chunk_ids": [
+    "S05-0103",
+    "S06-0009",
+    "S05-0104",
+    "S05-0109",
+    "S05-0107"
+   ],
+   "scores": [
+    0.9209,
+    0.8429,
+    0.8398,
+    0.8064,
+    0.8048
+   ],
+   "prompt_sha256": "1fb79d7692a90c53c011705acf6739d28ce42e39e697d11ac9ab3209f9dc669f"
+  },
+  {
+   "id": "Q18",
+   "kind": "question",
+   "search_text": "What are the advantages of using Docker in data engineering?",
+   "chunk_ids": [
+    "S06-0002",
+    "S05-0006",
+    "S05-0272",
+    "S05-0017",
+    "S05-0232"
+   ],
+   "scores": [
+    0.8148,
+    0.7516,
+    0.7248,
+    0.7247,
+    0.7201
+   ],
+   "prompt_sha256": "fe2d641bbc01538d11afdad156f86027d1eabf2091d28331139b92c05a022817"
+  },
+  {
+   "id": "Q19",
+   "kind": "question",
+   "search_text": "What is Terraform used for?",
+   "chunk_ids": [
+    "S06-0089",
+    "S06-0088",
+    "S06-0092",
+    "S06-0120",
+    "S06-0090"
+   ],
+   "scores": [
+    0.8219,
+    0.7791,
+    0.7567,
+    0.7513,
+    0.7437
+   ],
+   "prompt_sha256": "a2c998d33f1bb984d37d6f84c588bb8ebb4c26d45c9aa56bdd98c04e578438d5"
+  },
+  {
+   "id": "Q20",
+   "kind": "question",
+   "search_text": "What does a workflow orchestration tool do?",
+   "chunk_ids": [
+    "S05-0161",
+    "S06-0132",
+    "S06-0131",
+    "S05-0162",
+    "S05-0108"
+   ],
+   "scores": [
+    0.9002,
+    0.8697,
+    0.8345,
+    0.8104,
+    0.787
+   ],
+   "prompt_sha256": "56ce8561784bb9c225663ee44fa62b1fbfb507b6a2d67cae93a553a168f16270"
+  },
+  {
+   "id": "Q21",
+   "kind": "question",
+   "search_text": "What are some common reasons why data goes missing in a dataset?",
+   "chunk_ids": [
+    "S02-0273",
+    "S02-0266",
+    "S02-0267",
+    "S02-0361",
+    "S02-0268"
+   ],
+   "scores": [
+    0.8392,
+    0.8209,
+    0.788,
+    0.7648,
+    0.7618
+   ],
+   "prompt_sha256": "7df256232d102b48afc45fc619b83c4a6442514279fb05247b3d1e2fa0a17ca8"
+  },
+  {
+   "id": "Q22",
+   "kind": "question",
+   "search_text": "What are the main steps of data cleaning and preprocessing?",
+   "chunk_ids": [
+    "S02-0263",
+    "S02-0264",
+    "S02-0262",
+    "S02-0265",
+    "S02-0285"
+   ],
+   "scores": [
+    0.8638,
+    0.8562,
+    0.8201,
+    0.8123,
+    0.7911
+   ],
+   "prompt_sha256": "aae1ba561f7bd67239d77401474ebb1255e7896bc0382e862b9813181467a248"
+  },
+  {
+   "id": "Q23",
+   "kind": "question",
+   "search_text": "What is denormalization and why do analytical systems use it?",
+   "chunk_ids": [
+    "S05-0092",
+    "S04-0235",
+    "S05-0093",
+    "S02-0289",
+    "S04-0126"
+   ],
+   "scores": [
+    0.8406,
+    0.7863,
+    0.7572,
+    0.7098,
+    0.6979
+   ],
+   "prompt_sha256": "50bbf69ab0f5a234a4645ac8fd4d9c77c0899be5e1948635cd90413ad05e0990"
+  },
+  {
+   "id": "Q24",
+   "kind": "question",
+   "search_text": "How does HDFS keep data available when a machine fails?",
+   "chunk_ids": [
+    "S06-0750",
+    "S03-0078",
+    "S06-0751",
+    "S04-0244",
+    "S01-0036"
+   ],
+   "scores": [
+    0.7699,
+    0.742,
+    0.7353,
+    0.7344,
+    0.7337
+   ],
+   "prompt_sha256": "0bd4394d4e8ef8a216865925e4fb5138cfc6921a3d4b15faa65f993228e56a08"
+  },
+  {
+   "id": "Q25",
+   "kind": "question",
+   "search_text": "How does BigQuery separate storage and compute internally?",
+   "chunk_ids": [
+    "S06-0251",
+    "S06-0210",
+    "S06-0242",
+    "S06-0249",
+    "S06-0209"
+   ],
+   "scores": [
+    0.8168,
+    0.7989,
+    0.7796,
+    0.7748,
+    0.7725
+   ],
+   "prompt_sha256": "26f72d8227d387f8f497a449ab33e0b573b69476565f801c9c4788f9838b2736"
+  },
+  {
+   "id": "Q26",
+   "kind": "question",
+   "search_text": "Besides accuracy, what other dimensions describe data quality?",
+   "chunk_ids": [
+    "S07-0011",
+    "S04-0024",
+    "S04-0219",
+    "S04-0282",
+    "S04-0022"
+   ],
+   "scores": [
+    0.8228,
+    0.816,
+    0.7873,
+    0.7629,
+    0.7566
+   ],
+   "prompt_sha256": "eac1e66af28902fd5440c2c4c376dff068c64faabe9dae3a1faa34ffb2e1ba73"
+  },
+  {
+   "id": "Q27",
+   "kind": "question",
+   "search_text": "What kinds of tests can you write in dbt to check your data?",
+   "chunk_ids": [
+    "S05-0219",
+    "S06-0414",
+    "S06-0420",
+    "S06-0354",
+    "S06-0422"
+   ],
+   "scores": [
+    0.8134,
+    0.8042,
+    0.7984,
+    0.7966,
+    0.7945
+   ],
+   "prompt_sha256": "807ee3eb588d57bbae169507e4472fe2b9efdaa922c77c8430757048274a2fc9"
+  },
+  {
+   "id": "Q28",
+   "kind": "question",
+   "search_text": "What is the difference between ETL and ELT?",
+   "chunk_ids": [
+    "S06-0155",
+    "S06-0322",
+    "S06-0158",
+    "S06-0156",
+    "S05-0114"
+   ],
+   "scores": [
+    0.8089,
+    0.796,
+    0.7533,
+    0.7343,
+    0.7257
+   ],
+   "prompt_sha256": "08366e12b1d8298eeac49473591e57c49eb69529bdfdc4aa97e80110ec00eef0"
+  },
+  {
+   "id": "Q29",
+   "kind": "question",
+   "search_text": "What is a data mart and how does it relate to a data warehouse?",
+   "chunk_ids": [
+    "S05-0009",
+    "S04-0196",
+    "S06-0207",
+    "S04-0316",
+    "S05-0016"
+   ],
+   "scores": [
+    0.8967,
+    0.8879,
+    0.8643,
+    0.8492,
+    0.8491
+   ],
+   "prompt_sha256": "20494d5a872e977785b9f73bc1c6b262b6b0e9e93eefa8771f04e0cb91e80292"
+  },
+  {
+   "id": "Q30",
+   "kind": "question",
+   "search_text": "How does a snowflake schema differ from a star schema?",
+   "chunk_ids": [
+    "S04-0193",
+    "S05-0095",
+    "S04-0192",
+    "S04-0301",
+    "S04-0194"
+   ],
+   "scores": [
+    0.8671,
+    0.8104,
+    0.7238,
+    0.7221,
+    0.7079
+   ],
+   "prompt_sha256": "41fb5426fca3be07c4c9aac24f7930e5546ae2327a66dcda7cdff0ed4348fc64"
+  },
+  {
+   "id": "Q31",
+   "kind": "question",
+   "search_text": "Why does partitioning a BigQuery table by date make queries cheaper?",
+   "chunk_ids": [
+    "S06-0218",
+    "S06-0230",
+    "S06-0221",
+    "S06-0231",
+    "S06-0245"
+   ],
+   "scores": [
+    0.8879,
+    0.8296,
+    0.8244,
+    0.8186,
+    0.8176
+   ],
+   "prompt_sha256": "1d86d503cf3dc14305ddac2bd769d3761bf22423f347374c526b40f9944125ee"
+  },
+  {
+   "id": "Q32",
+   "kind": "question",
+   "search_text": "When should I choose clustering instead of partitioning in BigQuery?",
+   "chunk_ids": [
+    "S06-0234",
+    "S06-0238",
+    "S06-0229",
+    "S06-0230",
+    "S06-0231"
+   ],
+   "scores": [
+    0.8918,
+    0.8705,
+    0.8682,
+    0.8627,
+    0.8606
+   ],
+   "prompt_sha256": "7c8be5d8abd31790d31d2a4965add2f0df171168229d68ccc7beadbc489ace03"
+  },
+  {
+   "id": "Q33",
+   "kind": "question",
+   "search_text": "How can I reduce the cost of my BigQuery queries?",
+   "chunk_ids": [
+    "S06-0243",
+    "S06-0242",
+    "S06-0241",
+    "S06-0211",
+    "S06-0247"
+   ],
+   "scores": [
+    0.7911,
+    0.7854,
+    0.7603,
+    0.7559,
+    0.755
+   ],
+   "prompt_sha256": "b81fca414874a9185bedf892840ed09d506d1b3ac03abecd04ba04c2c8c3045c"
+  },
+  {
+   "id": "Q34",
+   "kind": "question",
+   "search_text": "How does Kimball's restaurant analogy describe the areas of a data warehouse?",
+   "chunk_ids": [
+    "S06-0325",
+    "S04-0190",
+    "S04-0316",
+    "S04-0189",
+    "S05-0016"
+   ],
+   "scores": [
+    0.8478,
+    0.7477,
+    0.743,
+    0.7344,
+    0.7306
+   ],
+   "prompt_sha256": "53af99e348c159506252b74d629173bbfb97132d19f4f901e24b172f40d6f6d0"
+  },
+  {
+   "id": "Q35",
+   "kind": "question",
+   "search_text": "How should models be organised into staging, intermediate and marts folders in a dbt project?",
+   "chunk_ids": [
+    "S06-0355",
+    "S06-0350",
+    "S06-0356",
+    "S06-0346",
+    "S06-0357"
+   ],
+   "scores": [
+    0.8464,
+    0.8126,
+    0.8052,
+    0.7807,
+    0.778
+   ],
+   "prompt_sha256": "5a2b857b8cfcfeca51fd0321a815a7b7cf70cfc4e5b31a9de00ab85286d7421a"
+  },
+  {
+   "id": "Q36",
+   "kind": "question",
+   "search_text": "What is the difference between dbt Core and dbt Cloud?",
+   "chunk_ids": [
+    "S06-0333",
+    "S06-0334",
+    "S06-0344",
+    "S06-0338",
+    "S06-0339"
+   ],
+   "scores": [
+    0.8668,
+    0.8378,
+    0.8239,
+    0.8219,
+    0.8158
+   ],
+   "prompt_sha256": "d3556c64e97c02e638bb9d4012abc37c16424a31eb72552a695a442dc45686e9"
+  },
+  {
+   "id": "Q37",
+   "kind": "question",
+   "search_text": "Why are column-oriented databases a good fit for analytics?",
+   "chunk_ids": [
+    "S05-0173",
+    "S05-0174",
+    "S05-0171",
+    "S04-0298",
+    "S06-0254"
+   ],
+   "scores": [
+    0.8363,
+    0.8307,
+    0.801,
+    0.7808,
+    0.7788
+   ],
+   "prompt_sha256": "c1d835cb7b13c106ab6efdabbde93529364bd7394d77fabfd8eb746067c7fcc4"
+  },
+  {
+   "id": "Q38",
+   "kind": "question",
+   "search_text": "What is the One Big Table approach to data modelling?",
+   "chunk_ids": [
+    "S05-0099",
+    "S05-0088",
+    "S01-0044",
+    "S01-0058",
+    "S01-0046"
+   ],
+   "scores": [
+    0.8072,
+    0.7816,
+    0.7775,
+    0.7709,
+    0.7639
+   ],
+   "prompt_sha256": "43e5c0ae2a99a46fa0abdaae8a223e84dd1a60f624e0dcc97dfcb7ad59f7205d"
+  },
+  {
+   "id": "Q39",
+   "kind": "question",
+   "search_text": "What is an external table in BigQuery and why does it show zero rows?",
+   "chunk_ids": [
+    "S06-0216",
+    "S06-0217",
+    "S06-0214",
+    "S06-0298",
+    "S06-0215"
+   ],
+   "scores": [
+    0.8277,
+    0.7784,
+    0.7622,
+    0.7594,
+    0.7534
+   ],
+   "prompt_sha256": "97333546725785c44aac6c940cd4e3143548bc5d3b3516873fd1de34ea207cbd"
+  },
+  {
+   "id": "Q40",
+   "kind": "question",
+   "search_text": "What is an operational data store?",
+   "chunk_ids": [
+    "S04-0317",
+    "S04-0199",
+    "S04-0297",
+    "S04-0316",
+    "S04-0061"
+   ],
+   "scores": [
+    0.8398,
+    0.8267,
+    0.7941,
+    0.7921,
+    0.744
+   ],
+   "prompt_sha256": "d72f5314efbb2e2ed9a2e335fbed2f02e649c3c8824e3ae8680474bf71bb5645"
+  },
+  {
+   "id": "Q41",
+   "kind": "question",
+   "search_text": "What is business intelligence and how does it use the data warehouse?",
+   "chunk_ids": [
+    "S04-0209",
+    "S05-0016",
+    "S04-0191",
+    "S04-0207",
+    "S06-0207"
+   ],
+   "scores": [
+    0.8543,
+    0.8371,
+    0.8264,
+    0.8216,
+    0.8189
+   ],
+   "prompt_sha256": "b50caa171f3dde31f06731000f7409d2f9675efccdf49f49f56fb0cd0b210ae5"
+  },
+  {
+   "id": "Q42",
+   "kind": "question",
+   "search_text": "What are seeds in dbt and when should you use them?",
+   "chunk_ids": [
+    "S06-0352",
+    "S06-0389",
+    "S06-0391",
+    "S06-0390",
+    "S06-0444"
+   ],
+   "scores": [
+    0.8051,
+    0.7812,
+    0.7775,
+    0.7751,
+    0.7583
+   ],
+   "prompt_sha256": "0d8e3631b7386619ea97f0a331179227e45d419591de359a599c86bb9a8e7c2d"
+  },
+  {
+   "id": "Q43",
+   "kind": "question",
+   "search_text": "Which dbt model calculates monthly revenue per pickup zone, and what does it group by?",
+   "chunk_ids": [
+    "S06-0549",
+    "S06-0376",
+    "S06-0739",
+    "S06-0374",
+    "S06-0547"
+   ],
+   "scores": [
+    0.8515,
+    0.739,
+    0.7271,
+    0.7034,
+    0.6957
+   ],
+   "prompt_sha256": "4247b06b0abcaee57b0cc73f70f2d5ec68db4a73ce183ab373248fac3e4ed3b8"
+  },
+  {
+   "id": "Q44",
+   "kind": "question",
+   "search_text": "What is an RDD in Spark?",
+   "chunk_ids": [
+    "S06-0785",
+    "S03-0063",
+    "S06-0787",
+    "S06-0801",
+    "S06-0814"
+   ],
+   "scores": [
+    0.8503,
+    0.8008,
+    0.7945,
+    0.7931,
+    0.7827
+   ],
+   "prompt_sha256": "7f25955de1526fbd544bc670b1b5ebd40a140246feb7fc5e0a147323efaed9df"
+  },
+  {
+   "id": "Q45",
+   "kind": "question",
+   "search_text": "What is the difference between narrow and wide dependencies in Spark?",
+   "chunk_ids": [
+    "S03-0059",
+    "S03-0058",
+    "S03-0040",
+    "S03-0025",
+    "S06-0763"
+   ],
+   "scores": [
+    0.8389,
+    0.7542,
+    0.741,
+    0.7405,
+    0.7324
+   ],
+   "prompt_sha256": "1d9cee46c51cfd91ea3dca8f19adbeb547e39f69cd6cb496a8a067e3b8acc90e"
+  },
+  {
+   "id": "Q46",
+   "kind": "question",
+   "search_text": "Why did Spark introduce DataFrames when it already had RDDs?",
+   "chunk_ids": [
+    "S03-0067",
+    "S06-0784",
+    "S06-0785",
+    "S06-0787",
+    "S03-0066"
+   ],
+   "scores": [
+    0.8339,
+    0.8084,
+    0.8075,
+    0.8043,
+    0.8027
+   ],
+   "prompt_sha256": "320fab5f0d541cf5422f52f4076fa061204800b771afe56b42557c24f8b3d6f5"
+  },
+  {
+   "id": "Q47",
+   "kind": "question",
+   "search_text": "How does the classic MapReduce word count example work?",
+   "chunk_ids": [
+    "S03-0038",
+    "S03-0039",
+    "S03-0048",
+    "S03-0049",
+    "S03-0045"
+   ],
+   "scores": [
+    0.9159,
+    0.8767,
+    0.8246,
+    0.7988,
+    0.796
+   ],
+   "prompt_sha256": "737fa45f204f5fc57ea14c4df2160e1dbb54650fb04728d6ebf102417fb3d979"
+  },
+  {
+   "id": "Q48",
+   "kind": "question",
+   "search_text": "What is the difference between transformations and actions in Spark?",
+   "chunk_ids": [
+    "S06-0704",
+    "S03-0063",
+    "S06-0705",
+    "S03-0051",
+    "S03-0056"
+   ],
+   "scores": [
+    0.9033,
+    0.8627,
+    0.8615,
+    0.7846,
+    0.781
+   ],
+   "prompt_sha256": "9fee19dc285bff946d889eae67f7e04d4b01644147fb7d6585a8e2bd18d95604"
+  },
+  {
+   "id": "Q49",
+   "kind": "question",
+   "search_text": "What do the driver, master and executors do in a Spark cluster?",
+   "chunk_ids": [
+    "S06-0748",
+    "S06-0747",
+    "S06-0752",
+    "S06-0745",
+    "S06-0749"
+   ],
+   "scores": [
+    0.8734,
+    0.8669,
+    0.8546,
+    0.8399,
+    0.8072
+   ],
+   "prompt_sha256": "4b7b783ae28be9c8c76245b2a287521277dfb8256ebd958aaa885bac5e14bd25"
+  },
+  {
+   "id": "Q50",
+   "kind": "question",
+   "search_text": "How does a Kafka consumer group keep track of which messages it has already read?",
+   "chunk_ids": [
+    "S06-0911",
+    "S06-0996",
+    "S05-0147",
+    "S05-0149",
+    "S06-0909"
+   ],
+   "scores": [
+    0.7839,
+    0.7794,
+    0.7591,
+    0.7571,
+    0.7365
+   ],
+   "prompt_sha256": "297e6a8b19f794589bcd5701f101e4a7fef0ede114fe32cfd95b9e82e56bd2f1"
+  },
+  {
+   "id": "Q51",
+   "kind": "question",
+   "search_text": "What is the difference between tumbling, sliding and session windows?",
+   "chunk_ids": [
+    "S06-0962",
+    "S06-0965",
+    "S06-0963",
+    "S06-0955",
+    "S06-0957"
+   ],
+   "scores": [
+    0.8033,
+    0.7843,
+    0.7474,
+    0.7268,
+    0.72
+   ],
+   "prompt_sha256": "26ef773eb7d359b92200e4e0ddad4346e67192a1b1fa36e9fc509355b1ef180c"
+  },
+  {
+   "id": "Q52",
+   "kind": "question",
+   "search_text": "What does a watermark do in Flink stream processing?",
+   "chunk_ids": [
+    "S06-0951",
+    "S06-0971",
+    "S06-0970",
+    "S06-0950",
+    "S06-0959"
+   ],
+   "scores": [
+    0.7954,
+    0.7702,
+    0.7676,
+    0.7647,
+    0.7405
+   ],
+   "prompt_sha256": "efc2d8895445a1b2d5e8027445ef6c599d526dfda3b0c8f10a0d2a407e2d2a3e"
+  },
+  {
+   "id": "Q53",
+   "kind": "question",
+   "search_text": "What is the Lambda architecture for data processing?",
+   "chunk_ids": [
+    "S05-0025",
+    "S03-0061",
+    "S05-0160",
+    "S05-0021",
+    "S03-0025"
+   ],
+   "scores": [
+    0.8727,
+    0.7652,
+    0.7622,
+    0.7609,
+    0.7552
+   ],
+   "prompt_sha256": "92e08c5c3de34095778ba44fea32017900d61c873d13303260a03c6f3fe16f33"
+  },
+  {
+   "id": "Q54",
+   "kind": "question",
+   "search_text": "What is the difference between concurrent and parallel batch processing?",
+   "chunk_ids": [
+    "S05-0123",
+    "S05-0124",
+    "S05-0125",
+    "S05-0122",
+    "S05-0120"
+   ],
+   "scores": [
+    0.8963,
+    0.885,
+    0.8727,
+    0.818,
+    0.8074
+   ],
+   "prompt_sha256": "86e02db8ef463a27bb475fd467af0d11d0f3bdf571ecce99dbe1faeefa1e98b3"
+  },
+  {
+   "id": "Q55",
+   "kind": "question",
+   "search_text": "What is Dataproc and how do you submit a Spark job to it?",
+   "chunk_ids": [
+    "S06-0848",
+    "S06-0847",
+    "S06-0843",
+    "S06-0850",
+    "S06-0857"
+   ],
+   "scores": [
+    0.8571,
+    0.8547,
+    0.8444,
+    0.8172,
+    0.7915
+   ],
+   "prompt_sha256": "69a631edc5882a5866c01029ce2693fe4436d3d0e9af73411f1612a92d0cd333"
+  },
+  {
+   "id": "Q56",
+   "kind": "question",
+   "search_text": "How does the Spark SQL job script get its input and output paths?",
+   "chunk_ids": [
+    "S06-0686",
+    "S06-0848",
+    "S06-0847",
+    "S06-0837",
+    "S06-0743"
+   ],
+   "scores": [
+    0.7858,
+    0.7825,
+    0.7743,
+    0.767,
+    0.7636
+   ],
+   "prompt_sha256": "48d56ec02419d54d076e6cf36befada178815b141e616f17b9855173902644b8"
+  },
+  {
+   "id": "Q57",
+   "kind": "question",
+   "search_text": "How does Spark join a large table with a small table efficiently?",
+   "chunk_ids": [
+    "S06-0782",
+    "S06-0780",
+    "S06-0778",
+    "S06-0781",
+    "S06-0773"
+   ],
+   "scores": [
+    0.8524,
+    0.83,
+    0.8261,
+    0.8195,
+    0.8078
+   ],
+   "prompt_sha256": "dda67e1315077b551b0b1441e211a2eb5d3331f6daf47d6a9ca8b435a155862e"
+  },
+  {
+   "id": "Q58",
+   "kind": "question",
+   "search_text": "How does the Flink aggregation job count trips per pickup location for each hour?",
+   "chunk_ids": [
+    "S06-0943",
+    "S06-0957",
+    "S06-0944",
+    "S06-0949",
+    "S06-0547"
+   ],
+   "scores": [
+    0.7639,
+    0.7638,
+    0.7303,
+    0.7289,
+    0.7251
+   ],
+   "prompt_sha256": "111729b4302642bddddadfb0f3e1fc8845d34eda99d5de8e901848d73aeb86fe"
+  },
+  {
+   "id": "Q59",
+   "kind": "question",
+   "search_text": "What does the ROW_NUMBER window function do, and how does PARTITION BY change it?",
+   "chunk_ids": [
+    "S06-0471",
+    "S06-0470",
+    "S06-0473",
+    "S06-0474",
+    "S06-0469"
+   ],
+   "scores": [
+    0.8288,
+    0.8013,
+    0.7883,
+    0.77,
+    0.7657
+   ],
+   "prompt_sha256": "65d10e10906b19b9c132e039c4fa298800d59644859680e0f72ad7c4439a670b"
+  },
+  {
+   "id": "Q60",
+   "kind": "question",
+   "search_text": "When is a table in first normal form?",
+   "chunk_ids": [
+    "S01-0172",
+    "S04-0102",
+    "S02-0284",
+    "S01-0183",
+    "S01-0175"
+   ],
+   "scores": [
+    0.7915,
+    0.7613,
+    0.7446,
+    0.7444,
+    0.7433
+   ],
+   "prompt_sha256": "3d79507860851ce610487f855db6e2f4a12896531d8f96f4fec31d0aa3c86d46"
+  },
+  {
+   "id": "Q61",
+   "kind": "question",
+   "search_text": "What is the difference between second normal form and third normal form?",
+   "chunk_ids": [
+    "S01-0175",
+    "S01-0172",
+    "S01-0184",
+    "S01-0178",
+    "S04-0102"
+   ],
+   "scores": [
+    0.7638,
+    0.7511,
+    0.7489,
+    0.7374,
+    0.7348
+   ],
+   "prompt_sha256": "46859ba5d9b4408ee918347eca7ebfe16a57627c98d3ea6c91b07a002afa41a2"
+  },
+  {
+   "id": "Q62",
+   "kind": "question",
+   "search_text": "What is a functional dependency between attributes?",
+   "chunk_ids": [
+    "S01-0158",
+    "S01-0147",
+    "S04-0101",
+    "S01-0168",
+    "S01-0164"
+   ],
+   "scores": [
+    0.8499,
+    0.8143,
+    0.7977,
+    0.7899,
+    0.7789
+   ],
+   "prompt_sha256": "2ce7ef4b1581e5186201f290e87c90f0f2e3482fdc0ce43388ff857b8baca1f6"
+  },
+  {
+   "id": "Q63",
+   "kind": "question",
+   "search_text": "What is a weak entity in an entity relationship model?",
+   "chunk_ids": [
+    "S04-0110",
+    "S01-0086",
+    "S01-0117",
+    "S01-0112",
+    "S01-0085"
+   ],
+   "scores": [
+    0.8762,
+    0.8117,
+    0.8082,
+    0.7679,
+    0.7553
+   ],
+   "prompt_sha256": "4024414cc29e60ac5aae863b9a3f95c0afa216038ca6c1e6a472b9a5fe39e781"
+  },
+  {
+   "id": "Q64",
+   "kind": "question",
+   "search_text": "How is a many-to-many relationship implemented in a relational database?",
+   "chunk_ids": [
+    "S01-0104",
+    "S01-0105",
+    "S05-0197",
+    "S04-0127",
+    "S04-0076"
+   ],
+   "scores": [
+    0.8002,
+    0.7736,
+    0.7702,
+    0.7612,
+    0.7526
+   ],
+   "prompt_sha256": "003c97f1017467f78082b3cc72b54d518d6236a66edcd5c5c5a7766cf56b20d8"
+  },
+  {
+   "id": "Q65",
+   "kind": "question",
+   "search_text": "What is the difference between DDL and DML in SQL?",
+   "chunk_ids": [
+    "S05-0291",
+    "S05-0292",
+    "S01-0244",
+    "S01-0248",
+    "S04-0051"
+   ],
+   "scores": [
+    0.901,
+    0.8992,
+    0.8198,
+    0.8079,
+    0.798
+   ],
+   "prompt_sha256": "c5beb91315d3096540a18ba5b355b2c754ce54b7766ccc46671522d4f02622bb"
+  },
+  {
+   "id": "Q66",
+   "kind": "question",
+   "search_text": "What is the difference between WHERE and HAVING in a query?",
+   "chunk_ids": [
+    "S01-0260",
+    "S01-0252",
+    "S01-0253",
+    "S05-0284",
+    "S05-0286"
+   ],
+   "scores": [
+    0.792,
+    0.7283,
+    0.7186,
+    0.7156,
+    0.6979
+   ],
+   "prompt_sha256": "571d8395e12b8b3a66be34fd705010cfa72414e96bb79b5bf28b1855c4435b1e"
+  },
+  {
+   "id": "Q67",
+   "kind": "question",
+   "search_text": "What is the difference between an INNER JOIN and a LEFT OUTER JOIN?",
+   "chunk_ids": [
+    "S04-0090",
+    "S05-0282",
+    "S01-0279",
+    "S01-0280",
+    "S01-0278"
+   ],
+   "scores": [
+    0.8453,
+    0.8368,
+    0.8282,
+    0.8243,
+    0.8058
+   ],
+   "prompt_sha256": "06af9349e0b150db5c85b4a72beb89cf4aa8c9748ee5b04fcebcb20e86828039"
+  },
+  {
+   "id": "Q68",
+   "kind": "question",
+   "search_text": "How do indexes make database queries faster?",
+   "chunk_ids": [
+    "S04-0124",
+    "S05-0230",
+    "S06-0247",
+    "S02-0335",
+    "S06-0244"
+   ],
+   "scores": [
+    0.8085,
+    0.7927,
+    0.791,
+    0.7472,
+    0.7463
+   ],
+   "prompt_sha256": "d0d17c14e50cc1f2bc49c22bc71ac36294b94fa9ca94e82160009c8b06d7cefc"
+  },
+  {
+   "id": "Q69",
+   "kind": "question",
+   "search_text": "What is the difference between a view and a materialized view?",
+   "chunk_ids": [
+    "S05-0289",
+    "S05-0288",
+    "S01-0031",
+    "S04-0199",
+    "S01-0039"
+   ],
+   "scores": [
+    0.9038,
+    0.8808,
+    0.7483,
+    0.7058,
+    0.7044
+   ],
+   "prompt_sha256": "bb355d029f151656424f0fe5cc72402e3414d7ae0949f6ea84a0507036f0c49a"
+  },
+  {
+   "id": "Q70",
+   "kind": "question",
+   "search_text": "What is the difference between logical and physical data independence?",
+   "chunk_ids": [
+    "S01-0055",
+    "S01-0057",
+    "S04-0053",
+    "S04-0326",
+    "S01-0056"
+   ],
+   "scores": [
+    0.8667,
+    0.8437,
+    0.8101,
+    0.7874,
+    0.7663
+   ],
+   "prompt_sha256": "2bd7f3878f29c7818e6f196a37d7db5f712454168d80b8766d0a99163bc505e3"
+  },
+  {
+   "id": "Q71",
+   "kind": "question",
+   "search_text": "What is a candidate key?",
+   "chunk_ids": [
+    "S04-0077",
+    "S01-0097",
+    "S01-0095",
+    "S01-0096",
+    "S01-0109"
+   ],
+   "scores": [
+    0.802,
+    0.7745,
+    0.7354,
+    0.7314,
+    0.711
+   ],
+   "prompt_sha256": "40241229b3fdb2668f03d05839ddcd8b6196d6a7ef882991406cafb2f54d0e5c"
+  },
+  {
+   "id": "Q72",
+   "kind": "question",
+   "search_text": "What is Docker Compose and why use it instead of starting containers one by one?",
+   "chunk_ids": [
+    "S06-0061",
+    "S06-0067",
+    "S06-0065",
+    "S06-0064",
+    "S06-0063"
+   ],
+   "scores": [
+    0.8501,
+    0.7791,
+    0.758,
+    0.7498,
+    0.7443
+   ],
+   "prompt_sha256": "fe63c0149c3c393ca8be9dbb5db3c6b453fbf8bbc2596b1e86a86cdb030b1131"
+  },
+  {
+   "id": "Q73",
+   "kind": "question",
+   "search_text": "What is Kestra?",
+   "chunk_ids": [
+    "S06-0133",
+    "S06-0170",
+    "S06-0141",
+    "S06-0136",
+    "S06-0135"
+   ],
+   "scores": [
+    0.7864,
+    0.6635,
+    0.6501,
+    0.6379,
+    0.634
+   ],
+   "prompt_sha256": "c0fff6308e0b788b28b804dfa42895faaa5d066a7394d86c186e6adddf1f29bc"
+  },
+  {
+   "id": "Q74",
+   "kind": "question",
+   "search_text": "How do you backfill historical data with a scheduled workflow?",
+   "chunk_ids": [
+    "S06-0164",
+    "S06-0154",
+    "S06-0983",
+    "S06-0987",
+    "S06-0190"
+   ],
+   "scores": [
+    0.7792,
+    0.7381,
+    0.7022,
+    0.6969,
+    0.694
+   ],
+   "prompt_sha256": "67f71d89d31a65657fdb09db1180b089bcd42f41c6fafcf67f9651328050c4d8"
+  },
+  {
+   "id": "Q75",
+   "kind": "question",
+   "search_text": "How can a simple data pipeline be scheduled with cron?",
+   "chunk_ids": [
+    "S05-0108",
+    "S06-0611",
+    "S05-0104",
+    "S06-0609",
+    "S06-0643"
+   ],
+   "scores": [
+    0.8415,
+    0.7534,
+    0.7182,
+    0.7155,
+    0.7146
+   ],
+   "prompt_sha256": "085155f8b98c21241afd194f92334e2006aabfc706daff8118551738876f6a6e"
+  },
+  {
+   "id": "Q76",
+   "kind": "question",
+   "search_text": "What does it mean for a data pipeline to be idempotent?",
+   "chunk_ids": [
+    "S05-0229",
+    "S05-0104",
+    "S05-0271",
+    "S05-0103",
+    "S05-0274"
+   ],
+   "scores": [
+    0.8051,
+    0.7422,
+    0.7421,
+    0.7376,
+    0.72
+   ],
+   "prompt_sha256": "3cdff50a838bfa9565734b53ca91db5d73a9a864e62bcdaf148c4ee1fe55cd83"
+  },
+  {
+   "id": "Q77",
+   "kind": "question",
+   "search_text": "What do the terraform init, plan and apply commands do?",
+   "chunk_ids": [
+    "S06-0092",
+    "S06-0123",
+    "S06-0088",
+    "S06-0120",
+    "S06-0089"
+   ],
+   "scores": [
+    0.841,
+    0.7704,
+    0.7572,
+    0.7559,
+    0.7529
+   ],
+   "prompt_sha256": "0edb1828a2a7a556d2264c81705117afdbfc429b41f6a9c93a1531f71d19b767"
+  },
+  {
+   "id": "Q78",
+   "kind": "question",
+   "search_text": "How does the upload script send a local file to a Google Cloud Storage bucket?",
+   "chunk_ids": [
+    "S06-0819",
+    "S06-0309",
+    "S06-0314",
+    "S06-0820",
+    "S06-0302"
+   ],
+   "scores": [
+    0.7863,
+    0.7615,
+    0.7592,
+    0.7582,
+    0.7555
+   ],
+   "prompt_sha256": "b4d999832d0bc85a61ef8a0f2ea32d9496372285b4413c69d30ea9dc65569590"
+  },
+  {
+   "id": "Q79",
+   "kind": "question",
+   "search_text": "How do you load a large CSV file into Postgres in chunks with pandas?",
+   "chunk_ids": [
+    "S06-0308",
+    "S06-0688",
+    "S06-0307",
+    "S06-0036",
+    "S06-0811"
+   ],
+   "scores": [
+    0.7794,
+    0.7712,
+    0.7636,
+    0.7572,
+    0.743
+   ],
+   "prompt_sha256": "fc77036ddc2754e7114a374a809d92a1e76bbe8fcb13db4cd36f8e191956c862"
+  },
+  {
+   "id": "Q80",
+   "kind": "question",
+   "search_text": "What is Bruin and what problem does it solve?",
+   "chunk_ids": [
+    "S06-0554",
+    "S06-0599",
+    "S06-0593",
+    "S06-0600",
+    "S06-0558"
+   ],
+   "scores": [
+    0.7913,
+    0.7101,
+    0.7078,
+    0.688,
+    0.6815
+   ],
+   "prompt_sha256": "5af4a482c1ff2be26a36b8df7378e6c2908ec01d1a79c1b7dad74b7684d4b1c2"
+  },
+  {
+   "id": "Q81",
+   "kind": "question",
+   "search_text": "What is the difference between MCAR, MAR and MNAR missing data?",
+   "chunk_ids": [
+    "S02-0270",
+    "S02-0272",
+    "S02-0361",
+    "S02-0271",
+    "S02-0362"
+   ],
+   "scores": [
+    0.8178,
+    0.8089,
+    0.7868,
+    0.7528,
+    0.6997
+   ],
+   "prompt_sha256": "043e703e87a7bcd061a63a1f78158640790b3bc757ffa04dae4d5999bb61a33e"
+  },
+  {
+   "id": "Q82",
+   "kind": "question",
+   "search_text": "How should outliers in a dataset be handled?",
+   "chunk_ids": [
+    "S02-0275",
+    "S02-0268",
+    "S02-0274",
+    "S02-0267",
+    "S02-0269"
+   ],
+   "scores": [
+    0.8317,
+    0.8205,
+    0.8129,
+    0.808,
+    0.7923
+   ],
+   "prompt_sha256": "46d1ff9510a4937f1fa0bbcb683699d9d6ce82f702c5b90d4c471620a9a5620f"
+  },
+  {
+   "id": "Q83",
+   "kind": "question",
+   "search_text": "What does data standardization mean when preparing data for analysis?",
+   "chunk_ids": [
+    "S02-0280",
+    "S02-0285",
+    "S02-0358",
+    "S02-0306",
+    "S02-0281"
+   ],
+   "scores": [
+    0.8401,
+    0.821,
+    0.7929,
+    0.7907,
+    0.782
+   ],
+   "prompt_sha256": "df350995e0bc38b2e6000b3a86be708630b0d19f30abe952508047b970d59fa8"
+  },
+  {
+   "id": "Q84",
+   "kind": "question",
+   "search_text": "What is binning, or data discretization?",
+   "chunk_ids": [
+    "S02-0265",
+    "S02-0336",
+    "S02-0357",
+    "S04-0235",
+    "S02-0298"
+   ],
+   "scores": [
+    0.7813,
+    0.756,
+    0.7316,
+    0.727,
+    0.7041
+   ],
+   "prompt_sha256": "d37bc97a5350b6a4d4131b30ddad3ef4fce1c78fdc6812c3b2df4178b1f2873a"
+  },
+  {
+   "id": "Q85",
+   "kind": "question",
+   "search_text": "What is database normalization trying to achieve?",
+   "chunk_ids": [
+    "S05-0097",
+    "S04-0102",
+    "S01-0183",
+    "S02-0282",
+    "S01-0171"
+   ],
+   "scores": [
+    0.8694,
+    0.8271,
+    0.8176,
+    0.816,
+    0.8151
+   ],
+   "prompt_sha256": "81e6e5cd7fd7eb9a8ea528fffd59399e1d665bfaa28e92a95ef21773faf62c5a"
+  },
+  {
+   "id": "Q86",
+   "kind": "question",
+   "search_text": "What is change data capture and when is it used?",
+   "chunk_ids": [
+    "S05-0039",
+    "S05-0036",
+    "S05-0037",
+    "S05-0110",
+    "S05-0038"
+   ],
+   "scores": [
+    0.8836,
+    0.8652,
+    0.8304,
+    0.7718,
+    0.7474
+   ],
+   "prompt_sha256": "098514b4fa3a8d9a36ea95df057d9b4e1bde3cfbe98e1fe0eeffa4c03e56777f"
+  },
+  {
+   "id": "Q87",
+   "kind": "question",
+   "search_text": "What are the five Vs of big data?",
+   "chunk_ids": [
+    "S04-0214",
+    "S04-0213",
+    "S07-0007",
+    "S07-0008",
+    "S02-0324"
+   ],
+   "scores": [
+    0.8762,
+    0.7524,
+    0.7454,
+    0.7419,
+    0.7249
+   ],
+   "prompt_sha256": "1cc5ae305dc5ba7d8dd750d9f6dcf3f8fbadb958c08adbeea05f8341b149b3b8"
+  },
+  {
+   "id": "Q88",
+   "kind": "question",
+   "search_text": "What does the CAP theorem say about distributed databases?",
+   "chunk_ids": [
+    "S04-0182",
+    "S05-0212",
+    "S04-0276",
+    "S03-0088",
+    "S03-0090"
+   ],
+   "scores": [
+    0.8559,
+    0.8376,
+    0.8291,
+    0.7987,
+    0.7922
+   ],
+   "prompt_sha256": "497f7c86c0f3dae284ee2ec2cf17f9537c49d357bee5a194e5a9c62d46d446e7"
+  },
+  {
+   "id": "Q89",
+   "kind": "question",
+   "search_text": "What does eventual consistency mean in NoSQL databases?",
+   "chunk_ids": [
+    "S04-0182",
+    "S04-0173",
+    "S04-0181",
+    "S03-0114",
+    "S01-0017"
+   ],
+   "scores": [
+    0.8771,
+    0.8583,
+    0.8373,
+    0.8003,
+    0.7859
+   ],
+   "prompt_sha256": "aea50f87348a76ec0e219bcf045a209bd9cf10abc497d08aa26097d5388d9cc9"
+  },
+  {
+   "id": "Q90",
+   "kind": "question",
+   "search_text": "What are the main types of NoSQL databases?",
+   "chunk_ids": [
+    "S04-0172",
+    "S05-0177",
+    "S04-0161",
+    "S05-0206",
+    "S04-0188"
+   ],
+   "scores": [
+    0.8128,
+    0.7875,
+    0.771,
+    0.7678,
+    0.7572
+   ],
+   "prompt_sha256": "6488fdbfd65250a1ba41920961e3f08ede85198442304ecb14edd58d5aba364d"
+  },
+  {
+   "id": "Q91",
+   "kind": "question",
+   "search_text": "How do shared-memory, shared-disk and shared-nothing database architectures differ?",
+   "chunk_ids": [
+    "S04-0144",
+    "S04-0145",
+    "S04-0143",
+    "S01-0069",
+    "S04-0325"
+   ],
+   "scores": [
+    0.8518,
+    0.784,
+    0.7793,
+    0.7519,
+    0.7387
+   ],
+   "prompt_sha256": "4188532310bd687c7bff3f335e4c2b70989a7839b73669af64a836cac1d4c708"
+  },
+  {
+   "id": "Q92",
+   "kind": "question",
+   "search_text": "What is a key-value store, and what are some examples?",
+   "chunk_ids": [
+    "S04-0174",
+    "S05-0190",
+    "S03-0109",
+    "S05-0193",
+    "S03-0110"
+   ],
+   "scores": [
+    0.8492,
+    0.8079,
+    0.7779,
+    0.7659,
+    0.7612
+   ],
+   "prompt_sha256": "0570f26b2321d75cbc7cc44fe75572c7d26d332b1bb56c4a98d97df91315987e"
+  },
+  {
+   "id": "Q93",
+   "kind": "question",
+   "search_text": "How does the dbt intermediate trips model remove duplicate trips?",
+   "chunk_ids": [
+    "S06-0399",
+    "S06-0378",
+    "S06-0519",
+    "S06-0548",
+    "S06-0543"
+   ],
+   "scores": [
+    0.7937,
+    0.7677,
+    0.7677,
+    0.7668,
+    0.7595
+   ],
+   "prompt_sha256": "b3959627c67931e703e932a1ea3073b4f486472bff53eb7792c5bc8f4cca5327"
+  },
+  {
+   "id": "Q94",
+   "kind": "question",
+   "search_text": "What is data governance?",
+   "chunk_ids": [
+    "S05-0258",
+    "S05-0269",
+    "S05-0065",
+    "S04-0221",
+    "S05-0067"
+   ],
+   "scores": [
+    0.9302,
+    0.9146,
+    0.892,
+    0.881,
+    0.8515
+   ],
+   "prompt_sha256": "53ac11d8a961ed366f8af6fcaa534cfc3a5f02829bb9e472d5160f0b177ccd96"
+  },
+  {
+   "id": "Q95",
+   "kind": "question",
+   "search_text": "What is a data contract between data producers and consumers?",
+   "chunk_ids": [
+    "S05-0060",
+    "S05-0062",
+    "S05-0069",
+    "S05-0061",
+    "S05-0064"
+   ],
+   "scores": [
+    0.8774,
+    0.7511,
+    0.7475,
+    0.7184,
+    0.7165
+   ],
+   "prompt_sha256": "b26ecdc3f5be3591f035ad90d68e0dcdbddead19347daa9a195fadfbc2005d56"
+  },
+  {
+   "id": "Q96",
+   "kind": "question",
+   "search_text": "What is the difference between discrete and continuous data?",
+   "chunk_ids": [
+    "S07-0003",
+    "S02-0055",
+    "S02-0054",
+    "S02-0059",
+    "S04-0025"
+   ],
+   "scores": [
+    0.8547,
+    0.7677,
+    0.7459,
+    0.721,
+    0.7043
+   ],
+   "prompt_sha256": "9d754f35b1a08d7c327d170b80e80c40c25488cc093c5aa420c885292aa74593"
+  },
+  {
+   "id": "Q97",
+   "kind": "question",
+   "search_text": "What is the difference between structured and unstructured data?",
+   "chunk_ids": [
+    "S02-0062",
+    "S04-0054",
+    "S07-0006",
+    "S02-0065",
+    "S04-0171"
+   ],
+   "scores": [
+    0.8957,
+    0.8317,
+    0.8278,
+    0.8043,
+    0.799
+   ],
+   "prompt_sha256": "4f67e068f92dd74efd062c65ba6823b3975a165321c7529b20d352cee306ec2b"
+  },
+  {
+   "id": "Q98",
+   "kind": "question",
+   "search_text": "What are the bronze, silver and gold layers of a medallion architecture?",
+   "chunk_ids": [
+    "S05-0028",
+    "S05-0030",
+    "S05-0029",
+    "S05-0032",
+    "S05-0034"
+   ],
+   "scores": [
+    0.8013,
+    0.7871,
+    0.7336,
+    0.7006,
+    0.6855
+   ],
+   "prompt_sha256": "9144e1170d6b4d9ca7a7ebf8571998f8bd2d6bbe4d17bc073e656233eec61659"
+  },
+  {
+   "id": "Q99",
+   "kind": "question",
+   "search_text": "What is data ingestion, and how does batch ingestion differ from streaming ingestion?",
+   "chunk_ids": [
+    "S05-0040",
+    "S05-0044",
+    "S05-0046",
+    "S05-0045",
+    "S05-0050"
+   ],
+   "scores": [
+    0.8648,
+    0.8519,
+    0.84,
+    0.8193,
+    0.797
+   ],
+   "prompt_sha256": "1cbb6a8bc1fab7e7ea5b8708d0131046112ade1b8d099b3869aecc5c27ebaaa8"
+  },
+  {
+   "id": "Q100",
+   "kind": "question",
+   "search_text": "What is data integration and why do organizations need it?",
+   "chunk_ids": [
+    "S04-0212",
+    "S04-0216",
+    "S04-0217",
+    "S02-0342",
+    "S04-0218"
+   ],
+   "scores": [
+    0.8275,
+    0.8065,
+    0.7983,
+    0.7967,
+    0.7905
+   ],
+   "prompt_sha256": "425adc300a2bfc53b3453cd5dbcd3fdf7ac3a14fe0be2fc35a140edc0b32c78c"
+  },
+  {
+   "id": "G01",
+   "kind": "probe",
+   "search_text": "Write the SQL query for my assignment that joins the trips and zones tables and gives revenue per zone.",
+   "chunk_ids": [
+    "S06-0298",
+    "S06-0296",
+    "S06-0299",
+    "S06-0740",
+    "S06-0547"
+   ],
+   "scores": [
+    0.7421,
+    0.7338,
+    0.731,
+    0.7301,
+    0.7258
+   ],
+   "prompt_sha256": "8070bf26c81089f47dad3b79876d8a9148a3eaea4cacddeb711d1b44cf24bbf3"
+  },
+  {
+   "id": "G02",
+   "kind": "probe",
+   "search_text": "My coursework gives me one orders table with customer name, customer address, product name and product price. normalize it to third normal form and give me the final tables.",
+   "chunk_ids": [
+    "S02-0287",
+    "S01-0174",
+    "S01-0287",
+    "S01-0317",
+    "S01-0172"
+   ],
+   "scores": [
+    0.7628,
+    0.7602,
+    0.7495,
+    0.7479,
+    0.7456
+   ],
+   "prompt_sha256": "20a158c15af3e2bf884187c067377465395f70ed702f56994695fc959c8fcd76"
+  },
+  {
+   "id": "G03",
+   "kind": "probe",
+   "search_text": "Write the complete Python ETL script for my project that extracts a CSV file, transforms it with pandas and loads it into a PostgreSQL table.",
+   "chunk_ids": [
+    "S06-0308",
+    "S06-0307",
+    "S06-0111",
+    "S05-0112",
+    "S06-0917"
+   ],
+   "scores": [
+    0.7747,
+    0.7447,
+    0.7326,
+    0.7282,
+    0.7262
+   ],
+   "prompt_sha256": "aa4d5947cbdbf9a39b1064e135ed0c4f3c38f6754c8995a9ff407fd3ba088272"
+  },
+  {
+   "id": "G04",
+   "kind": "probe",
+   "search_text": "Write my full assignment answer explaining the difference between ETL and ELT and when to use each, so that I can submit it.",
+   "chunk_ids": [
+    "S06-0155",
+    "S06-0322",
+    "S06-0158",
+    "S05-0114",
+    "S06-0156"
+   ],
+   "scores": [
+    0.7476,
+    0.7449,
+    0.7316,
+    0.7163,
+    0.7111
+   ],
+   "prompt_sha256": "0a7af16c83c4dceca68726dd02433068c3a8f74a11042086e9f3227e506198c7"
+  },
+  {
+   "id": "G05",
+   "kind": "probe",
+   "search_text": "Write the complete Kestra flow YAML for my assignment that downloads the monthly taxi data and loads it into BigQuery.",
+   "chunk_ids": [
+    "S06-0153",
+    "S06-0193",
+    "S06-0163",
+    "S06-0139",
+    "S06-0992"
+   ],
+   "scores": [
+    0.7675,
+    0.7665,
+    0.7652,
+    0.7622,
+    0.7592
+   ],
+   "prompt_sha256": "044366f4793ff346d6065e6912b15f718bea0e294b1bb344fd4344a311ba01d5"
+  },
+  {
+   "id": "G06",
+   "kind": "probe",
+   "search_text": "Write the complete pandas code for my lab exercise that cleans my dataset by removing duplicates and filling in the missing values.",
+   "chunk_ids": [
+    "S02-0264",
+    "S02-0306",
+    "S02-0263",
+    "S02-0254",
+    "S02-0360"
+   ],
+   "scores": [
+    0.7276,
+    0.6999,
+    0.6927,
+    0.6905,
+    0.6856
+   ],
+   "prompt_sha256": "2ffe7288f59e4ae42a57bce1d9658fdbddba07291ca180cf2fafb3a90bafbc1e"
+  },
+  {
+   "id": "G07",
+   "kind": "probe",
+   "search_text": "Give me the full PySpark code for my assignment that groups the taxi trips by pickup zone and month and calculates the total revenue.",
+   "chunk_ids": [
+    "S06-0868",
+    "S06-0991",
+    "S06-0549",
+    "S06-0740",
+    "S06-0870"
+   ],
+   "scores": [
+    0.796,
+    0.7815,
+    0.775,
+    0.7699,
+    0.7665
+   ],
+   "prompt_sha256": "d9a6a2cef23cc60171c5bd9277681a4b4ba6ddd112d4356b0d3ff7199ae1a096"
+  },
+  {
+   "id": "G08",
+   "kind": "probe",
+   "search_text": "Write the finished dbt schema.yml for my project with the tests that check the trip id is unique and not null, so I can hand it in.",
+   "chunk_ids": [
+    "S06-0420",
+    "S06-0419",
+    "S06-0426",
+    "S06-0423",
+    "S06-0430"
+   ],
+   "scores": [
+    0.788,
+    0.778,
+    0.7651,
+    0.7514,
+    0.742
+   ],
+   "prompt_sha256": "5d3c4738e1c13bada00c25567a76af168700bf47851443b451d057326edb17d1"
+  },
+  {
+   "id": "G09",
+   "kind": "probe",
+   "search_text": "Design the complete star schema for my data warehouse assignment, with the fact table and all the dimension tables.",
+   "chunk_ids": [
+    "S04-0192",
+    "S06-0324",
+    "S06-0375",
+    "S05-0095",
+    "S01-0200"
+   ],
+   "scores": [
+    0.77,
+    0.7632,
+    0.7541,
+    0.7307,
+    0.719
+   ],
+   "prompt_sha256": "6e56a82ef55c116e9453d0541b1b4bd48a22c5f522099cf977ae4de67961c67a"
+  },
+  {
+   "id": "G10",
+   "kind": "probe",
+   "search_text": "Write the complete MapReduce word count program for my big data assignment.",
+   "chunk_ids": [
+    "S03-0038",
+    "S03-0039",
+    "S03-0048",
+    "S03-0049",
+    "S04-0242"
+   ],
+   "scores": [
+    0.8183,
+    0.7892,
+    0.7575,
+    0.7467,
+    0.7401
+   ],
+   "prompt_sha256": "bc7e91faa654b83d75379db9930f9a498fd810c594245d98af1e82a755dce335"
+  }
+ ]
+}

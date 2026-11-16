@@ -3,6 +3,7 @@ Streamlit chat interface (DEV PROTOTYPE).
 
 A minimal page to talk to the knowledge base: one text box, the chat history, and the sources behind each
 answer. All retrieval and generation happens in src/core (rag.py); this file only displays things.
+Citations are renumbered for display after an answer is complete (src/core/citations.py); the model's own text is unchanged.
 
 Launch from the project root:  venv\\Scripts\\streamlit run src\\app\\app.py
 """
@@ -18,7 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
 import streamlit as st
 
 from config import settings
-from src.core import llm
+from src.core import citations, llm
 from src.core.rag import RagPipeline
 
 st.set_page_config(page_title="Data Engineering Course Assistant", page_icon="💬")
@@ -30,15 +31,60 @@ def load_pipeline() -> RagPipeline:
     return RagPipeline()
 
 
-def show_sources(sources: list[dict], used_fallback: bool) -> None:
-    """Show the retrieved chunks behind an answer in a collapsible box."""
-    label = "Closest course material found (not used: below the relevance threshold)" if used_fallback else "Sources"
+def where(source: dict) -> str:
+    """The page number for a PDF chunk, otherwise the file it came from."""
+    return f"page {source['page']}" if source["page"] else (source["file"] or "")
+
+
+def show_retrieved(sources: list[dict], used_fallback: bool) -> None:
+    """All five retrieved chunks with their similarity scores, collapsed. Kept for transparency: it shows what the model
+    was given, whether or not the answer cited it."""
+    label = ("All retrieved material (not used: below the relevance threshold)" if used_fallback
+             else "All retrieved material given to the model")
     with st.expander(f"{label} · {len(sources)} chunks"):
         for s in sources:
-            where = f"page {s['page']}" if s["page"] else (s["file"] or "")
-            st.markdown(f"**[{s['chunk_id']}]** {s['source_name']} · {s['section']} · {where} · "
+            st.markdown(f"**[{s['chunk_id']}]** {s['source_name']} · {s['section']} · {where(s)} · "
                         f"similarity {s['score']:.2f}")
             st.caption(s["text"][:300] + ("..." if len(s["text"]) > 300 else ""))
+
+
+def _plain(token: str) -> str:
+    """A model-written token shown inside inline code, so markdown characters in it cannot change the page."""
+    return "`" + token.replace("`", "'") + "`"
+
+
+def show_cited_sources(sources: list[dict], check: dict) -> None:
+    """Under a model answer: the chunks it cited, numbered as in the answer, each opening to its full excerpt, then a short
+    note for any citation problem."""
+    by_id = {s["chunk_id"]: s for s in sources}
+    if check["cited_ids"]:
+        st.markdown("**Sources**")
+        for number, chunk_id in enumerate(check["cited_ids"], 1):
+            s = by_id[chunk_id]
+            with st.expander(f"[{number}] {s['source_name']} · {s['section']} · {where(s)}"):
+                st.caption(f"Chunk {chunk_id}")
+                if s.get("source_type") == "code":
+                    st.code(s["text"], language=None, wrap_lines=True)
+                else:                         # plain text, so a markdown heading in a chunk cannot turn into page layout
+                    st.text(s["text"])
+    else:
+        st.caption(f":orange[{settings.DEV_CITATION_MSG_NONE}]")
+    if check["outside_set"]:
+        st.caption(":orange[" + settings.DEV_CITATION_MSG_OUTSIDE.format(
+            ids=", ".join(_plain(t) for t in check["outside_set"])) + "]")
+    if check["malformed"]:
+        st.caption(":orange[" + settings.DEV_CITATION_MSG_MALFORMED.format(
+            tokens=", ".join(_plain(t) for t in check["malformed"])) + "]")
+
+
+def show_session_counts(slot) -> None:
+    """Sidebar tally of citation problems over the model answers in this chat."""
+    counts = citations.session_counts([m["citations"] for m in st.session_state.messages if m.get("citations")])
+    if counts["answers_checked"]:
+        plural = "" if counts["answers_checked"] == 1 else "s"
+        slot.caption(f"Citation check, {counts['answers_checked']} model answer{plural} in this chat: "
+                     f"{counts['outside_set']} cited material not given to the model · {counts['malformed']} had a "
+                     f"malformed citation · {counts['no_citation']} cited no course material")
 
 
 def reply_caption(model: str | None, used_fallback: bool) -> str:
@@ -50,20 +96,35 @@ def reply_caption(model: str | None, used_fallback: bool) -> str:
     return "Fixed reply · no model used"
 
 
+def model_label(model: str) -> str:
+    """The dropdown text for a model, with its group. st.selectbox has no option groups, so the group is a prefix."""
+    group = settings.DEV_MODEL_GROUP_CLOUD if llm.is_cloud_model(model) else settings.DEV_MODEL_GROUP_LOCAL
+    return f"{group} · {model}"
+
+
+def usage_caption(usage: dict) -> str:
+    """One line under a cloud answer: tokens, what it would cost at list price, and how long it took."""
+    reasoning = f" (reasoning {usage['reasoning_tokens']:,})" if usage["reasoning_tokens"] else ""
+    plural = "retry" if usage["retries"] == 1 else "retries"
+    retries = f" · {usage['retries']} {plural}, {usage['retry_wait_seconds']:.0f} s waiting" if usage["retries"] else ""
+    return (f"Input {usage['input_tokens']:,} tokens · output {usage['output_tokens']:,} tokens{reasoning} · "
+            f"${usage['cost_usd_list']:.6f} at list price · {usage['latency_seconds']:.1f} s{retries}")
+
+
 # ---------------------------------------------------------------- sidebar
 with st.sidebar:
     st.subheader("Dev prototype")
-    default_index = settings.DEV_LLM_MODEL_OPTIONS.index(settings.DEV_LLM_MODEL) \
-        if settings.DEV_LLM_MODEL in settings.DEV_LLM_MODEL_OPTIONS else 0
-    selected_model = st.selectbox("Answer model (local Ollama)", settings.DEV_LLM_MODEL_OPTIONS,
-                                  index=default_index)
-    st.caption(f"New answers are generated by **{selected_model}**. Casual local viewing only, not the "
+    model_options = settings.DEV_LLM_MODEL_OPTIONS + list(settings.DEV_CLOUD_MODELS)
+    default_index = model_options.index(settings.DEV_LLM_MODEL) if settings.DEV_LLM_MODEL in model_options else 0
+    selected_model = st.selectbox("Answer model", model_options, index=default_index, format_func=model_label)
+    st.caption(f"New answers are generated by **{selected_model}**. Casual viewing only, not the "
                f"notebook 04 model comparison. Each reply shows the model that wrote it.")
     backend_ok, backend_message = llm.check_backend(selected_model)
     (st.success if backend_ok else st.error)(backend_message)
     st.caption(f"Intent classifier: {settings.DEV_LLM_MODEL} · retrieval: {settings.EMBEDDING_MODEL} · "
                f"top {settings.TOP_K} chunks · fallback below similarity {settings.SIMILARITY_THRESHOLD}")
     st.caption("Each question is answered on its own; earlier messages are not sent to the model.")
+    citation_counts_slot = st.empty()      # filled at the end of the page, so it includes an answer written in this run
     if st.button("Clear chat"):
         st.session_state.messages = []
         st.rerun()
@@ -78,11 +139,18 @@ if "messages" not in st.session_state:
 # ---------------------------------------------------------------- history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-        if message["role"] == "assistant":
-            st.caption(reply_caption(message.get("model"), message.get("used_fallback", False)))
+        if message.get("failed"):
+            st.error(message["content"])
+        else:
+            st.markdown(message["content"])
+            if message["role"] == "assistant":
+                st.caption(reply_caption(message.get("model"), message.get("used_fallback", False)))
+            if message.get("usage"):
+                st.caption(usage_caption(message["usage"]))
+            if message.get("citations"):
+                show_cited_sources(message["sources"], message["citations"])
         if message.get("sources"):
-            show_sources(message["sources"], message["used_fallback"])
+            show_retrieved(message["sources"], message["used_fallback"])
 
 # ---------------------------------------------------------------- new question
 question = st.chat_input("Type your question...")
@@ -98,11 +166,43 @@ if question:
             pipeline = load_pipeline()
             with st.spinner("Searching the course materials..."):
                 result = pipeline.answer(question, model=selected_model)
-            answer = st.write_stream(result.answer_stream)
-            st.caption(reply_caption(result.model, result.used_fallback))
+            usage, failed = None, False
+            answer_slot = st.empty()          # the raw answer goes here first, then the version with numbered citations
+            if result.cloud_call:             # a cloud answer is not streamed: show the waiting state until it is ready
+                try:
+                    cloud = result.cloud_call(answer_slot.info)
+                except llm.CloudError as error:
+                    answer, failed = str(error), True
+                else:
+                    answer = cloud.text
+                    usage = {"input_tokens": cloud.input_tokens, "output_tokens": cloud.output_tokens,
+                             "reasoning_tokens": cloud.reasoning_tokens, "cost_usd_list": cloud.cost_usd_list,
+                             "latency_seconds": cloud.latency_seconds, "retries": cloud.retries,
+                             "retry_wait_seconds": cloud.retry_wait_seconds}
+                answer_slot.empty()
+            else:
+                with answer_slot.container():
+                    answer = st.write_stream(result.answer_stream)
             sources = [{"chunk_id": c.chunk_id, "source_name": c.source_name, "section": c.section,
-                        "page": c.page, "file": c.file, "score": c.score, "text": c.text} for c in result.chunks]
+                        "page": c.page, "file": c.file, "score": c.score, "text": c.text,
+                        "source_type": c.source_type} for c in result.chunks]
+            # Only a model's answer has citations to check; fixed replies, the fallback and a failed call have none.
+            check = citations.check(answer, [s["chunk_id"] for s in sources]) if result.model and not failed else None
+            shown = check.text if check else answer
+            if failed:
+                answer_slot.error(answer)
+            else:
+                answer_slot.markdown(shown)
+                st.caption(reply_caption(result.model, result.used_fallback))
+            if usage:
+                st.caption(usage_caption(usage))
+            if check:
+                show_cited_sources(sources, check.to_dict())
             if sources:                       # small talk / unclear input skips retrieval: nothing to show
-                show_sources(sources, result.used_fallback)
-            st.session_state.messages.append({"role": "assistant", "content": answer, "model": result.model,
-                                              "sources": sources, "used_fallback": result.used_fallback})
+                show_retrieved(sources, result.used_fallback)
+            st.session_state.messages.append({"role": "assistant", "content": shown, "raw_answer": answer,
+                                              "model": result.model, "sources": sources,
+                                              "used_fallback": result.used_fallback, "usage": usage, "failed": failed,
+                                              "citations": check.to_dict() if check else None})
+
+show_session_counts(citation_counts_slot)
