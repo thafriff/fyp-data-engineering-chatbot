@@ -19,7 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
 import streamlit as st
 
 from config import settings
-from src.core import citations, llm
+from src.core import citations, guardrail, llm
 from src.core.rag import RagPipeline
 
 st.set_page_config(page_title="Data Engineering Course Assistant", page_icon="💬")
@@ -142,6 +142,8 @@ for message in st.session_state.messages:
         if message.get("failed"):
             st.error(message["content"])
         else:
+            if message.get("coach_mode"):
+                st.info(settings.GUARDRAIL_UI_NOTE)
             st.markdown(message["content"])
             if message["role"] == "assistant":
                 st.caption(reply_caption(message.get("model"), message.get("used_fallback", False)))
@@ -186,13 +188,19 @@ if question:
             sources = [{"chunk_id": c.chunk_id, "source_name": c.source_name, "section": c.section,
                         "page": c.page, "file": c.file, "score": c.score, "text": c.text,
                         "source_type": c.source_type} for c in result.chunks]
+            # Coach mode (a task request): cap any long code block, whatever the model did with the instruction.
+            if result.coach_mode and not failed:
+                answer, _ = guardrail.cap_code_blocks(answer)
             # Only a model's answer has citations to check; fixed replies, the fallback and a failed call have none.
             check = citations.check(answer, [s["chunk_id"] for s in sources]) if result.model and not failed else None
             shown = check.text if check else answer
             if failed:
                 answer_slot.error(answer)
             else:
-                answer_slot.markdown(shown)
+                with answer_slot.container():
+                    if result.coach_mode:
+                        st.info(settings.GUARDRAIL_UI_NOTE)
+                    st.markdown(shown)
                 st.caption(reply_caption(result.model, result.used_fallback))
             if usage:
                 st.caption(usage_caption(usage))
@@ -203,6 +211,7 @@ if question:
             st.session_state.messages.append({"role": "assistant", "content": shown, "raw_answer": answer,
                                               "model": result.model, "sources": sources,
                                               "used_fallback": result.used_fallback, "usage": usage, "failed": failed,
-                                              "citations": check.to_dict() if check else None})
+                                              "citations": check.to_dict() if check else None,
+                                              "coach_mode": result.coach_mode})
 
 show_session_counts(citation_counts_slot)

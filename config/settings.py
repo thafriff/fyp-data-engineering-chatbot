@@ -557,6 +557,48 @@ SPELL_PROTECTED_TERMS = ["dbt", "elt", "etl", "olap", "oltp", "bigquery", "gcp",
 EMOTIONAL_OVERRIDE_MIN_SIMILARITY = SIMILARITY_THRESHOLD
 INTENT_CLASSIFIER_MAX_TOKENS = 8         # a label is at most ~6 tokens; stops any free-form text early
 INTENT_CLASSIFIER_TIMEOUT_SECONDS = 20    # on timeout -> REAL_QUESTION (retrieval)
+# ---------------------------------------------------------------------------
+# Code-level guardrail router (src/core/guardrail.py; author approved 2026-11-16). A SYSTEM FEATURE of the chat prototype,
+# evaluated in notebook 05; NOT part of the notebook 04 comparison (the runners never route, and build_messages() is untouched).
+# Why: with the frozen SYSTEM_PROMPT alone, llama3.2:3b gave a complete solution on 7 of 9 standard guardrail probes.
+# A message is a TASK REQUEST when, after greeting removal, it has (A) a production verb, (B) a deliverable and (C) either an
+# assessed signal (my assignment, homework, "so I can submit" ...) or a completeness word (complete, full, finished ...).
+# "complete/full" alone counts because the frozen prompt itself forbids "a complete query, program or written answer".
+# EXAMPLE EXCEPTION: a request for an example/sample/demo with no ASSESSED signal is a learning request and passes through.
+# Rules only (no classifier) in v1: English only, so Malay requests are a known gap. The held-out evaluation set
+# (evaluation/guardrail_router_cases.json) was written and hashed BEFORE these rules and is never tuned to them.
+# ---------------------------------------------------------------------------
+GUARDRAIL_ROUTER_ENABLED = True
+GUARDRAIL_PRODUCTION_VERBS = [
+    "write", "give me", "give us", "create", "build", "design", "generate", "produce", "implement", "make", "make me",
+    "do", "complete", "finish", "solve", "draft", "normalise", "normalize", "code", "develop", "prepare",
+]
+GUARDRAIL_DELIVERABLES = [
+    "query", "queries", "sql", "code", "script", "program", "function", "flow", "yaml", "dag", "pipeline", "schema",
+    "schema.yml", "table", "tables", "model", "solution", "answer", "essay", "report", "configuration", "config",
+    "diagram", "ddl", "job", "file", "notebook", "assignment answer", "star schema",
+]
+GUARDRAIL_ASSESSED_SIGNALS = [
+    "my assignment", "our assignment", "the assignment", "assignment", "coursework", "homework", "my project", "our project",
+    "lab exercise", "my lab", "lab ", "exercise", "tutorial", "quiz", "exam", "test question", "so i can submit", "so that i can submit",
+    "to submit", "hand it in", "hand in", "turn it in", "for submission", "graded", "marked",
+]
+GUARDRAIL_COMPLETE_SIGNALS = ["complete", "full", "finished", "final", "entire", "whole"]
+GUARDRAIL_EXAMPLE_WORDS = ["example", "examples", "sample", "demo", "illustration"]
+
+# Coach mode: the reply a caught request gets. The normal prompt is kept and this instruction is appended after it, so the
+# frozen prompt text and build_messages() are untouched. Grounding and citations are still required.
+GUARDRAIL_COACH_INSTRUCTION = (
+    "This request asks for a finished piece of assessed work. Do not provide it. Instead: (1) explain the concepts from the "
+    "excerpts that the task needs, citing chunk IDs; (2) give the steps the student should follow, in order; (3) if code or a "
+    "query is involved, show at most a short skeleton with ___ blanks for the parts the student must write; (4) end with one "
+    "question that helps the student take the first step. Keep every statement grounded in the excerpts."
+)
+GUARDRAIL_CODE_MAX_LINES = 8            # any fenced code block longer than this is cut (code-level enforcement)
+GUARDRAIL_CODE_CUT_NOTE = "# ... your turn: complete the rest using the steps above"
+GUARDRAIL_UI_NOTE = ("Coach mode: this looks like a request for a finished assignment answer, so here are the concepts, "
+                     "steps and hints instead.")
+
 EMOTIONAL_RESPONSES = {
     "EMOTIONAL_SICK": "Sorry to hear you're not feeling well. Get well soon! Come back whenever you're ready.",
     "EMOTIONAL_TIRED": "No worries, take your time and get some rest. I'll be here when you're ready to continue.",

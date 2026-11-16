@@ -19,7 +19,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from config import settings
-from src.core import llm
+from src.core import guardrail, llm
 
 # Compiled once: each small-talk pattern must match the WHOLE normalised message.
 _SMALL_TALK = {name: re.compile(rf"^(?:{pattern})$") for name, pattern in settings.SMALL_TALK_PATTERNS.items()}
@@ -30,9 +30,10 @@ class Intent:
     """The routing decision for one message."""
     kind: str                   # "small_talk", "unclear", "emotional" or "question"
     reply: str | None = None    # fixed reply for small_talk / unclear / emotional; None for questions
-    path: str = "pattern"       # "pattern", "question_heuristic", "classifier" or "similarity_override"
+    path: str = "pattern"       # "pattern", "task_request", "question_heuristic", "classifier" or "similarity_override"
     label: str | None = None    # raw classifier output (when the classifier was called)
     top_score: float | None = None   # top-1 course similarity (when the override check ran)
+    task: object | None = None  # guardrail.TaskDecision when the message is a task request (answered in coach mode)
 
 
 def _normalise(message: str) -> str:
@@ -92,6 +93,12 @@ def route(message: str, top_score: Callable[[str], float] | None = None,
 
     cleaned = clean(message) if clean else message
     cleaned_text = _normalise(cleaned) or text
+    # Task requests ("write the full code for my assignment") come before the obvious-question check, because "give"
+    # and "show" are question-start words there. They are still questions: retrieval runs, then coach mode answers.
+    if settings.GUARDRAIL_ROUTER_ENABLED:
+        decision = guardrail.detect_task_request(cleaned)
+        if decision.is_task:
+            return Intent("question", path="task_request", task=decision)
     if not settings.INTENT_CLASSIFIER_ENABLED or _is_obvious_question(cleaned, cleaned_text):
         return Intent("question", path="question_heuristic")
 

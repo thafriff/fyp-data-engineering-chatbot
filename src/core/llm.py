@@ -75,12 +75,15 @@ def generate(question: str, chunks: list[RetrievedChunk], model: str | None = No
 
 
 def stream_generate(question: str, chunks: list[RetrievedChunk], model: str | None = None,
-                    corrections: list[tuple[str, str]] | None = None) -> Iterator[str]:
+                    corrections: list[tuple[str, str]] | None = None,
+                    transform: Callable[[list[dict]], list[dict]] | None = None) -> Iterator[str]:
     """Yield the answer piece by piece as the model writes it, so the interface can show it immediately.
     Stops at settings.DEV_LLM_MAX_ANSWER_TOKENS, or as soon as the model writes the same line (of at least
     settings.DEV_LLM_REPEAT_MIN_CHARS characters) settings.DEV_LLM_REPEAT_LINE_LIMIT times, and then adds a
-    short note saying why it stopped. corrections: the spelling hint pairs (see build_messages)."""
-    body = _request_body(build_messages(question, chunks, corrections=corrections), stream=True, model=model)
+    short note saying why it stopped. corrections: the spelling hint pairs (see build_messages). transform, when given,
+    is applied to the built messages (coach mode appends its instruction this way); the default sends them as built."""
+    messages = build_messages(question, chunks, corrections=corrections)
+    body = _request_body(transform(messages) if transform else messages, stream=True, model=model)
     body["options"]["num_predict"] = settings.DEV_LLM_MAX_ANSWER_TOKENS
     line_counts: dict[str, int] = {}
     current_line = ""
@@ -321,14 +324,16 @@ def _apply_answer_guards(reply: _Reply) -> str:
 
 def cloud_generate(question: str, chunks: list[RetrievedChunk], model: str,
                    on_status: Callable[[str], None] | None = None,
-                   corrections: list[tuple[str, str]] | None = None) -> CloudAnswer:
+                   corrections: list[tuple[str, str]] | None = None,
+                   transform: Callable[[list[dict]], list[dict]] | None = None) -> CloudAnswer:
     """Answer with a cloud model, from the same prompt as a local answer. on_status(text) is called on the calling thread
     about twice a second with a line for the student (waiting, or retrying), so a slow reply does not look like a hang.
     Raises CloudError, whose text can be shown as it is, for a missing or rejected key, overload, timeout or an empty reply."""
     key = _google_api_key()
     if not key:
         raise CloudError(settings.DEV_CLOUD_MSG_MISSING_KEY.format(model=model))
-    request = _cloud_request(model, build_messages(question, chunks, corrections=corrections))
+    messages = build_messages(question, chunks, corrections=corrections)
+    request = _cloud_request(model, transform(messages) if transform else messages)
     reply, latency, retries, waited = _call_with_retries(model, key, request, on_status or (lambda text: None))
     if not reply.text.strip():
         raise CloudError(settings.DEV_CLOUD_MSG_BLOCKED.format(model=model, finish=reply.finish))

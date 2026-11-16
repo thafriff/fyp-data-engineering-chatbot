@@ -152,10 +152,11 @@ class SpellingHint(unittest.TestCase):
         pipeline.retriever = SimpleNamespace(retrieve=lambda text, top_k=None: [
             SimpleNamespace(chunk_id="S05-0138", score=0.9, text="OLAP is a model. Load data at once.")])
 
-        def fake_stream(question, chunks, model=None, corrections=None):
+        def fake_stream(question, chunks, model=None, corrections=None, transform=None):
             seen.update(question=question, corrections=corrections)
             yield "answer"
-        with mock.patch.object(intent, "route", lambda q, top_score=None, clean=None: SimpleNamespace(kind="question")),                 mock.patch.object(llm, "stream_generate", fake_stream):
+        with mock.patch.object(intent, "route", lambda q, top_score=None, clean=None: SimpleNamespace(kind="question", path="question_heuristic")), \
+                mock.patch.object(llm, "stream_generate", fake_stream):
             for text, corrections in (("hey what is olpa", [("olpa", "olap")]), ("hi what is olap", []),
                                       ("how do I load dat into BigQuery?", [])):
                 "".join(pipeline.answer(text, model="llama3.2:3b").answer_stream)
@@ -175,7 +176,7 @@ class Pipeline(unittest.TestCase):
         def fake_stream(question, chunks, model=None, **kwargs):
             seen["model_question"] = question
             yield "answer"
-        with mock.patch.object(intent, "route", lambda q, top_score=None, clean=None: SimpleNamespace(kind="question")), \
+        with mock.patch.object(intent, "route", lambda q, top_score=None, clean=None: SimpleNamespace(kind="question", path="question_heuristic")), \
                 mock.patch.object(llm, "stream_generate", fake_stream):
             result = pipeline.answer("Salam, what is olpa", model="llama3.2:3b")
             "".join(result.answer_stream)

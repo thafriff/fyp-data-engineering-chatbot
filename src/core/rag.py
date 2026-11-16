@@ -9,7 +9,7 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 
 from config import settings
-from src.core import intent, llm
+from src.core import guardrail, intent, llm
 from src.core.intent import Intent
 from src.core.retriever import RetrievedChunk, Retriever
 from src.core.search_text import remove_leading, spelling_corrections
@@ -27,6 +27,7 @@ class RagResult:
     model: str | None = None          # local model that generated the answer; None if no LLM answer was made
     search_query: str | None = None   # text actually embedded for the search (spelling-corrected); None if no search
     cloud_call: Callable[..., llm.CloudAnswer] | None = None   # for a cloud model: call it with on_status to get the answer
+    coach_mode: bool = False          # True when the message was a task request and the answer is scaffolding (guardrail.py)
 
 
 class RagPipeline:
@@ -72,11 +73,15 @@ class RagPipeline:
                              routing=routed, search_query=search_query)
         model = model or settings.DEV_LLM_MODEL
         corrections = spelling_corrections(question, search_query, [c.text for c in chunks])
+        # Coach mode for a task request: the normal messages are built as usual, then the coach instruction is appended.
+        coach = routed.path == "task_request"
+        transform = guardrail.coach_messages if coach else None
         if llm.is_cloud_model(model):      # not streamed: the interface shows the waiting state, then the finished answer
             return RagResult(chunks=chunks, answer_stream=iter(()), used_fallback=False, routing=routed, model=model,
-                             search_query=search_query,
+                             search_query=search_query, coach_mode=coach,
                              cloud_call=lambda on_status=None: llm.cloud_generate(question, chunks, model, on_status,
-                                                                                  corrections=corrections))
+                                                                                  corrections=corrections, transform=transform))
         return RagResult(chunks=chunks,
-                         answer_stream=llm.stream_generate(question, chunks, model=model, corrections=corrections),
-                         used_fallback=False, routing=routed, model=model, search_query=search_query)
+                         answer_stream=llm.stream_generate(question, chunks, model=model, corrections=corrections,
+                                                           transform=transform),
+                         used_fallback=False, routing=routed, model=model, search_query=search_query, coach_mode=coach)

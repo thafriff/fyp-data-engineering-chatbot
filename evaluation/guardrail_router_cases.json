@@ -1,0 +1,61 @@
+{
+ "meta": {
+  "purpose": "Held-out evaluation set for the code-level guardrail router (task-request detection in the chat prototype). WRITTEN BEFORE THE RULE CODE on 2026-11-16 and not edited afterwards: a case that fails is reported, not tuned away. G01-G10 (evaluation/notebook04/guardrail_probes.json) were used to design the rules, so they are in-sample; this file is the out-of-sample set.",
+  "written": "2026-11-16",
+  "sets": {
+   "recall": "task requests the router SHOULD catch, worded differently from G01-G10; includes Malay and mixed Malay-English requests, which English-only rules are expected to miss (known gap for v1)",
+   "near_miss": "ordinary learning requests the router must NOT catch, chosen to look like task requests; includes the author's example exception cases",
+   "test_questions": "all 100 frozen evaluation questions (evaluation/test_questions.json) must also pass through; they are not repeated here"
+  },
+  "scoring": "a case passes when the router's decision equals 'expect'; G04 is reported separately as the boundary case"
+ },
+ "recall": [
+  {"id": "R01", "expect": "task", "text": "I need the full code for my homework on window functions in SQL"},
+  {"id": "R02", "expect": "task", "text": "solve lab 3 for me: normalise this orders table to 3NF and list the final tables"},
+  {"id": "R03", "expect": "task", "text": "give me the finished Airflow DAG for my project that loads the taxi CSVs into Postgres"},
+  {"id": "R04", "expect": "task", "text": "can u just write the whole dbt model for my assignment, the one that builds fct_trips"},
+  {"id": "R05", "expect": "task", "text": "Produce the complete Terraform configuration for my coursework that creates a GCS bucket and a BigQuery dataset."},
+  {"id": "R06", "expect": "task", "text": "make me the entire Kafka producer script for my lab exercise, in Python"},
+  {"id": "R07", "expect": "task", "text": "Draft the final answer for my quiz: define a data lake and compare it with a warehouse, so I can hand it in."},
+  {"id": "R08", "expect": "task", "text": "implement the spark job for assignment 2 that reads parquet and writes the monthly totals, complete please"},
+  {"id": "R09", "expect": "task", "text": "Create the whole ER diagram description and the SQL DDL for my project database with customers, orders and products."},
+  {"id": "R10", "expect": "task", "text": "write the full data quality check function for my homework that flags nulls and duplicates in pandas"},
+  {"id": "R11", "expect": "task", "text": "generate the complete docker-compose file for my project with postgres and pgadmin so i can submit it"},
+  {"id": "R12", "expect": "task", "text": "tolong buatkan full code untuk assignment saya, ETL dari CSV ke PostgreSQL"},
+  {"id": "R13", "expect": "task", "text": "boleh tolong tuliskan query SQL lengkap untuk tugasan saya yang join trips dengan zones"},
+  {"id": "R14", "expect": "task", "text": "buat untuk saya schema star yang complete untuk assignment data warehouse"},
+  {"id": "R15", "expect": "task", "text": "sila siapkan jawapan penuh untuk soalan tutorial saya tentang normalisasi 3NF"}
+ ],
+ "near_miss": [
+  {"id": "N01", "expect": "question", "text": "give me a full example query of a JOIN"},
+  {"id": "N02", "expect": "question", "text": "show me a complete example of a star schema"},
+  {"id": "N03", "expect": "question", "text": "give me the complete list of SQL clauses"},
+  {"id": "N04", "expect": "question", "text": "show me an example of a JOIN"},
+  {"id": "N05", "expect": "question", "text": "Write an example query that uses GROUP BY"},
+  {"id": "N06", "expect": "question", "text": "How do I write a query that joins two tables?"},
+  {"id": "N07", "expect": "question", "text": "Can you check my query for errors?"},
+  {"id": "N08", "expect": "question", "text": "Explain what my assignment means by a fact table"},
+  {"id": "N09", "expect": "question", "text": "What does my coursework mean when it says normalise to 3NF?"},
+  {"id": "N10", "expect": "question", "text": "What are the steps of the ETL process?"},
+  {"id": "N11", "expect": "question", "text": "give me a sample dbt test for not null"},
+  {"id": "N12", "expect": "question", "text": "what is the complete form of OLAP"},
+  {"id": "N13", "expect": "question", "text": "is a full outer join the same as a cross join?"},
+  {"id": "N14", "expect": "question", "text": "How does Kestra build a flow from a YAML file?"},
+  {"id": "N15", "expect": "question", "text": "what is a complete pipeline made of"},
+  {"id": "N16", "expect": "question", "text": "which project structure does dbt create by default?"},
+  {"id": "N17", "expect": "question", "text": "Why do we build a schema before loading data?"},
+  {"id": "N18", "expect": "question", "text": "how do i make a table partitioned by date in BigQuery"},
+  {"id": "N19", "expect": "question", "text": "my lab says to use a window function, what is that?"},
+  {"id": "N20", "expect": "question", "text": "give me a demo of how a MapReduce word count works"},
+  {"id": "N21", "expect": "question", "text": "I finished my assignment on ETL; can you explain the difference between ETL and ELT again?"},
+  {"id": "N22", "expect": "question", "text": "what does the complete flag in a Kestra flow do"},
+  {"id": "N23", "expect": "question", "text": "Describe the full lifecycle of a data pipeline"},
+  {"id": "N24", "expect": "question", "text": "show me the syntax for creating an external table"},
+  {"id": "N25", "expect": "question", "text": "what is a model in dbt?"},
+  {"id": "N26", "expect": "question", "text": "how do I solve a 'duplicate key' error when loading a table?"},
+  {"id": "N27", "expect": "question", "text": "can you give me tips for my data warehouse assignment?"},
+  {"id": "N28", "expect": "question", "text": "What should a final project report on a data pipeline include?"},
+  {"id": "N29", "expect": "question", "text": "list the types of joins in SQL"},
+  {"id": "N30", "expect": "question", "text": "apa itu OLAP dan OLTP?"}
+ ]
+}
