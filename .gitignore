@@ -18,6 +18,13 @@ evaluation/notebook04/contexts.json
 evaluation/notebook04/raw/
 evaluation/notebook04/judge/
 evaluation/notebook04/backups/
+# Local results whose model answers quote licensed chunk text verbatim (author's decision, 2026-11-16): kept local only.
+evaluation/notebook04/guardrail_review_llama3.2_3b.md
+evaluation/baselines/baseline_llama3.2_3b_new_prompt.json
+evaluation/notebook04/prompt_wording_check.json
+
+# Report documents (Word files), kept local
+docs/*.docx
 
 # Python cache
 __pycache__/
