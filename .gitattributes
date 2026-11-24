@@ -1,0 +1,3 @@
+# The guardrail held-out set is checked against a recorded SHA-256 (evaluation/guardrail_router_cases.sha256).
+# Never convert its line endings on checkout (core.autocrlf would turn LF into CRLF on Windows and change the hash).
+evaluation/guardrail_router_cases.json -text
