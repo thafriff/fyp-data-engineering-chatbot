@@ -653,11 +653,15 @@ ANSWER_REMINDER = (
 # evaluation criteria, and is not reported as a chosen model.
 # ---------------------------------------------------------------------------
 OLLAMA_BASE_URL = "http://localhost:11434"
-DEV_LLM_MODEL = "llama3.2:3b"     # ~2 GB, fits a 4 GB laptop GPU (GTX 1650) almost entirely
+# Offline (local) model, chosen by the author on 2026-11-24 from the offline model check of 2026-11-23 (llama3.2:3b,
+# qwen3:1.7b, qwen3.5:2b on the same 110 frozen items + coach mode G01-G10 x3). A dev-time choice of the OFFLINE model
+# only: not part of the notebook 04 cloud comparison. qwen3.5:2b: Apache 2.0, Q8_0, ~3.0 GB loaded (partly on the CPU
+# of a 4 GB GTX 1650); thinking is switched off (DEV_LLM_THINK_OFF_MODELS below). Also used by the intent classifier.
+DEV_LLM_MODEL = "qwen3.5:2b"
 # Models offered in the app's sidebar dropdown for CASUAL side-by-side viewing only (not the notebook 04
 # comparison). Only the final answer generation uses the picked model; the intent classifier always uses
 # DEV_LLM_MODEL. To add one: `ollama pull <name>` (e.g. ollama pull qwen2.5:3b), then add the name here.
-DEV_LLM_MODEL_OPTIONS = ["llama3.2:3b", "phi3:mini"]
+DEV_LLM_MODEL_OPTIONS = ["qwen3.5:2b", "llama3.2:3b", "qwen3:1.7b", "phi3:mini"]
 DEV_LLM_NUM_CTX = 4096            # prompt (instructions + 5 chunks + question) is ~1,500-2,000 tokens
 DEV_LLM_KEEP_ALIVE = "30m"        # keep the model loaded between questions so answers start quickly
 DEV_LLM_TIMEOUT_SECONDS = 300
