@@ -661,6 +661,11 @@ DEV_LLM_MODEL_OPTIONS = ["llama3.2:3b", "phi3:mini"]
 DEV_LLM_NUM_CTX = 4096            # prompt (instructions + 5 chunks + question) is ~1,500-2,000 tokens
 DEV_LLM_KEEP_ALIVE = "30m"        # keep the model loaded between questions so answers start quickly
 DEV_LLM_TIMEOUT_SECONDS = 300
+# Local models with a thinking mode that is ON by default in Ollama (ollama show: "thinking ... default true"). For these,
+# every request sends "think": false: thinking tokens count against DEV_LLM_MAX_ANSWER_TOKENS (qwen3.5:2b spent all 800
+# on thinking and returned an empty answer) and add tens of seconds per answer. Models not listed get no "think" field,
+# so llama3.2:3b's request body is unchanged.
+DEV_LLM_THINK_OFF_MODELS = {"qwen3:1.7b", "qwen3.5:2b"}
 # Runaway-answer guards for the final answer generation. Without a cap Ollama generates until the model stops by
 # itself; small models (seen with phi3:mini) can loop on one paragraph, and once the context window is full
 # Ollama slides it and the loop never ends.

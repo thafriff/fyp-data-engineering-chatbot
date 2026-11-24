@@ -72,6 +72,7 @@ def main() -> None:
     args.out.write_text(json.dumps({"meta": {"model": args.model, "runs": args.runs, "ran_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                                              "coach_instruction": settings.GUARDRAIL_COACH_INSTRUCTION,
                                              "code_max_lines": settings.GUARDRAIL_CODE_MAX_LINES,
+                                             "ollama_think": False if args.model in settings.DEV_LLM_THINK_OFF_MODELS else "not sent (model default)",
                                              "scoring": "author_score to be filled by the author with the frozen judge rule"},
                                     "records": records}, indent=1, ensure_ascii=False), encoding="utf-8")
     print(f"saved {len(records)} answers to {args.out}")

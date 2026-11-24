@@ -93,6 +93,7 @@ def run_settings(model: str, contexts: Path | None = None) -> dict:
         "max_answer_tokens": settings.DEV_LLM_MAX_ANSWER_TOKENS,
         "request_timeout_seconds": settings.NB04_REQUEST_TIMEOUT_SECONDS,
         "spell_correction": settings.SPELL_CORRECTION_ENABLED,
+        "ollama_think": False if model in settings.DEV_LLM_THINK_OFF_MODELS else "not sent (model default)",
         "intent_routing": "skipped (all evaluation questions are real course questions)",
         "date": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "git": git_commit(),

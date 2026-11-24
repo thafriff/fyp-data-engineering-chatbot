@@ -54,14 +54,18 @@ def build_messages(question: str, chunks: list[RetrievedChunk],
 
 def _request_body(messages: list[dict], stream: bool, model: str | None = None) -> dict:
     """Ollama /api/chat request body with the generation settings from settings.py.
-    model defaults to settings.DEV_LLM_MODEL."""
-    return {
+    model defaults to settings.DEV_LLM_MODEL. Models in settings.DEV_LLM_THINK_OFF_MODELS get "think": false (thinking off);
+    every other model's body has no "think" field."""
+    body = {
         "model": model or settings.DEV_LLM_MODEL,
         "messages": messages,
         "stream": stream,
         "keep_alive": settings.DEV_LLM_KEEP_ALIVE,
         "options": {"temperature": settings.LLM_TEMPERATURE, "num_ctx": settings.DEV_LLM_NUM_CTX},
     }
+    if body["model"] in settings.DEV_LLM_THINK_OFF_MODELS:
+        body["think"] = False
+    return body
 
 
 def generate(question: str, chunks: list[RetrievedChunk], model: str | None = None,
