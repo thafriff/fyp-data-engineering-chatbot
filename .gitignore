@@ -40,3 +40,8 @@ data/faiss_index/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Offline-model check (2026-11-23): the run files quote licensed chunk text; only the scripts are committed
+evaluation/baselines/offline_model_check/*
+!evaluation/baselines/offline_model_check/*.py
+!evaluation/baselines/offline_model_check/run_all.sh
