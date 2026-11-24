@@ -49,13 +49,22 @@ class TaskDecision:
     reasons: list[str] = field(default_factory=list)
 
 
+def _overlaps(a: re.Match, b: re.Match) -> bool:
+    """True when two matches share any character of the text."""
+    return a.start() < b.end() and b.start() < a.end()
+
+
 def detect_task_request(text: str) -> TaskDecision:
     """Apply the A + B + C rule to the cleaned message text. The example exception applies when the message asks for an
-    example, sample or demo and carries no assessed signal."""
-    verb = _VERBS.search(text)
-    deliverable = _DELIVERABLES.search(text)
+    example, sample or demo and carries no assessed signal. v2: the verb (A) and the C signal must be different words, so
+    one "complete" cannot count as both."""
     assessed = _ASSESSED.search(text)
-    complete = _COMPLETE.search(text)
+    c_signals = [m for m in list(_ASSESSED.finditer(text)) + list(_COMPLETE.finditer(text))]
+    verbs = list(_VERBS.finditer(text))
+    pair = next(((v, c) for v in verbs for c in c_signals if not _overlaps(v, c)), None)
+    verb = pair[0] if pair else (verbs[0] if verbs else None)
+    complete = pair[1] if pair and pair[1].re is _COMPLETE else _COMPLETE.search(text)
+    deliverable = _DELIVERABLES.search(text)
     example = _EXAMPLE.search(text)
     decision = TaskDecision(False, verb and verb.group(0), deliverable and deliverable.group(0),
                             assessed and assessed.group(0), complete and complete.group(0), example and example.group(0))
@@ -65,6 +74,8 @@ def detect_task_request(text: str) -> TaskDecision:
         decision.reasons.append("no deliverable")
     if not (assessed or complete):
         decision.reasons.append("no assessed or completeness signal")
+    elif verb and not pair:
+        decision.reasons.append("verb and completeness signal are the same word")
     if example and not assessed:
         decision.reasons.append("asks for an example and is not assessed")
     decision.is_task = not decision.reasons

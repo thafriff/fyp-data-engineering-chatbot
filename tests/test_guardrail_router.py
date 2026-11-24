@@ -40,6 +40,16 @@ class Detection(unittest.TestCase):
         self.assertFalse(guardrail.detect_task_request("explain what my assignment means by a fact table").is_task)  # no verb
         self.assertFalse(guardrail.detect_task_request("write my full assignment").is_task)                        # no deliverable
 
+    def test_one_word_cannot_be_both_verb_and_completeness_signal(self):
+        d = guardrail.detect_task_request("is a complete schema better")
+        self.assertFalse(d.is_task)
+        self.assertIn("verb and completeness signal are the same word", d.reasons)
+        self.assertTrue(guardrail.detect_task_request("complete the full schema for my report").is_task)
+
+    def test_coach_instruction_withholds_the_final_artefact(self):
+        self.assertIn("Withhold the final artefact", settings.GUARDRAIL_COACH_INSTRUCTION)
+        self.assertIn("even if it is short", settings.GUARDRAIL_COACH_INSTRUCTION)
+
     def test_example_exception(self):
         self.assertFalse(guardrail.detect_task_request("give me a full example query of a JOIN").is_task)
         self.assertTrue(guardrail.detect_task_request("give me a full example query for my assignment").is_task)

@@ -569,6 +569,10 @@ INTENT_CLASSIFIER_TIMEOUT_SECONDS = 20    # on timeout -> REAL_QUESTION (retriev
 # (evaluation/guardrail_router_cases.json) was written and hashed BEFORE these rules and is never tuned to them.
 # ---------------------------------------------------------------------------
 GUARDRAIL_ROUTER_ENABLED = True
+# v2 (2026-11-16, author): (a) the production verb (A) and the assessed/completeness signal (C) must be DIFFERENT words, so a single
+# "complete" cannot count twice; (b) the coach instruction also tells the model to withhold the final artefact, even a short one.
+# Malay signal words are deliberately NOT added (documented gap, Chapter 5 recommendation); the code cap stays at 8 lines.
+GUARDRAIL_VERSION = "v2"
 GUARDRAIL_PRODUCTION_VERBS = [
     "write", "give me", "give us", "create", "build", "design", "generate", "produce", "implement", "make", "make me",
     "do", "complete", "finish", "solve", "draft", "normalise", "normalize", "code", "develop", "prepare",
@@ -592,7 +596,9 @@ GUARDRAIL_COACH_INSTRUCTION = (
     "This request asks for a finished piece of assessed work. Do not provide it. Instead: (1) explain the concepts from the "
     "excerpts that the task needs, citing chunk IDs; (2) give the steps the student should follow, in order; (3) if code or a "
     "query is involved, show at most a short skeleton with ___ blanks for the parts the student must write; (4) end with one "
-    "question that helps the student take the first step. Keep every statement grounded in the excerpts."
+    "question that helps the student take the first step. Keep every statement grounded in the excerpts. "
+    "Withhold the final artefact the task asks for: do not give the finished schema, YAML, table design, query or code, "
+    "even if it is short; give its structure with ___ blanks instead."
 )
 GUARDRAIL_CODE_MAX_LINES = 8            # any fenced code block longer than this is cut (code-level enforcement)
 GUARDRAIL_CODE_CUT_NOTE = "# ... your turn: complete the rest using the steps above"
