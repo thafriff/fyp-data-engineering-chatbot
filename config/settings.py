@@ -777,7 +777,10 @@ NB04_ERROR_TEXT_MAX_CHARS = 1000
 
 # Hard-stop rule (plan section 8). Spend is counted at list price, even on a free tier, so it can only over-count.
 NB04_USD_TO_MYR = 4.40                # assumption, not verified; replace with the actual card rate
-NB04_TOTAL_STOP_MYR = 135             # stop when all generation and judge spend reaches this (90% of the RM150 ceiling)
+# Stop when all generation and judge spend reaches this. Lowered from RM135 to RM96 by the author on 2026-11-26, so that the approved
+# maximum (RM96) is binding; the expected total is RM76.05 and the per-model and per-job 120% stops sum to RM91.26 (plan section 8).
+# PLANNED for the paying phase, NOT implemented: judges at half price (OpenAI Batch or Flex, Anthropic Message Batches).
+NB04_TOTAL_STOP_MYR = 96
 NB04_MODEL_STOP_FACTOR = 1.2          # stop a model when its spend exceeds 120% of its estimate below
 NB04_PROBE_REPEATS = 3                # each probe runs this many times per candidate; each question runs once
 NB04_ANSWERS_PER_MODEL = NB04_EXPECTED_QUESTIONS + NB04_EXPECTED_PROBES * NB04_PROBE_REPEATS
@@ -785,7 +788,9 @@ NB04_ANSWERS_PER_MODEL = NB04_EXPECTED_QUESTIONS + NB04_EXPECTED_PROBES * NB04_P
 NB04_TRUNCATION_FLAG_POINTS = 0.05
 NB04_PRICES_CHECKED = "2026-11-01"
 
-NB04_EST_INPUT_TOKENS = 1390          # measured mean over all 130 answers (1,386) rounded up; see plan section 8
+# Measured mean over all 130 answers (100 questions + 10 probes x 3), characters / 4, from the freeze: 1,386 under the 1 Nov prompt
+# (estimate was 1390), 1,604.9 under the 24 Nov answer-style prompt (author approved the update, 2026-11-24); see plan section 8.
+NB04_EST_INPUT_TOKENS = 1605
 NB04_EST_OUTPUT_TOKENS = 400
 NB04_EST_THINKING_OUTPUT_TOKENS = 800  # gemini-3.8-flash cannot turn thinking off, and thinking counts as output
 # Reasoning tokens allowed ON TOP of the answer cap, for a model whose thinking cannot be disabled, so that reasoning

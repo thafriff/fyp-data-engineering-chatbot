@@ -273,7 +273,7 @@ class RequestedBehaviours(JudgingTestCase):
         self.assertEqual(len(self.fake.requests), calls)
 
     def test_4_spend_stop_fires_and_saves_state(self):
-        """The shared total: generation spend already near RM135, and judging pushes it over."""
+        """The shared total: generation spend already near the overall stop (NB04_TOTAL_STOP_MYR), and judging pushes it over."""
         limit_usd = settings.NB04_TOTAL_STOP_MYR / settings.NB04_USD_TO_MYR
         write_answer_cache(self.raw, "gpt-4o", ids={"Q01", "Q02", "Q03"}, spend=limit_usd - 0.005)
         self.fake.input_tokens, self.fake.output_tokens = 1000, 400     # about $0.0085 a call at gpt-5.4 prices
@@ -315,7 +315,10 @@ class RequestedBehaviours(JudgingTestCase):
     def test_4d_per_candidate_120_percent_stop_includes_generation_and_judging(self):
         write_answer_cache(self.raw, "gpt-4o", ids={"Q01", "Q02", "Q03"}, spend=0.97)
         limit = run_judging.candidate_limit_usd("gpt-4o")
-        expected = 1.2 * (0.97 + 14.09 / 6)
+        # gpt-4o's generation estimate: $0.97 at NB04_EST_INPUT_TOKENS 1390 (1 Nov prompt), $1.04 at 1605 (24 Nov answer-style prompt).
+        generation = run_generation.estimated_spend_usd(settings.NB04_CANDIDATES["gpt-4o"])
+        self.assertAlmostEqual(generation, 130 * (settings.NB04_EST_INPUT_TOKENS * 2.50 + 400 * 10.00) / 1e6, places=6)
+        expected = 1.2 * (generation + 14.09 / 6)
         self.assertAlmostEqual(limit, expected, places=1)
         write_answer_cache(self.raw, "gpt-4o", ids={"Q01", "Q02", "Q03"}, spend=limit + 0.01)
         code, out = self.run_main("--job", "rubric", "--only", "Q01,Q02,Q03")

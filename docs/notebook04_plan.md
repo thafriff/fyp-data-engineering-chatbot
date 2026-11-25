@@ -774,13 +774,39 @@ NOT changed: they stay as frozen, and they turn out conservative for these two m
 That is RM22 under the RM135 hard stop, which itself sits RM15 below the RM150 ceiling. Free
 models: Gemini (free tier), Gemma 4 and possibly LLaMA.
 
+**Re-estimated 2026-11-24 (answer-style prompt, section 6; `NB04_EST_INPUT_TOKENS` 1390 -> 1605, author approved).** Printed by
+`evaluation/notebook04/budget_table.py` from `settings.py`; USD 1 = RM 4.40. Judge inputs do not contain the candidate's prompt, so only
+generation changes (+RM0.89). "Max" is each model's or job's 120% stop.
+
+| Item | Expected RM | Max RM |
+|---|---|---|
+| Generation, six candidates, 780 answers | 14.08 | 16.90 |
+| Rubric judge, `gpt-5.4` x 600 | 28.38 | 34.06 |
+| RAGAS judge, `gpt-5.4-mini` x 600 | 16.04 | 19.25 |
+| Guardrail judge, `gpt-5.4` x 180 | 5.98 | 7.18 |
+| Cross-check judge, `claude-opus-5-5` x 120 | 11.57 | 13.89 |
+| **All, counted at list price** | **76.05** | **91.26** |
+| All, actually billed (free tiers bill nothing) | 72.92 | 87.51 |
+
+The overall hard stop is still RM135. The author's approved figures (RM64 expected, RM96 maximum) match the 1 Nov estimate without the
+cross-check judge (RM63.6 expected; RM95.4 with the 50% contingency); with it, the 1 Nov estimate was RM75.2.
+
+**Author's budget decisions (2026-11-26):**
+- **Hard stop lowered from RM135 to RM96** (`NB04_TOTAL_STOP_MYR`), so the approved maximum is binding. The expected total (RM76.05) and the
+  sum of the 120% stops (RM91.26) both sit below it, so no planned work is cut.
+- **PLANNED for the paying phase, NOT implemented:** the judges at half price with the same models and prompts: OpenAI Batch (or Flex) for
+  the rubric, RAGAS and guardrail jobs, Anthropic Message Batches for the cross-check. Both providers list half the standard rate (checked
+  2026-11-24). Expected total about RM45 if all four judge jobs use it. Needs runner changes and the batch prices in `settings.py`.
+- **Kept as they are:** 20 cross-check answers per candidate and the `gpt-5.4-mini` RAGAS judge.
+- **Llama slot** (paid OpenRouter route or drop): decided in the paying phase (section 13).
+
 **Hard stop rule:**
 - After every API call the runner adds the call's cost (from returned token counts × recorded price) to a
   running total per model and overall. Spend counts at list price even on a free tier, so it can only over-count.
 - It stops immediately, saving state, if either:
   - a model's spend exceeds **120% of its estimate above**, or
-  - the overall total reaches **RM135** (raised from RM120 by the author on 2026-11-01). That sits below the RM150
-    ceiling, with room above the RM113 contingency estimate.
+  - the overall total reaches **RM96** (RM120, raised to RM135 by the author on 2026-11-01, then lowered to RM96 on 2026-11-26 to match
+    the approved maximum; the expected total is RM76.05 and the 120% stops sum to RM91.26).
 - It then reports the overrun and waits for the author's decision.
 - Also set provider-side monthly spend limits in the OpenAI and Anthropic consoles before running.
 

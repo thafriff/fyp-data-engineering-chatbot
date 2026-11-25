@@ -19,7 +19,7 @@ Rules this file enforces:
 - bias controls: the judge never sees a model name, answers run in a fixed shuffled order across models, temperature is 0
   where the API accepts it, the output is forced JSON, and malformed output is retried once and then recorded as an error;
 - spend: judge caches use the same "spend" record as the answer caches, and run_generation.total_spend_usd() adds both
-  folders, so the RM135 stop is one running total shared by generation and judging. Three checks run before EVERY billable
+  folders, so the overall stop (settings.NB04_TOTAL_STOP_MYR, RM96) is one running total shared by generation and judging. Three checks run before EVERY billable
   call, including retries and each RAGAS step: that total; the job's spend against 120% of its plan section 4 estimate; and
   the candidate's generation plus judging spend against 120% of its combined estimate;
 - caches are written atomically after every billed call, a rerun skips finished judgements, and a run refuses to resume if a
