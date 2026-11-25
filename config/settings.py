@@ -860,6 +860,11 @@ DEV_CLOUD_MODELS = {name: NB04_CANDIDATES[name] for name in ("gemini-3.8-flash",
 DEV_MODEL_GROUP_LOCAL = "Local (Ollama)"
 DEV_MODEL_GROUP_CLOUD = "Cloud (Google free tier)"
 DEV_CLOUD_STATUS_TICK_SECONDS = 0.5   # how often the "waiting for <model>" line refreshes
+# Bold text in the DARK theme (author, 2026-11-24): Streamlit's dark theme draws bold in the same near-white as normal text, so
+# key terms in an answer were hard to pick out. In the dark theme only, bold gets a heavier weight and a light tint of
+# Streamlit's accent colour (#FF4B4B), which keeps a high contrast on the dark background. The light theme is unchanged.
+DEV_UI_DARK_BOLD_COLOR = "#FF8F8F"
+DEV_UI_DARK_BOLD_WEIGHT = 700
 DEV_CLOUD_BACKOFF_MAX_RETRIES = 6     # kept at 6 for chat: a person is waiting, unlike the batch runner (NB04_BACKOFF_MAX_RETRIES)
 DEV_CLOUD_MSG_WAITING = "Waiting for {model}... {elapsed} s. Cloud answers can take a few minutes when Google is busy."
 DEV_CLOUD_MSG_RETRYING = ("{model} is busy ({reason}). Retrying in {remaining} s, attempt {attempt} of {attempts}. "

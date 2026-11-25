@@ -19,10 +19,16 @@ if str(PROJECT_ROOT) not in sys.path:
 import streamlit as st
 
 from config import settings
+from src.app import styles
 from src.core import citations, guardrail, llm
 from src.core.rag import RagPipeline
 
 st.set_page_config(page_title="Data Engineering Course Assistant", page_icon="💬")
+
+# Bold text in the dark theme: heavier and in a light accent tint (src/app/styles.py; display only).
+_css = styles.dark_bold_css(getattr(getattr(st.context, "theme", None), "type", None))
+if _css:
+    st.html(_css)
 
 
 @st.cache_resource(show_spinner="Loading the knowledge base (embedding model + search index)...")
