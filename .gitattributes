@@ -1,3 +1,5 @@
 # The guardrail held-out set is checked against a recorded SHA-256 (evaluation/guardrail_router_cases.sha256).
 # Never convert its line endings on checkout (core.autocrlf would turn LF into CRLF on Windows and change the hash).
 evaluation/guardrail_router_cases.json -text
+# The intent-classifier check set is checked against a recorded SHA-256 (evaluation/intent_classifier_cases.sha256) too.
+evaluation/intent_classifier_cases.json -text

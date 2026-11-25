@@ -472,13 +472,17 @@ INTENT_CLASSIFIER_PROMPT = (
     "EMOTIONAL_SICK - the student says they are ill, sick or unwell.\n"
     "EMOTIONAL_TIRED - the student says they are tired, exhausted, sleepy or need a break or rest.\n"
     "EMOTIONAL_STRESSED - the student says they are stressed, anxious, overwhelmed, frustrated or having a bad day.\n"
-    "EMOTIONAL_OTHER - any other personal or emotional statement that does not ask for information or help.\n"
-    "REAL_QUESTION - the message asks for information, an explanation or help on ANY topic, even if it also "
-    "mentions feelings, or it is anything else.\n"
+    "EMOTIONAL_OTHER - any other statement about the student's own feelings or personal life that asks for nothing.\n"
+    "REAL_QUESTION - the message asks for, or is looking for, information, an explanation, a recommendation or help on "
+    "ANY topic, including topics outside the course such as food, places, films, shopping, sport or news. A short "
+    "search-style phrase with no question word and no question mark counts too. Also use it when the message mentions "
+    "feelings but asks for something, and for anything else.\n"
     "Output only the label, in capital letters, with no punctuation, explanation or other words."
 )
 # Few-shot examples (message, label) shown to the classifier as earlier turns. Deliberately different from the
-# test messages used to check the feature.
+# test messages used to check the feature (evaluation/intent_classifier_cases.json, fixed and hashed before the 2026-11-24
+# change). The two off-topic requests were added on 2026-11-24 (author): "best nasi lemak in Shah Alam" (no question word)
+# was labelled EMOTIONAL_OTHER and got the empathy reply instead of retrieval and the course fallback.
 INTENT_CLASSIFIER_EXAMPLES = [
     ("i have a fever today", "EMOTIONAL_SICK"),
     ("so sleepy rn", "EMOTIONAL_TIRED"),
@@ -486,6 +490,8 @@ INTENT_CLASSIFIER_EXAMPLES = [
     ("my cat died this morning", "EMOTIONAL_OTHER"),
     ("im tired of my pipeline failing, how do i add retries", "REAL_QUESTION"),
     ("star schema vs snowflake schema", "REAL_QUESTION"),
+    ("cheap hotels near KLCC", "REAL_QUESTION"),
+    ("good songs to study to", "REAL_QUESTION"),
 ]
 # Spelling correction (src/core/spelling.py) of the RETRIEVAL QUERY only: runs after intent routing has sent a message
 # to retrieval and before the embedding search. The original message is still what is shown, stored and sent to the

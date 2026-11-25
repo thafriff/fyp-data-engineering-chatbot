@@ -1,0 +1,39 @@
+{
+ "purpose": "Fixed check set for the intent classifier fix of 2026-11-24 (off-topic requests with no question word were labelled EMOTIONAL_OTHER and got the empathy reply instead of the course fallback). Written and hashed (intent_classifier_cases.sha256) BEFORE the classifier prompt or examples were changed; never edited afterwards. None of these messages is used as a classifier example. 'author' marks the six messages the author specified; the rest are held out.",
+ "expected_meanings": {
+  "fallback": "routed to retrieval, below the similarity threshold, so the student gets settings.FALLBACK_MESSAGE",
+  "emotional": "the fixed reply for the given label (plus a topic offer line if the message names a course topic)",
+  "small_talk": "the fixed small-talk reply, no classifier call",
+  "answered": "routed to retrieval and at or above the threshold, so the model answers from the course materials"
+ },
+ "cases": [
+  {"message": "best nasi lemak in Shah Alam", "expect": "fallback", "source": "author"},
+  {"message": "recommend me a movie", "expect": "fallback", "source": "author"},
+  {"message": "who won the world cup", "expect": "fallback", "source": "author"},
+  {"message": "im sick", "expect": "emotional", "label": "EMOTIONAL_SICK", "source": "author"},
+  {"message": "ugh today has been rough", "expect": "emotional", "label": "EMOTIONAL_STRESSED", "source": "author"},
+  {"message": "thanks", "expect": "small_talk", "source": "author"},
+  {"message": "good laptop for gaming under RM3000", "expect": "fallback", "source": "held_out"},
+  {"message": "weather in Kuala Lumpur tomorrow", "expect": "fallback", "source": "held_out"},
+  {"message": "nearest mamak open now", "expect": "fallback", "source": "held_out"},
+  {"message": "top anime this season", "expect": "fallback", "source": "held_out"},
+  {"message": "cheap flights to Bali", "expect": "fallback", "source": "held_out"},
+  {"message": "chicken rice recipe", "expect": "fallback", "source": "held_out"},
+  {"message": "latest iphone price", "expect": "fallback", "source": "held_out"},
+  {"message": "football scores today", "expect": "fallback", "source": "held_out"},
+  {"message": "suggest a good book to read", "expect": "fallback", "source": "held_out"},
+  {"message": "places to visit in Penang", "expect": "fallback", "source": "held_out"},
+  {"message": "i have a headache", "expect": "emotional", "label": "EMOTIONAL_SICK", "source": "held_out"},
+  {"message": "feeling sad today", "expect": "emotional", "label": "EMOTIONAL_OTHER", "source": "held_out"},
+  {"message": "this week has been exhausting", "expect": "emotional", "label": "EMOTIONAL_TIRED", "source": "held_out"},
+  {"message": "my exam is tomorrow and im panicking", "expect": "emotional", "label": "EMOTIONAL_STRESSED", "source": "held_out"},
+  {"message": "i failed my quiz", "expect": "emotional", "label": "EMOTIONAL_OTHER", "source": "held_out"},
+  {"message": "im so burnt out", "expect": "emotional", "label": "EMOTIONAL_TIRED", "source": "held_out"},
+  {"message": "lol", "expect": "emotional", "label": "EMOTIONAL_OTHER", "source": "held_out"},
+  {"message": "ugh sql is so hard i want to give up", "expect": "emotional", "label": "EMOTIONAL_STRESSED", "source": "held_out"},
+  {"message": "star schema", "expect": "answered", "source": "held_out"},
+  {"message": "dbt tests", "expect": "answered", "source": "held_out"},
+  {"message": "kafka partitions", "expect": "answered", "source": "held_out"}
+ ],
+ "scoring": "A case passes when the route matches 'expect'. For 'emotional', any EMOTIONAL_* label passes (the replies differ only in wording); the expected label is recorded to report label agreement separately."
+}
