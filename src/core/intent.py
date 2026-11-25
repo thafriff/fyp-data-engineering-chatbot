@@ -10,6 +10,8 @@ Order (cheapest first):
 5. Course-content override: an EMOTIONAL_* label is accepted only if the message's top-1 similarity to the
    course index is below settings.EMOTIONAL_OVERRIDE_MIN_SIMILARITY; then it gets a canned reply chosen here
    from settings.EMOTIONAL_RESPONSES. Otherwise (or if the check is unavailable or fails) it is a question.
+   If the emotional message names a course topic, one fixed line offering to start with that topic follows the reply
+   (settings.EMOTIONAL_TOPIC_OFFERS); it is chosen here by pattern, with no model call.
 Every "question" goes through retrieval and the similarity-threshold fallback, so no path lets the model answer
 from its own knowledge. All patterns, prompts and replies live in config/settings.py.
 """
@@ -23,6 +25,9 @@ from src.core import guardrail, llm
 
 # Compiled once: each small-talk pattern must match the WHOLE normalised message.
 _SMALL_TALK = {name: re.compile(rf"^(?:{pattern})$") for name, pattern in settings.SMALL_TALK_PATTERNS.items()}
+# Course topics an emotional message may name, matched as whole words (settings.EMOTIONAL_TOPIC_OFFERS).
+_TOPICS = [(re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE), topic, question)
+           for pattern, topic, question in settings.EMOTIONAL_TOPIC_OFFERS]
 
 
 @dataclass
@@ -49,6 +54,18 @@ def _is_keyboard_mash(word: str) -> bool:
     if len(set(word)) == 1:
         return True
     return any(word in row for row in settings.KEYBOARD_ROWS)
+
+
+def topic_offer(*texts: str) -> str | None:
+    """The one-line offer for the first course topic named in the message, or None if it names none. texts are the message
+    as typed and its cleaned search text (so a corrected typo such as "sqll" still counts); the earliest mention wins.
+    Fixed text from settings: no model is called."""
+    for text in texts:
+        found = [(m.start(), topic, question) for pattern, topic, question in _TOPICS if (m := pattern.search(text or ""))]
+        if found:
+            _, topic, question = min(found)
+            return settings.EMOTIONAL_TOPIC_OFFER_TEMPLATE.format(topic=topic, question=question)
+    return None
 
 
 def _is_obvious_question(message: str, text: str) -> bool:
@@ -113,4 +130,8 @@ def route(message: str, top_score: Callable[[str], float] | None = None,
         score = None
     if score is None or score >= settings.EMOTIONAL_OVERRIDE_MIN_SIMILARITY:
         return Intent("question", path="similarity_override", label=label, top_score=score)
-    return Intent("emotional", settings.EMOTIONAL_RESPONSES[label], path="classifier", label=label, top_score=score)
+    reply = settings.EMOTIONAL_RESPONSES[label]
+    offer = topic_offer(message, cleaned)
+    if offer:
+        reply = f"{reply}\n\n{offer}"
+    return Intent("emotional", reply, path="classifier", label=label, top_score=score)

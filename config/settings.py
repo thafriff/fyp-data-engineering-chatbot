@@ -624,6 +624,23 @@ EMOTIONAL_RESPONSES = {
     "EMOTIONAL_OTHER": ("Thanks for sharing that with me. Whenever you're ready, I'm here to help with any "
                         "Data Engineering topic from the course."),
 }
+# Topic offer (author, 2026-11-24): when an emotional message names a course topic ("ugh sql is so hard i want to give up"), one
+# line is added after the fixed reply, offering to start with that topic. Chosen by code from this list, never by a model. The
+# chat is single-turn, so a bare "yes" would not carry the topic: the line gives a starter question the student can send, and
+# every starter question scores above SIMILARITY_THRESHOLD, so it is answered (tests/test_emotional_topic_offer.py checks this).
+# Each entry: (pattern matched as whole words on the message, case-insensitive; topic name; starter question). The first topic
+# MENTIONED in the message wins; one line at most. Topics follow the course's eight (report Sections 1.5 and 3.5).
+EMOTIONAL_TOPIC_OFFERS = [
+    (r"sql|joins?|quer(?:y|ies)|normali[sz](?:ation|e|ing)", "SQL", "What is SQL?"),
+    (r"etl|elt", "ETL and ELT", "What is the difference between ETL and ELT?"),
+    (r"(?:data )?pipelines?", "data pipelines", "What is a data pipeline?"),
+    (r"data cleaning|cleaning data|clean(?:ing)? (?:the )?data", "data cleaning", "What is data cleaning?"),
+    (r"data quality", "data quality", "What is data quality?"),
+    (r"data processing|batch processing|stream processing|streaming", "data processing", "What is batch processing?"),
+    (r"data ?warehous(?:e|es|ing)|star schema", "data warehousing", "What is a data warehouse?"),
+    (r"big data|spark|hadoop|kafka", "big data", "What is big data?"),
+]
+EMOTIONAL_TOPIC_OFFER_TEMPLATE ='Want me to start with the basics of {topic}? Just ask: "{question}"'
 
 # Prompt used to generate answers from retrieved chunks. Follows proposal Section 3.9: course-assistant persona,
 # simple academic English, knowledge base only, steps for complex questions, "do not answer questions directly"
