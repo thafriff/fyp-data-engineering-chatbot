@@ -539,6 +539,17 @@ SPELLING_BRITISH_VARIANTS = [
     (r"ence$", "ense"),                                    # licence, defence -> license, defense
     (r"amme(s)?$", r"am\1"),                               # programme -> program
 ]
+# Only content and technical words are announced (author, 2026-11-24): a correction whose corrected word is a COMMON word is
+# never named in the hint ("wht is data engineering" must not give "Assuming you mean what"). It is still corrected in the search
+# text, and it neither triggers nor blocks the hint for the other words. Common = scikit-learn's ENGLISH_STOP_WORDS (318 function
+# words: what, is, the, how, why ...) plus the everyday question words below, which the model reads without help.
+SPELLING_HINT_EXTRA_COMMON_WORDS = [
+    "difference", "differences", "different", "differ", "explain", "explanation", "mean", "means", "meaning", "example",
+    "examples", "use", "used", "uses", "using", "usage", "work", "works", "working", "need", "needs", "want", "help", "know",
+    "tell", "define", "definition", "compare", "comparison", "step", "steps", "way", "ways", "type", "types", "kind", "kinds",
+    "good", "better", "best", "same", "simple", "important", "main", "purpose", "happen", "happens", "make", "makes", "create",
+    "write", "give", "list", "does", "doing", "done", "difficult", "easy", "question", "answer", "please", "thanks",
+]
 SPELLING_HINT_TYPO = '"{typed}" is probably a typo for "{corrected}"'
 SPELLING_HINT_TEMPLATE = 'Note: {typos}. If so, begin your answer with "Assuming you mean {meant}," and answer that.'
 

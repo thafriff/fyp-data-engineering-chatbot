@@ -13,6 +13,8 @@ The phrase lists live in config/settings.py (SEARCH_LEADING_*, SEARCH_REQUEST_VE
 
 import re
 
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+
 from config import settings
 from src.core.spelling import WORD
 
@@ -42,6 +44,13 @@ def remove_leading(question: str) -> str:
 
 
 _BRITISH = [(re.compile(pattern), replacement) for pattern, replacement in settings.SPELLING_BRITISH_VARIANTS]
+# Words never announced in the spelling hint (settings.SPELLING_HINT_EXTRA_COMMON_WORDS explains why).
+_COMMON_WORDS = frozenset(ENGLISH_STOP_WORDS) | {w.lower() for w in settings.SPELLING_HINT_EXTRA_COMMON_WORDS}
+
+
+def is_common_word(word: str) -> bool:
+    """True for a common function or question word ("what", "the", "how", "difference"), which the hint never names."""
+    return word.lower() in _COMMON_WORDS
 
 
 def is_british_variant(typed: str, corrected: str) -> bool:
@@ -59,14 +68,17 @@ def is_british_variant(typed: str, corrected: str) -> bool:
 def spelling_corrections(question: str, search_text: str, excerpts: list[str]) -> list[tuple[str, str]]:
     """The (typed, corrected) word pairs to show the model as a spelling hint, or [] for no hint.
     Spelling correction replaces words one for one, so the typed and the corrected words line up. British spellings are not
-    typos and are left out ("Normalise" -> "normalize"). A hint is given only when EVERY remaining changed word's correction has
-    at least SPELLING_HINT_MIN_LETTERS letters and appears, as a whole word, in the retrieved excerpts: "olpa" -> "olap"
-    qualifies, "dat" -> "at" does not. Greeting removal alone changes no word, so it never produces a hint. Works from stored
+    typos and are left out ("Normalise" -> "normalize"), and so are corrections to common words ("wht" -> "what"). A hint is
+    given only when EVERY remaining changed word's correction has at least SPELLING_HINT_MIN_LETTERS letters and appears, as a
+    whole word, in the retrieved excerpts: "olpa" -> "olap" qualifies, "dat" -> "at" does not. Greeting removal alone changes no word, so it never produces a hint. Works from stored
     values, so the parity check can rebuild a frozen prompt without the spelling corrector."""
     typed, corrected = WORD.findall(remove_leading(question)), WORD.findall(search_text)
     if len(typed) != len(corrected):
         return []
-    pairs = [(t, c) for t, c in zip(typed, corrected) if t != c and not is_british_variant(t, c)]
+    # Only content and technical words are announced: a common-word correction ("wht" -> "what") is left out here, so it
+    # neither appears in the hint nor stops the hint for another word ("wht is olpa" -> only "olpa" -> "olap").
+    pairs = [(t, c) for t, c in zip(typed, corrected)
+             if t != c and not is_british_variant(t, c) and not is_common_word(c)]
     text = "\n".join(excerpts).lower()
     qualifies = all(len(c) >= settings.SPELLING_HINT_MIN_LETTERS and re.search(rf"\b{re.escape(c.lower())}\b", text)
                     for _, c in pairs)

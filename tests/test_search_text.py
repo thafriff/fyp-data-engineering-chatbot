@@ -106,9 +106,35 @@ class SpellingHint(unittest.TestCase):
         self.assertEqual(sc("can a wifi network fail", "can a wife network fail", ["a network"]), [])   # not in the excerpts
         self.assertEqual(sc("hi what is olap", "what is olap", self.OLAP), [])                          # greeting removal only
         self.assertEqual(sc("what is OLAP?", "what is OLAP?", self.OLAP), [])
-        self.assertEqual(sc("whst is olpa", "what is olap", self.OLAP), [])     # "what" is not in the excerpts: no hint at all
-        self.assertEqual(sc("whst is olpa", "what is olap", self.OLAP + ["what it is"]), [("whst", "what"), ("olpa", "olap")])
+        # 2026-11-24: "what" is a common word, so it is never announced and no longer blocks the "olpa" hint.
+        self.assertEqual(sc("whst is olpa", "what is olap", self.OLAP), [("olpa", "olap")])
+        self.assertEqual(sc("whst is olpa", "what is olap", self.OLAP + ["what it is"]), [("olpa", "olap")])
         self.assertEqual(sc("what is olpap", "what is olap", ["OLAPS only"]), [])     # whole words only
+
+    def test_common_words_are_never_announced(self):
+        """Author, 2026-11-24: only content and technical words get the hint ("wht is data engineering" -> no hint)."""
+        from src.core.search_text import is_common_word, spelling_corrections as sc
+        excerpts = ["What is data engineering? The difference between OLTP and OLAP. How does it work, why, where and when."]
+        self.assertEqual(sc("wht is data engineering", "what is data engineering", excerpts), [])
+        self.assertEqual(sc("whats teh difference between oltp and olap", "whats the difference between oltp and olap", excerpts), [])
+        self.assertEqual(sc("hwo does it wrok", "how does it work", excerpts), [])
+        self.assertEqual(sc("what is teh diffrence", "what is the difference", excerpts), [])
+        self.assertEqual(sc("wht is olpa", "what is olap", excerpts), [("olpa", "olap")])         # the content word still is
+        self.assertEqual(sc("wht is data enginering", "what is data engineering", excerpts), [("enginering", "engineering")])
+        for word in ("what", "is", "the", "how", "why", "where", "when", "which", "does", "Difference", "WHAT", "explain"):
+            self.assertTrue(is_common_word(word), word)
+        for word in ("olap", "oltp", "engineering", "warehouse", "schema", "kafka", "pipeline", "data"):
+            self.assertFalse(is_common_word(word), word)
+
+    def test_no_assuming_you_mean_what_in_the_prompt(self):
+        """End to end through the pipeline's hint step: the model is never told "Assuming you mean what"."""
+        from src.core.search_text import spelling_corrections as sc
+        chunk = SimpleNamespace(chunk_id="S05-0035", source_name="DE Wiki", section="Data Engineering",
+                                text="What is data engineering? Data engineering is a subset of software engineering.")
+        corrections = sc("wht is data engineering", "what is data engineering", [chunk.text])
+        user = llm.build_messages("wht is data engineering", [chunk], corrections=corrections)[1]["content"]
+        self.assertNotIn("Assuming you mean", user)
+        self.assertIn("Student question: wht is data engineering\n\n", user)
 
     def test_british_spellings_are_not_typos(self):
         from src.core.search_text import is_british_variant, spelling_corrections as sc
