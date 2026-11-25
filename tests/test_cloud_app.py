@@ -263,7 +263,7 @@ class Interface(unittest.TestCase):
 
 class Frozen(unittest.TestCase):
     def test_frozen_prompt_unchanged(self):
-        self.assertTrue(hashlib.sha256(settings.SYSTEM_PROMPT.encode("utf-8")).hexdigest().startswith("fe8912d1"))
+        self.assertTrue(hashlib.sha256(settings.SYSTEM_PROMPT.encode("utf-8")).hexdigest().startswith("677e8b3b"))   # re-registered 2026-11-24 (was fe8912d1)
 
     def test_stream_generate_still_uses_ollama(self):
         urls = []

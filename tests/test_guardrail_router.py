@@ -148,7 +148,7 @@ class FreezeUntouched(unittest.TestCase):
     """The router is an app-layer feature: the candidate prompt is unchanged."""
 
     def test_system_prompt_sha(self):
-        self.assertTrue(hashlib.sha256(settings.SYSTEM_PROMPT.encode("utf-8")).hexdigest().startswith("fe8912d1"))
+        self.assertTrue(hashlib.sha256(settings.SYSTEM_PROMPT.encode("utf-8")).hexdigest().startswith("677e8b3b"))   # re-registered 2026-11-24 (was fe8912d1)
 
     def test_all_110_frozen_prompts_rebuild_byte_identical(self):
         import freeze_contexts
