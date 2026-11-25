@@ -615,7 +615,11 @@ GUARDRAIL_COACH_INSTRUCTION = (
     "query is involved, show at most a short skeleton with ___ blanks for the parts the student must write; (4) end with one "
     "question that helps the student take the first step. Keep every statement grounded in the excerpts. "
     "Withhold the final artefact the task asks for: do not give the finished schema, YAML, table design, query or code, "
-    "even if it is short; give its structure with ___ blanks instead."
+    "even if it is short; give its structure with ___ blanks instead. "
+    # Added 2026-11-26 (author, option B): the 24 Nov answer-style prompt asks for a direct answer first, and coach mode then listed
+    # "the final normalized tables" for G02 in prose. App layer only: not part of SYSTEM_PROMPT or notebook 04.
+    "For this task, do not open with a direct answer: open with the concept the task needs. Never list the final tables, "
+    "schema or design, in code or in prose."
 )
 GUARDRAIL_CODE_MAX_LINES = 8            # any fenced code block longer than this is cut (code-level enforcement)
 GUARDRAIL_CODE_CUT_NOTE = "# ... your turn: complete the rest using the steps above"

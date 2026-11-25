@@ -50,6 +50,17 @@ class Detection(unittest.TestCase):
         self.assertIn("Withhold the final artefact", settings.GUARDRAIL_COACH_INSTRUCTION)
         self.assertIn("even if it is short", settings.GUARDRAIL_COACH_INSTRUCTION)
 
+    def test_coach_instruction_overrides_the_direct_answer_rule(self):
+        """2026-11-26: the answer-style prompt asks for a direct answer first; in coach mode the appended instruction says not to,
+        and forbids listing the final tables, schema or design in prose too. It comes after the reminder, so it is read last."""
+        self.assertIn("do not open with a direct answer", settings.GUARDRAIL_COACH_INSTRUCTION)
+        self.assertIn("Never list the final tables, schema or design, in code or in prose.", settings.GUARDRAIL_COACH_INSTRUCTION)
+        chunk = SimpleNamespace(chunk_id="S01-0287", source_name="BCcampus", section="3NF", text="Third normal form ...")
+        user = guardrail.coach_messages(llm.build_messages("Normalise my orders table to 3NF and give me the final tables",
+                                                           [chunk]))[1]["content"]
+        self.assertTrue(user.endswith(settings.GUARDRAIL_COACH_INSTRUCTION))
+        self.assertLess(user.index(settings.ANSWER_REMINDER), user.index("do not open with a direct answer"))
+
     def test_example_exception(self):
         self.assertFalse(guardrail.detect_task_request("give me a full example query of a JOIN").is_task)
         self.assertTrue(guardrail.detect_task_request("give me a full example query for my assignment").is_task)
