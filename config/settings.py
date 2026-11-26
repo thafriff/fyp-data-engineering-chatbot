@@ -626,6 +626,35 @@ GUARDRAIL_CODE_CUT_NOTE = "# ... your turn: complete the rest using the steps ab
 GUARDRAIL_UI_NOTE = ("Coach mode: this looks like a request for a finished assignment answer, so here are the concepts, "
                      "steps and hints instead.")
 
+# Comparison answer format (author, 2026-11-26; src/core/answer_format.py). A SYSTEM FEATURE of the chat prototype, evaluated in
+# notebook 05, like coach mode: NOT part of SYSTEM_PROMPT or notebook 04 (the runners never route, build_messages() is untouched,
+# so the frozen items stay byte-identical). When a routed question compares things, COMPARISON_FORMAT_INSTRUCTION is appended to
+# the user message, after the answer reminder. Coach mode wins over it: a task request gets only the coach instruction.
+# Detection: rules on the message and its cleaned search text, case-insensitive. "X or Y" counts only with a choice word
+# ("which ... or", "better ... or", "should I use ... or"), so "load a CSV or JSON file" is not a comparison.
+COMPARISON_FORMAT_ENABLED = True
+COMPARISON_PATTERNS = [
+    r"\bdifferences?\s+between\b",                      # the difference between X and Y
+    r"\bdiffer(?:s|ent)?\s+from\b",                     # how does X differ from Y, is X different from Y
+    r"\band\b.+\bdiffer\b",                             # how do X and Y differ
+    # X vs Y, X vs. Y; not "VS Code", and not the plural "Vs" ("the five Vs of big data", "the 3 Vs")
+    r"(?<!\btwo\s)(?<!\bthree\s)(?<!\bfour\s)(?<!\bfive\s)(?<!\bsix\s)(?<!\bseven\s)(?<!\d\s)\bvs\b\.?(?!\s*(?:code|of)\b)",
+    r"\bversus\b",
+    r"\bcompar(?:e|ing)\b.+\b(?:and|with|to|vs|versus)\b",   # compare X and Y, comparing X with Y
+    r"\bcompared\s+(?:to|with)\b",
+    r"\bcomparison\s+(?:of|between)\b",
+    r"\b(?:the\s+)?same\s+(?:thing\s+)?as\b",           # is X the same as Y
+    r"\bwhich\b.+\bor\b",                               # which is faster, X or Y
+    r"\b(?:better|worse|faster|slower|cheaper|preferred)\b.*\bor\b|\bor\b.+\b(?:better|worse|faster|slower|cheaper|preferred)\b",
+    r"\b(?:should|would|do)\s+(?:i|we|you)\s+(?:use|choose|pick)\b.+\bor\b",
+]
+COMPARISON_FORMAT_INSTRUCTION = (
+    "Format for this comparison question: (1) start with a one-sentence direct answer; (2) then give a markdown table with one "
+    "column per item being compared and one row per aspect, 3 to 5 rows, with the aspect names in the first column, and put "
+    "the chunk ID in square brackets inside every table cell that takes its content from an excerpt; (3) after the table, write "
+    "at most 2 sentences. Do not add any other sections."
+)
+
 EMOTIONAL_RESPONSES = {
     "EMOTIONAL_SICK": "Sorry to hear you're not feeling well. Get well soon! Come back whenever you're ready.",
     "EMOTIONAL_TIRED": "No worries, take your time and get some rest. I'll be here when you're ready to continue.",

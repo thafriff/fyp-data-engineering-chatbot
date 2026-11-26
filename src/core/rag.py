@@ -9,7 +9,7 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 
 from config import settings
-from src.core import guardrail, intent, llm
+from src.core import answer_format, guardrail, intent, llm
 from src.core.intent import Intent
 from src.core.retriever import RetrievedChunk, Retriever
 from src.core.search_text import remove_leading, spelling_corrections
@@ -28,6 +28,7 @@ class RagResult:
     search_query: str | None = None   # text actually embedded for the search (spelling-corrected); None if no search
     cloud_call: Callable[..., llm.CloudAnswer] | None = None   # for a cloud model: call it with on_status to get the answer
     coach_mode: bool = False          # True when the message was a task request and the answer is scaffolding (guardrail.py)
+    comparison_format: bool = False   # True when the comparison format instruction was appended (answer_format.py)
 
 
 class RagPipeline:
@@ -75,13 +76,16 @@ class RagPipeline:
         corrections = spelling_corrections(question, search_query, [c.text for c in chunks])
         # Coach mode for a task request: the normal messages are built as usual, then the coach instruction is appended.
         coach = routed.path == "task_request"
-        transform = guardrail.coach_messages if coach else None
+        # Comparison format for a question that compares things; coach mode wins, so a task request never gets it.
+        comparison = not coach and answer_format.detect_comparison(question, search_query) is not None
+        transform = guardrail.coach_messages if coach else (answer_format.comparison_messages if comparison else None)
         if llm.is_cloud_model(model):      # not streamed: the interface shows the waiting state, then the finished answer
             return RagResult(chunks=chunks, answer_stream=iter(()), used_fallback=False, routing=routed, model=model,
-                             search_query=search_query, coach_mode=coach,
+                             search_query=search_query, coach_mode=coach, comparison_format=comparison,
                              cloud_call=lambda on_status=None: llm.cloud_generate(question, chunks, model, on_status,
                                                                                   corrections=corrections, transform=transform))
         return RagResult(chunks=chunks,
                          answer_stream=llm.stream_generate(question, chunks, model=model, corrections=corrections,
                                                            transform=transform),
-                         used_fallback=False, routing=routed, model=model, search_query=search_query, coach_mode=coach)
+                         used_fallback=False, routing=routed, model=model, search_query=search_query, coach_mode=coach,
+                         comparison_format=comparison)
