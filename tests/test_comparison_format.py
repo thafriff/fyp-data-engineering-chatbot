@@ -23,6 +23,7 @@ from config import settings  # noqa: E402
 from src.core import answer_format, guardrail, intent, llm, rag  # noqa: E402
 from src.core.retriever import RetrievedChunk  # noqa: E402
 
+SEP = "\n\n"      # how llm.build_messages and the transforms join message parts
 COMPARISONS = [
     "whts the difference between olap and oltp",          # the author's three
     "data lake vs data warehouse",
@@ -80,10 +81,31 @@ class Detection(unittest.TestCase):
 
 class Instruction(unittest.TestCase):
     def test_instruction_asks_for_the_layout(self):
+        """2026-11-26 v2: an "In simple terms:" line with one plain-English bullet per item replaces the one-sentence opening."""
         text = settings.COMPARISON_FORMAT_INSTRUCTION
-        for phrase in ("one-sentence direct answer", "markdown table", "one column per item", "one row per aspect",
-                       "3 to 5 rows", "chunk ID in square brackets inside every table cell", "at most 2 sentences"):
+        for phrase in ("\nIn simple terms:\n", "each bullet on its own line, one bullet per item being compared",
+                       "a beginner understands", "at most 20 words", "do not write anything else before the table",
+                       "markdown table", "one column per item", "one row per aspect", "3 to 5 rows",
+                       "chunk ID in square brackets inside every table cell", "at most 1 sentence"):
             self.assertIn(phrase, text)
+        self.assertNotIn("one-sentence direct answer", text)
+
+    def test_opening_rule_text(self):
+        text = settings.ANSWER_OPENING_INSTRUCTION
+        self.assertIn("Start directly with the answer itself", text)
+        self.assertIn('"The course materials"', text)
+        self.assertIn("or any sentence in it", text)
+
+    def test_no_course_content_in_the_comparison_template(self):
+        """The comparison layout shows only neutral placeholders, so the model cannot copy one example's content."""
+        for term in ("OLTP", "OLAP", "ETL", "warehouse", "normalized", "S06-", "S05-", "S04-"):
+            self.assertNotIn(term, settings.COMPARISON_FORMAT_INSTRUCTION)
+
+    def test_opening_rule_is_the_kept_v2b_wording(self):
+        """The author's decision rule kept v2b (2026-11-26), including its concrete OLTP example. Known limitation, recorded in
+        settings.py and CLAUDE.md: 2 of 3 OLAP/OLTP answers on qwen3.5:2b copied that example as their opening line."""
+        self.assertIn('write "OLTP databases are normalized [S06-0205].", not "The course materials highlight that',
+                      settings.ANSWER_OPENING_INSTRUCTION)
 
     def test_messages_are_the_normal_ones_plus_the_instruction(self):
         chunk = SimpleNamespace(chunk_id="S06-0204", source_name="Zoomcamp", section="OLTP vs OLAP", text="OLTP ... OLAP ...")
@@ -114,21 +136,74 @@ class Pipeline(unittest.TestCase):
             "".join(result.answer_stream)
         return result, seen["transform"]
 
-    def test_comparison_gets_the_format(self):
+    BASE = llm.build_messages("q", [SimpleNamespace(chunk_id="S06-0204", source_name="Zoomcamp", section="OLTP vs OLAP",
+                                                    text="OLTP and OLAP.")])
+
+    def user_text(self, transform):
+        return transform(self.BASE)[1]["content"]
+
+    def test_comparison_gets_the_opening_rule_then_the_format(self):
         result, transform = self.run_answer("data lake vs data warehouse")
         self.assertTrue(result.comparison_format)
-        self.assertIs(transform, answer_format.comparison_messages)
+        self.assertEqual(self.user_text(transform), self.BASE[1]["content"] + SEP + settings.ANSWER_OPENING_INSTRUCTION
+                         + SEP + settings.COMPARISON_FORMAT_INSTRUCTION)
 
-    def test_other_questions_get_no_transform(self):
+    def test_other_questions_get_only_the_opening_rule(self):
         result, transform = self.run_answer("what is a data warehouse")
         self.assertFalse(result.comparison_format)
-        self.assertIsNone(transform)
+        self.assertEqual(self.user_text(transform), self.BASE[1]["content"] + SEP + settings.ANSWER_OPENING_INSTRUCTION)
 
     def test_coach_mode_wins(self):
         result, transform = self.run_answer("write the full code comparing ETL vs ELT for my assignment", path="task_request")
         self.assertTrue(result.coach_mode)
         self.assertFalse(result.comparison_format)
-        self.assertIs(transform, guardrail.coach_messages)
+        self.assertEqual(self.user_text(transform), self.BASE[1]["content"] + SEP + settings.ANSWER_OPENING_INSTRUCTION
+                         + SEP + settings.GUARDRAIL_COACH_INSTRUCTION)
+
+    def test_system_prompt_is_never_changed(self):
+        for message, path in (("data lake vs data warehouse", "question_heuristic"), ("what is ETL?", "question_heuristic"),
+                              ("write the full SQL query for my assignment", "task_request")):
+            _, transform = self.run_answer(message, path=path)
+            self.assertEqual(transform(self.BASE)[0], {"role": "system", "content": settings.SYSTEM_PROMPT})
+
+    def test_opening_rule_can_be_switched_off(self):
+        with mock.patch.object(settings, "ANSWER_OPENING_RULE_ENABLED", False):
+            _, transform = self.run_answer("what is a data warehouse")
+            self.assertIsNone(transform)                                  # exactly the pre-2026-11-26 behaviour
+            _, transform = self.run_answer("data lake vs data warehouse")
+            self.assertEqual(self.user_text(transform), self.BASE[1]["content"] + SEP + settings.COMPARISON_FORMAT_INSTRUCTION)
+
+
+class CheckScriptSavesPartialData(unittest.TestCase):
+    """evaluation/comparison_format_check.py saves after every run, so a stopped run (e.g. a free-tier model that stops
+    answering) keeps what it has. The pipeline is faked; the output goes to a temporary folder."""
+
+    def test_a_stopped_run_keeps_its_records(self):
+        import importlib.util
+        import tempfile
+        spec = importlib.util.spec_from_file_location("comparison_format_check", ROOT / "evaluation" / "comparison_format_check.py")
+        check = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(check)
+        calls = []
+
+        class FakePipeline:
+            def answer(self, question, model=None):
+                calls.append(question)
+                if len(calls) == 2:
+                    raise KeyboardInterrupt          # the run is stopped during the second answer
+                return SimpleNamespace(answer_stream=iter(["In simple terms:\n- **A** is a.\n- **B** is b."]), cloud_call=None,
+                                       chunks=[], routing=SimpleNamespace(path="question_heuristic"), comparison_format=True,
+                                       used_fallback=False, model="fake")
+        with tempfile.TemporaryDirectory() as folder:
+            out = Path(folder) / "partial.json"
+            with mock.patch.object(check, "RagPipeline", FakePipeline), \
+                    mock.patch.object(sys, "argv", ["x", str(out), "--runs", "3", "--arms", "app", "--questions", "a vs b"]):
+                with self.assertRaises(KeyboardInterrupt):
+                    check.main()
+            saved = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(len(saved["records"]), 1)
+        self.assertFalse(saved["meta"]["finished"])
+        self.assertTrue(saved["records"][0]["simple_terms_line"])
 
 
 class Notebook04Untouched(unittest.TestCase):

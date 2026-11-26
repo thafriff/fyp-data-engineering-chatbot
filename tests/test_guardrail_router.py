@@ -138,15 +138,18 @@ class Routing(unittest.TestCase):
         def fake_stream(question, chunks, model=None, corrections=None, transform=None):
             seen["transform"] = transform
             yield "answer"
+        chunk = SimpleNamespace(chunk_id="S05-0138", source_name="DE Wiki", section="OLAP", text="OLAP is a data model.")
+        base = llm.build_messages("q", [chunk])
         with mock.patch.object(llm, "stream_generate", fake_stream):
             task = p.answer("write the complete SQL query for my assignment", model="llama3.2:3b")
             "".join(task.answer_stream)
             self.assertTrue(task.coach_mode)
-            self.assertIs(seen["transform"], guardrail.coach_messages)
+            # 2026-11-26: every app answer also gets the opening rule first (answer_format.app_transform), then the coach line.
+            self.assertTrue(seen["transform"](base)[1]["content"].endswith(settings.GUARDRAIL_COACH_INSTRUCTION))
             normal = p.answer("what is OLAP?", model="llama3.2:3b")
             "".join(normal.answer_stream)
             self.assertFalse(normal.coach_mode)
-            self.assertIsNone(seen["transform"])
+            self.assertNotIn(settings.GUARDRAIL_COACH_INSTRUCTION, seen["transform"](base)[1]["content"])
 
     def test_router_can_be_switched_off(self):
         p = self.pipeline()

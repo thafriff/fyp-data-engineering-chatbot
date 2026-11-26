@@ -9,7 +9,7 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 
 from config import settings
-from src.core import answer_format, guardrail, intent, llm
+from src.core import answer_format, intent, llm
 from src.core.intent import Intent
 from src.core.retriever import RetrievedChunk, Retriever
 from src.core.search_text import remove_leading, spelling_corrections
@@ -78,7 +78,8 @@ class RagPipeline:
         coach = routed.path == "task_request"
         # Comparison format for a question that compares things; coach mode wins, so a task request never gets it.
         comparison = not coach and answer_format.detect_comparison(question, search_query) is not None
-        transform = guardrail.coach_messages if coach else (answer_format.comparison_messages if comparison else None)
+        # Every generated answer also gets the opening rule (answer_format.app_transform), before any mode instruction.
+        transform = answer_format.app_transform(coach=coach, comparison=comparison)
         if llm.is_cloud_model(model):      # not streamed: the interface shows the waiting state, then the finished answer
             return RagResult(chunks=chunks, answer_stream=iter(()), used_fallback=False, routing=routed, model=model,
                              search_query=search_query, coach_mode=coach, comparison_format=comparison,

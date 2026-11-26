@@ -648,11 +648,38 @@ COMPARISON_PATTERNS = [
     r"\b(?:better|worse|faster|slower|cheaper|preferred)\b.*\bor\b|\bor\b.+\b(?:better|worse|faster|slower|cheaper|preferred)\b",
     r"\b(?:should|would|do)\s+(?:i|we|you)\s+(?:use|choose|pick)\b.+\bor\b",
 ]
+# Opening changed 2026-11-26 (author): the first version asked for "a one-sentence direct answer", which qwen3.5:2b never kept to
+# (2-3 sentences in 9 of 9 runs). The answer now opens with an "In simple terms:" line and one plain-English bullet per item.
+# Wording v2b (same day): v2a gave the bullets inline ("In simple terms: **OLTP** is ..., while **OLAP** is ...") in 5 of 6
+# runs, so the layout is now shown line by line.
 COMPARISON_FORMAT_INSTRUCTION = (
-    "Format for this comparison question: (1) start with a one-sentence direct answer; (2) then give a markdown table with one "
-    "column per item being compared and one row per aspect, 3 to 5 rows, with the aspect names in the first column, and put "
-    "the chunk ID in square brackets inside every table cell that takes its content from an excerpt; (3) after the table, write "
-    "at most 2 sentences. Do not add any other sections."
+    "Format for this comparison question, in this order:\n"
+    "1. Start with exactly this layout, each bullet on its own line, one bullet per item being compared:\n"
+    "In simple terms:\n"
+    "- **<first item>** is for <what it is used for, in one short line of plain English a beginner understands>.\n"
+    "- **<second item>** is for <what it is used for, in one short line>.\n"
+    "Each bullet is one short line of at most 20 words; do not write anything else before the table.\n"
+    "2. Then give a markdown table with one column per item and one row per aspect, 3 to 5 rows, with the aspect names in the "
+    "first column, and put the chunk ID in square brackets inside every table cell that takes its content from an excerpt.\n"
+    "3. After the table, write at most 1 sentence. Do not add any other sections."
+)
+
+# Opening rule for EVERY generated answer in the app (author, 2026-11-26; src/core/answer_format.py). App layer only, like the
+# coach and comparison instructions: NOT part of SYSTEM_PROMPT or notebook 04. Appended after the answer reminder, before any
+# coach or comparison instruction. Why: qwen3.5:2b began sentences with "The course materials highlight/indicate ..." in 8 of 9
+# answers (the frozen prompt says to call the source "the course materials"); the citations already show the source.
+ANSWER_OPENING_RULE_ENABLED = True
+# Wording v2b, KEPT by the author's decision rule (2026-11-26). v2a left 8 of 9 answers with a sentence that starts "The course
+# materials highlight ..."; v2b shows the rewrite it wants with a concrete example. Tried and NOT kept: v2c (neutral placeholders:
+# the start line then overrode "In simple terms:", label 0/6) and v2d (start line only for plain questions: label still 0/6 on
+# qwen3.5:2b). The rule's fallback applied because the gemini-3.8-flash check could not run (free tier returned no answer).
+# KNOWN LIMITATION of this wording: under v2b, 2 of 3 OLAP/OLTP answers on qwen3.5:2b copied the OLTP example word for word as their
+# opening line ("OLTP databases are normalized [S06-0205] ...").
+ANSWER_OPENING_INSTRUCTION = (
+    "Start directly with the answer itself. Do not begin the answer, or any sentence in it, with \"The course materials\", "
+    "\"According to the course materials\", \"Based on the course materials\" or a similar phrase about the source; the chunk "
+    "IDs already show where each point comes from. State the fact itself: write \"OLTP databases are normalized [S06-0205].\", "
+    "not \"The course materials highlight that OLTP databases are normalized [S06-0205].\""
 )
 
 EMOTIONAL_RESPONSES = {
