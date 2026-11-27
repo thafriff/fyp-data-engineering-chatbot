@@ -101,13 +101,17 @@ class Instruction(unittest.TestCase):
         for term in ("OLTP", "OLAP", "ETL", "warehouse", "normalized", "S06-", "S05-", "S04-"):
             self.assertNotIn(term, settings.COMPARISON_FORMAT_INSTRUCTION)
 
-    def test_opening_rule_example_is_a_neutral_placeholder(self):
+    def test_opening_rule_has_no_example_or_template_to_copy(self):
         """2026-11-26 (author): the concrete v2b example "OLTP databases are normalized [S06-0205]" appeared in 13 of 69
-        multi-turn answers and 10 cited S06-0205 without retrieving it. The example must hold no course content or chunk ID."""
-        self.assertIn('write "<fact> [<chunk ID>].", not "The course materials highlight that <fact> [<chunk ID>]."',
-                      settings.ANSWER_OPENING_INSTRUCTION)
+        multi-turn answers and 10 cited S06-0205 without retrieving it, so it became the placeholder "<fact> [<chunk ID>]".
+        2026-11-27 (author): qwen3.5:2b copied that placeholder literally ("<fact>...</fact> [<S05-0097>]") in 2 of 105 answers,
+        so the rule is now in words only: no course content, no chunk ID and no angle-bracket tag."""
+        text = settings.ANSWER_OPENING_INSTRUCTION
+        self.assertIn("put its chunk ID in square brackets after it", text)
+        self.assertIn('instead of introducing it with "The course materials highlight that"', text)
+        self.assertNotRegex(text, r"<[^<>]*>")
         for term in ("OLTP", "OLAP", "ETL", "warehouse", "normalized", "S06-", "S05-", "S04-"):
-            self.assertNotIn(term, settings.ANSWER_OPENING_INSTRUCTION)
+            self.assertNotIn(term, text)
 
     def test_messages_are_the_normal_ones_plus_the_instruction(self):
         chunk = SimpleNamespace(chunk_id="S06-0204", source_name="Zoomcamp", section="OLTP vs OLAP", text="OLTP ... OLAP ...")

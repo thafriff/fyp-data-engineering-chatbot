@@ -679,9 +679,12 @@ ANSWER_OPENING_RULE_ENABLED = True
 ANSWER_OPENING_INSTRUCTION = (
     "Start directly with the answer itself. Do not begin the answer, or any sentence in it, with \"The course materials\", "
     "\"According to the course materials\", \"Based on the course materials\" or a similar phrase about the source; the chunk "
-    "IDs already show where each point comes from. State the fact itself: write \"<fact> [<chunk ID>].\", not \"The course "
-    "materials highlight that <fact> [<chunk ID>].\""
+    "IDs already show where each point comes from. State each fact directly and put its chunk ID in square brackets after it, "
+    "instead of introducing it with \"The course materials highlight that\"."
 )
+# 2026-11-27 (author): the placeholder template "<fact> [<chunk ID>]" (2026-11-26) was copied literally by qwen3.5:2b in 2 of 105
+# multi-turn answers ("<fact>...</fact> [<S05-0097>]", malformed citations; H07 turn 3), so the rule is now described in words, with
+# no angle-bracket tags, no template, no course content and no chunk ID.
 
 # ---------------------------------------------------------------------------
 # Multi-turn chat (author's approved design, 2026-11-26; src/core/conversation.py). Proposal Section 2.4.3. A SYSTEM FEATURE of
