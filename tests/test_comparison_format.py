@@ -101,11 +101,13 @@ class Instruction(unittest.TestCase):
         for term in ("OLTP", "OLAP", "ETL", "warehouse", "normalized", "S06-", "S05-", "S04-"):
             self.assertNotIn(term, settings.COMPARISON_FORMAT_INSTRUCTION)
 
-    def test_opening_rule_is_the_kept_v2b_wording(self):
-        """The author's decision rule kept v2b (2026-11-26), including its concrete OLTP example. Known limitation, recorded in
-        settings.py and CLAUDE.md: 2 of 3 OLAP/OLTP answers on qwen3.5:2b copied that example as their opening line."""
-        self.assertIn('write "OLTP databases are normalized [S06-0205].", not "The course materials highlight that',
+    def test_opening_rule_example_is_a_neutral_placeholder(self):
+        """2026-11-26 (author): the concrete v2b example "OLTP databases are normalized [S06-0205]" appeared in 13 of 69
+        multi-turn answers and 10 cited S06-0205 without retrieving it. The example must hold no course content or chunk ID."""
+        self.assertIn('write "<fact> [<chunk ID>].", not "The course materials highlight that <fact> [<chunk ID>]."',
                       settings.ANSWER_OPENING_INSTRUCTION)
+        for term in ("OLTP", "OLAP", "ETL", "warehouse", "normalized", "S06-", "S05-", "S04-"):
+            self.assertNotIn(term, settings.ANSWER_OPENING_INSTRUCTION)
 
     def test_messages_are_the_normal_ones_plus_the_instruction(self):
         chunk = SimpleNamespace(chunk_id="S06-0204", source_name="Zoomcamp", section="OLTP vs OLAP", text="OLTP ... OLAP ...")

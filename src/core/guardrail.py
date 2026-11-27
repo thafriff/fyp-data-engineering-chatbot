@@ -83,10 +83,10 @@ def detect_task_request(text: str) -> TaskDecision:
 
 
 def coach_messages(messages: list[dict]) -> list[dict]:
-    """The normal messages from llm.build_messages(), with the coach instruction appended to the user message. The system
-    prompt and everything before the instruction are unchanged."""
-    system, user = messages
-    return [system, {"role": user["role"], "content": f"{user['content']}\n\n{settings.GUARDRAIL_COACH_INSTRUCTION}"}]
+    """The normal messages from llm.build_messages(), with the coach instruction appended to the last (current) user message.
+    The system prompt, any earlier chat turns and everything before the instruction are unchanged."""
+    *head, user = messages
+    return [*head, {"role": user["role"], "content": f"{user['content']}\n\n{settings.GUARDRAIL_COACH_INSTRUCTION}"}]
 
 
 def cap_code_blocks(answer: str, max_lines: int | None = None) -> tuple[str, int]:

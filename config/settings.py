@@ -673,14 +673,96 @@ ANSWER_OPENING_RULE_ENABLED = True
 # materials highlight ..."; v2b shows the rewrite it wants with a concrete example. Tried and NOT kept: v2c (neutral placeholders:
 # the start line then overrode "In simple terms:", label 0/6) and v2d (start line only for plain questions: label still 0/6 on
 # qwen3.5:2b). The rule's fallback applied because the gemini-3.8-flash check could not run (free tier returned no answer).
-# KNOWN LIMITATION of this wording: under v2b, 2 of 3 OLAP/OLTP answers on qwen3.5:2b copied the OLTP example word for word as their
-# opening line ("OLTP databases are normalized [S06-0205] ...").
+# 2026-11-26 (author): the example is now a NEUTRAL PLACEHOLDER (the rest of v2b is unchanged). In the multi-turn evaluation the
+# concrete v2b example "OLTP databases are normalized [S06-0205]" appeared in 13 of 69 model answers on unrelated topics and 10 of
+# them cited S06-0205 without retrieving it: a grounding failure. Target after the swap: S06-0205 never cited unless retrieved.
 ANSWER_OPENING_INSTRUCTION = (
     "Start directly with the answer itself. Do not begin the answer, or any sentence in it, with \"The course materials\", "
     "\"According to the course materials\", \"Based on the course materials\" or a similar phrase about the source; the chunk "
-    "IDs already show where each point comes from. State the fact itself: write \"OLTP databases are normalized [S06-0205].\", "
-    "not \"The course materials highlight that OLTP databases are normalized [S06-0205].\""
+    "IDs already show where each point comes from. State the fact itself: write \"<fact> [<chunk ID>].\", not \"The course "
+    "materials highlight that <fact> [<chunk ID>].\""
 )
+
+# ---------------------------------------------------------------------------
+# Multi-turn chat (author's approved design, 2026-11-26; src/core/conversation.py). Proposal Section 2.4.3. A SYSTEM FEATURE of
+# the chat prototype, evaluated in notebook 05. NOT part of notebook 04: the runners never pass a conversation, build_messages()
+# is untouched and the first message of every conversation is answered exactly as a single-turn question.
+# Test set: evaluation/multiturn_cases.json (hashed before this code), run with evaluation/multiturn_eval.py.
+# ---------------------------------------------------------------------------
+MULTITURN_ENABLED = True
+HISTORY_MAX_EXCHANGES = 2              # earlier model-answered exchanges sent with a new message, at most
+HISTORY_ANSWER_MAX_CHARS = 500         # an earlier answer is trimmed to this, at a sentence end, without citations or tables
+HISTORY_QUESTION_MAX_CHARS = 300       # an earlier question is sent as typed, cut to this
+# Budget guard: Ollama silently drops the START of an over-long prompt (the system prompt and its guardrail), so the oldest
+# exchanges are dropped until the estimated prompt + the answer cap + a margin fits DEV_LLM_NUM_CTX. Tokens are estimated as
+# characters / 3.5: qwen3.5:2b read 3.57-4.61 characters per token on the frozen prompts (2026-11-26), so this over-counts.
+HISTORY_CHARS_PER_TOKEN = 3.5
+HISTORY_TOKEN_MARGIN = 150
+HISTORY_MESSAGE_OVERHEAD_TOKENS = 8    # per chat message, for the role markers the chat template adds
+# Appended to the current user message (after the opening rule, before a coach or comparison instruction), only when at least
+# one earlier exchange is sent.
+HISTORY_INSTRUCTION = (
+    "The earlier messages are the conversation so far. Use them only to understand what the student's new message refers to; "
+    "take every fact from the excerpts above and cite only their chunk IDs."
+)
+# Follow-up retrieval (option B, with the author's pronoun change). A follow-up is searched COMBINED with the earlier turn's topic
+# text when it has no topic word of its own (only stop words, refer-back words and generic aspect words), or when it contains one
+# of the refer-back pronouns. Otherwise it is searched alone, exactly as a single-turn question.
+# The author's list, plus "one"/"ones" (author, 2026-11-26: "which one better for big data"). "one" is already an English stop
+# word, so as a refer-back WORD it would change nothing; it is a refer-back PRONOUN instead, except inside a hyphenated term
+# ("one-to-many", "one-hot").
+FOLLOWUP_PRONOUNS = ["it", "that", "this", "these", "they", "them", "its", "one", "ones"]
+FOLLOWUP_REFERBACK_WORDS = [
+    "simpler", "simple", "simply", "easier", "easy", "clearer", "example", "examples", "explain", "explanation", "elaborate",
+    "mean", "meaning", "means", "detail", "details", "detailed", "further", "clarify", "rephrase", "summarise", "summarize",
+    "summary", "short", "shorter", "brief", "briefly", "tell", "again", "else", "words", "layman", "terms", "understand",
+    "confused", "confusing", "dont", "lost", "pls", "please", "okay", "ok",
+]
+FOLLOWUP_GENERIC_WORDS = [
+    "advantages", "disadvantages", "advantage", "disadvantage", "pros", "cons", "benefits", "benefit", "drawbacks", "drawback",
+    "uses", "use", "usage", "steps", "step", "purpose", "types", "type", "kinds", "kind", "limitations", "limitation",
+    "problems", "problem", "issues", "issue", "real", "world", "life", "case", "cases", "scenario", "scenarios", "practice",
+    "important", "importance", "difference", "differences", "work", "works", "working", "code", "query", "answer", "solution",
+]
+# Topic offer state: after an emotional reply with a topic offer, the next message is checked first (whole message, normalised).
+OFFER_AFFIRMATIVE_PATTERN = (r"(yes|yes please|yeah|yea|yep|yup|ya|sure|sure thing|ok|okay|ok sure|okay sure|alright|please|"
+                             r"go ahead|lets go|let s go|why not|boleh|ok boleh|can|ok can)")
+OFFER_NEGATIVE_PATTERN = r"(no|nope|nah|no thanks|no thank you|not now|maybe later|later|tak|tak apa|takpe|tak nak)"
+OFFER_DECLINED_RESPONSE = "No problem. Whenever you're ready, ask me about any topic from the course."
+# Coach mode stays on after a coach-mode turn when the next message refers back or pushes for the solution (these patterns), until
+# a new question with its own topic that is not a task.
+GUARDRAIL_PRESSURE_PATTERNS = [
+    r"\bjust (give|tell|write|show|do|send|answer)\b",
+    r"\b(give|show|send|write|tell) me the (full|complete|whole|final|actual|real) (code|answer|query|solution|script|schema|program)\b",
+    r"\b(do|write|finish|solve|complete) it for me\b",
+    r"\bi (give up|dont care|don t care)\b",
+    r"\b(no|stop the|stop giving) hints\b",
+]
+# Short-follow-up RESCUE (author, 2026-11-26, fix 2): a follow-up searched alone that falls below SIMILARITY_THRESHOLD is searched
+# again COMBINED with the earlier topic, but only when every topic word in it is a COURSE TERM ("and ELT?" scored 0.614 alone).
+# A course term is a word in SPELL_PROTECTED_TERMS, or one at least COURSE_TERM_MIN_RATIO times more frequent in the course chunks
+# than in general English (pyspellchecker's English word list) and seen at least COURSE_TERM_MIN_COUNT times in the chunks. The
+# threshold (10x) was fixed before looking at any word: weather 2.2x, today 0.5x, check 1.6x are not course terms; elt, spark
+# (419x), streaming (169x), quality (41x), schema are. So "what about the weather today?" still gets the fallback.
+FOLLOWUP_RESCUE_ENABLED = True
+COURSE_TERM_MIN_COUNT = 5
+COURSE_TERM_MIN_RATIO = 10
+# Short follow-ups are not sent to the emotional reply (author, 2026-11-26, fix 3): inside a conversation (an answered turn
+# exists), a message of at most FOLLOWUP_SHORT_MAX_WORDS words that would reach the intent classifier is routed as a follow-up
+# question (path "followup") WITHOUT the classifier, unless it is clearly emotional (EMOTIONAL_CUE_PATTERNS), which still gets the
+# kind reply. Small talk, the offer and coach checks and task requests come first, as before.
+FOLLOWUP_SHORT_MAX_WORDS = 8
+EMOTIONAL_CUE_PATTERNS = [
+    r"\bgiv(e|ing) up\b", r"\bquit\b", r"\bstress(ed|ful)?\b", r"\banxi(ous|ety)\b", r"\bpanic(king)?\b", r"\boverwhelm(ed|ing)?\b",
+    r"\btired\b", r"\bexhausted\b", r"\bsleepy\b", r"\bburn(t|ed) out\b", r"\bsick\b", r"\bill\b", r"\bunwell\b", r"\bfever\b",
+    r"\bheadache\b", r"\bsad\b", r"\bdepress(ed|ing)\b", r"\bupset\b", r"\bcry(ing)?\b", r"\bhate\b", r"\bfrustrat(ed|ing)\b",
+    r"\bannoyed\b", r"\bangry\b", r"\bscared\b", r"\bafraid\b", r"\bworried\b", r"\blonely\b", r"\bugh+\b", r"\brough day\b",
+    r"\bbad day\b", r"\bfed up\b", r"\bcant do this\b", r"\bhopeless\b", r"\bpenat\b", r"\bsedih\b", r"\bstres\b",
+]
+DEV_UI_NEW_CHAT_LABEL = "New chat"
+DEV_UI_HISTORY_CAPTION = ("Follow-up questions are understood from the last {n} answered exchanges; each answer still comes "
+                          "only from the course materials. New chat clears the conversation.")
+DEV_UI_FOLLOWUP_NOTE = "Follow-up: searched together with your earlier question."
 
 EMOTIONAL_RESPONSES = {
     "EMOTIONAL_SICK": "Sorry to hear you're not feeling well. Get well soon! Come back whenever you're ready.",

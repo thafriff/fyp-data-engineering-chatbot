@@ -3,3 +3,6 @@
 evaluation/guardrail_router_cases.json -text
 # The intent-classifier check set is checked against a recorded SHA-256 (evaluation/intent_classifier_cases.sha256) too.
 evaluation/intent_classifier_cases.json -text
+# The multi-turn test set is checked against a recorded SHA-256 (evaluation/multiturn_cases.sha256).
+evaluation/multiturn_cases.json -text
+evaluation/multiturn_cases_holdout2.json -text

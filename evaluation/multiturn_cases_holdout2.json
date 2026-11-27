@@ -1,0 +1,17 @@
+{
+ "purpose": "Second held-out multi-turn set (author, 2026-11-26), written by the author and hashed (multiturn_cases_holdout2.sha256) BEFORE fixes 2 and 3 (short-follow-up rescue; short non-emotional follow-ups not sent to the emotional reply) were implemented; never edited afterwards. The rules are not tuned to it; it is reported separately. Expectations state what a good system should do. Same check meanings and pass rule as evaluation/multiturn_cases.json.",
+ "regroup": {"H01": "tuning", "H02": "tuning", "H03": "tuning"},
+ "regroup_reason": "The author's decision (2026-11-26): fixes 2 and 3 were inspired by H01-H03, so they are reported as tuning cases from now on, not held out. evaluation/multiturn_cases.json itself stays unedited.",
+ "conversations": [
+  {"id": "H04", "group": "held_out", "case": "informal pronoun follow-up: how to check it", "turns": [
+   {"user": "what is data quality", "deterministic": {"kind": "question", "fallback": false}, "answer": {"answered": true}},
+   {"user": "ok so how to check it", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true}}]},
+  {"id": "H05", "group": "held_out", "case": "still confused: expects a simpler explanation, not only the empathy reply", "turns": [
+   {"user": "explain star schema", "deterministic": {"kind": "question", "fallback": false}, "answer": {"answered": true}},
+   {"user": "hmm still dont get it", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true}}]},
+  {"id": "H06", "group": "held_out", "case": "kafka, then spark, then which one for streaming", "turns": [
+   {"user": "what is kafka", "deterministic": {"kind": "question", "fallback": false}, "answer": {"answered": true}},
+   {"user": "and spark?", "deterministic": {"kind": "question", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true}},
+   {"user": "which one for streaming", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 2}, "answer": {"answered": true}}]}
+ ]
+}

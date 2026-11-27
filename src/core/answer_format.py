@@ -14,6 +14,7 @@ import re
 from collections.abc import Callable
 
 from config import settings
+from src.core import conversation as conversation_rules
 from src.core import guardrail
 
 _PATTERNS = [re.compile(p, re.IGNORECASE) for p in settings.COMPARISON_PATTERNS]
@@ -32,9 +33,10 @@ def detect_comparison(*texts: str) -> str | None:
 
 
 def _append(messages: list[dict], instruction: str) -> list[dict]:
-    """The messages with one instruction appended to the user message; the system prompt is unchanged."""
-    system, user = messages
-    return [system, {"role": user["role"], "content": f"{user['content']}\n\n{instruction}"}]
+    """The messages with one instruction appended to the last (current) user message; the system prompt and any earlier
+    chat turns are unchanged."""
+    *head, user = messages
+    return [*head, {"role": user["role"], "content": f"{user['content']}\n\n{instruction}"}]
 
 
 def comparison_messages(messages: list[dict]) -> list[dict]:
@@ -47,10 +49,15 @@ def opening_messages(messages: list[dict]) -> list[dict]:
     return _append(messages, settings.ANSWER_OPENING_INSTRUCTION)
 
 
-def app_transform(coach: bool = False, comparison: bool = False) -> Callable[[list[dict]], list[dict]] | None:
-    """The function the pipeline passes to the generator: the opening rule first (if switched on), then the coach instruction
-    for a task request or the comparison instruction for a comparison (coach wins). None when nothing is to be appended."""
+def app_transform(coach: bool = False, comparison: bool = False,
+                  history: list | None = None) -> Callable[[list[dict]], list[dict]] | None:
+    """The function the pipeline passes to the generator: the opening rule first (if switched on), then, in a multi-turn chat,
+    the earlier exchanges chosen by conversation.select_history (inserted as chat turns, with the history instruction), then the
+    coach instruction for a task request or the comparison instruction for a comparison (coach wins). None when nothing is to be
+    added. With no history the result is exactly the single-turn one."""
     steps = [opening_messages] if settings.ANSWER_OPENING_RULE_ENABLED else []
+    if history:
+        steps.append(lambda messages: conversation_rules.with_history(messages, history))
     if coach:
         steps.append(guardrail.coach_messages)
     elif comparison:

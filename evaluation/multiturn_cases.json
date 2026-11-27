@@ -1,0 +1,74 @@
+{
+ "purpose": "Fixed multi-turn test set for the chat prototype (author's approved design, 2026-11-26). Written and hashed (multiturn_cases.sha256) BEFORE any multi-turn feature code, never edited afterwards. C01-C11 are design cases. H01-H03 were written by the author and are HELD OUT: the rules are not tuned to them and they are reported separately; their expectations state what a good system should do, not what the rules are expected to produce.",
+ "pass_rule": "A conversation passes when every deterministic check passes in all 3 runs AND every answer check passes in at least 2 of 3 runs (each run plays the whole conversation from a new, empty conversation).",
+ "check_meanings": {
+  "deterministic": {
+   "kind": "routing outcome of the turn: small_talk | unclear | emotional | question | offer_declined",
+   "search": "alone = the turn's own search text (as single-turn); combined = the anchoring topic text of the earlier turn plus this turn's search text; none = no retrieval",
+   "fallback": "the pipeline fallback was given (below the similarity threshold, no model call)",
+   "coach": "the answer was made in coach mode",
+   "comparison": "the comparison format instruction was appended",
+   "offer": "the fixed reply carries a topic offer line",
+   "resolved_question": "the question actually answered (an accepted topic offer becomes its starter question); null = no resolution happened",
+   "model_called": "a model wrote the answer (false for fixed replies and the pipeline fallback)",
+   "history_exchanges": "number of earlier exchanges sent to the model with this turn",
+   "min_overlap_with_previous_top5": "at least this many of this turn's top-5 chunk IDs are also in the previous model-answered turn's top 5",
+   "top1_contains": "the top-1 retrieved chunk's text contains this word (case-insensitive)",
+   "top5_contains_all": "each word appears (case-insensitive) in at least one of the top-5 retrieved chunks"
+  },
+  "answer": {
+   "answered": "the model answered: not the fallback sentence alone, at least one valid citation, no citation outside the turn's retrieved set, no malformed citation",
+   "table": "the answer contains a markdown table (header, separator and at least 2 data rows)"
+  }
+ },
+ "conversations": [
+  {"id": "C01", "group": "design", "case": "refer-back: explain that simpler", "turns": [
+   {"user": "what is a star schema?", "deterministic": {"kind": "question", "search": "alone", "fallback": false, "history_exchanges": 0}, "answer": {"answered": true}},
+   {"user": "explain that simpler", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 1, "min_overlap_with_previous_top5": 3}, "answer": {"answered": true}}]},
+  {"id": "C02", "group": "design", "case": "refer-back: give an example", "turns": [
+   {"user": "what is change data capture?", "deterministic": {"kind": "question", "search": "alone", "fallback": false}, "answer": {"answered": true}},
+   {"user": "give an example", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true}}]},
+  {"id": "C03", "group": "design", "case": "new topic without a pronoun: searched alone", "turns": [
+   {"user": "what is a star schema?", "deterministic": {"kind": "question", "search": "alone"}, "answer": {"answered": true}},
+   {"user": "what about snowflake schema?", "deterministic": {"kind": "question", "search": "alone", "fallback": false, "history_exchanges": 1, "top1_contains": "snowflake"}, "answer": {"answered": true}}]},
+  {"id": "C04", "group": "design", "case": "topic offer accepted with yes", "turns": [
+   {"user": "ugh sql is so hard i want to give up", "deterministic": {"kind": "emotional", "offer": true, "model_called": false, "search": "none"}},
+   {"user": "yes", "deterministic": {"kind": "question", "resolved_question": "What is SQL?", "search": "alone", "fallback": false, "history_exchanges": 0}, "answer": {"answered": true}}]},
+  {"id": "C05", "group": "design", "case": "topic offer declined, then no offer pending", "turns": [
+   {"user": "ugh sql is so hard i want to give up", "deterministic": {"kind": "emotional", "offer": true, "model_called": false}},
+   {"user": "no", "deterministic": {"kind": "offer_declined", "search": "none", "model_called": false}},
+   {"user": "yes", "deterministic": {"resolved_question": null, "model_called": false}}]},
+  {"id": "C06", "group": "design", "case": "coach mode stays on under pressure", "turns": [
+   {"user": "write the full SQL query for my assignment that joins the trips and zones tables and gives revenue per zone", "deterministic": {"kind": "question", "coach": true, "search": "alone"}, "answer": {"answered": true}},
+   {"user": "just give me the answer", "deterministic": {"kind": "question", "coach": true, "search": "combined", "history_exchanges": 1}, "answer": {"answered": true}},
+   {"user": "give me the full code then", "deterministic": {"kind": "question", "coach": true, "search": "combined", "history_exchanges": 2}, "answer": {"answered": true}}]},
+  {"id": "C07", "group": "design", "case": "off-topic follow-up still gets the fallback", "turns": [
+   {"user": "what is OLAP?", "deterministic": {"kind": "question", "search": "alone"}, "answer": {"answered": true}},
+   {"user": "what about the weather today?", "deterministic": {"search": "alone", "fallback": true, "model_called": false}}]},
+  {"id": "C08", "group": "design", "case": "small talk does not break the chain", "turns": [
+   {"user": "what is ETL?", "deterministic": {"kind": "question", "search": "alone"}, "answer": {"answered": true}},
+   {"user": "thanks", "deterministic": {"kind": "small_talk", "model_called": false, "search": "none"}},
+   {"user": "and ELT?", "deterministic": {"kind": "question", "search": "alone", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true}}]},
+  {"id": "C09", "group": "design", "case": "comparison, then a refer-back gets no table", "turns": [
+   {"user": "what is OLTP?", "deterministic": {"kind": "question", "search": "alone"}, "answer": {"answered": true}},
+   {"user": "what is the difference between OLTP and OLAP?", "deterministic": {"kind": "question", "search": "alone", "comparison": true, "history_exchanges": 1}, "answer": {"answered": true, "table": true}},
+   {"user": "explain that simpler", "deterministic": {"kind": "question", "search": "combined", "comparison": false, "history_exchanges": 2}, "answer": {"answered": true}}]},
+  {"id": "C10", "group": "design", "case": "New chat clears the history", "turns": [
+   {"user": "what is a star schema?", "deterministic": {"kind": "question", "search": "alone"}, "answer": {"answered": true}},
+   {"action": "new_chat"},
+   {"user": "explain that simpler", "deterministic": {"search": "alone", "history_exchanges": 0}}]},
+  {"id": "C11", "group": "design", "case": "topic words plus a pronoun: combined (the author's change to option B)", "turns": [
+   {"user": "what is a data warehouse?", "deterministic": {"kind": "question", "search": "alone"}, "answer": {"answered": true}},
+   {"user": "how is it different from a data lake?", "deterministic": {"kind": "question", "search": "combined", "comparison": true, "fallback": false, "history_exchanges": 1, "top5_contains_all": ["warehouse", "lake"]}, "answer": {"answered": true, "table": true}}]},
+  {"id": "H01", "group": "held_out", "case": "Malay: what is a data pipeline, then give a small example", "turns": [
+   {"user": "apa itu data pipeline", "deterministic": {"kind": "question", "fallback": false}, "answer": {"answered": true}},
+   {"user": "bagi example sikit", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true}}]},
+  {"id": "H02", "group": "held_out", "case": "informal: why do people need it", "turns": [
+   {"user": "whats normalization", "deterministic": {"kind": "question", "fallback": false}, "answer": {"answered": true}},
+   {"user": "why do ppl need it tho", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true}}]},
+  {"id": "H03", "group": "held_out", "case": "informal three-turn ETL / ELT / which is better", "turns": [
+   {"user": "explain etl", "deterministic": {"kind": "question", "fallback": false}, "answer": {"answered": true}},
+   {"user": "ok and how bout elt", "deterministic": {"kind": "question", "search": "alone", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true}},
+   {"user": "which one better for big data", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 2}, "answer": {"answered": true}}]}
+ ]
+}

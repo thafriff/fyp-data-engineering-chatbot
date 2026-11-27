@@ -39,6 +39,7 @@ class Intent:
     label: str | None = None    # raw classifier output (when the classifier was called)
     top_score: float | None = None   # top-1 course similarity (when the override check ran)
     task: object | None = None  # guardrail.TaskDecision when the message is a task request (answered in coach mode)
+    offer_question: str | None = None   # starter question of a topic offer in an emotional reply ("What is SQL?")
 
 
 def _normalise(message: str) -> str:
@@ -60,11 +61,18 @@ def topic_offer(*texts: str) -> str | None:
     """The one-line offer for the first course topic named in the message, or None if it names none. texts are the message
     as typed and its cleaned search text (so a corrected typo such as "sqll" still counts); the earliest mention wins.
     Fixed text from settings: no model is called."""
+    match = topic_offer_match(*texts)
+    return match[0] if match else None
+
+
+def topic_offer_match(*texts: str) -> tuple[str, str] | None:
+    """(offer line, starter question) for the first course topic named in the texts, or None. Multi-turn chat keeps the
+    starter question, so a following "yes" can be answered as that question (conversation.py)."""
     for text in texts:
         found = [(m.start(), topic, question) for pattern, topic, question in _TOPICS if (m := pattern.search(text or ""))]
         if found:
             _, topic, question = min(found)
-            return settings.EMOTIONAL_TOPIC_OFFER_TEMPLATE.format(topic=topic, question=question)
+            return settings.EMOTIONAL_TOPIC_OFFER_TEMPLATE.format(topic=topic, question=question), question
     return None
 
 
@@ -88,8 +96,22 @@ def classify(message: str) -> str:
     return output if output in settings.INTENT_LABELS else settings.INTENT_FALLBACK_LABEL
 
 
+def fixed_reply(message: str) -> Intent | None:
+    """The small-talk or unclear decision for a message, or None if it is neither (the first two steps of route()).
+    Small talk comes first, so one-letter phrases such as "k" are not caught by the unclear check."""
+    text = _normalise(message)
+    for name, pattern in _SMALL_TALK.items():
+        if pattern.match(text):
+            return Intent("small_talk", settings.SMALL_TALK_RESPONSES[name])
+    if sum(ch.isalnum() for ch in text) < settings.UNCLEAR_MIN_ALNUM_CHARS:
+        return Intent("unclear", settings.UNCLEAR_RESPONSE)
+    if " " not in text and _is_keyboard_mash(text):
+        return Intent("unclear", settings.UNCLEAR_RESPONSE)
+    return None
+
+
 def route(message: str, top_score: Callable[[str], float] | None = None,
-          clean: Callable[[str], str] | None = None) -> Intent:
+          clean: Callable[[str], str] | None = None, use_classifier: bool = True) -> Intent:
     """Classify the message: small talk, unclear and emotional input get a fixed reply; anything else is a
     question that goes to retrieval. top_score(message) returns the top-1 course similarity; it is needed to
     accept an emotional label (without it, emotional labels fall back to a question).
@@ -97,16 +119,9 @@ def route(message: str, top_score: Callable[[str], float] | None = None,
     obvious-question check reads it, so "hey what is olpa" is seen as "what is olap" and goes straight to retrieval
     without the classifier. Small talk and the unclear check still read the message as typed, so "hi" stays a greeting."""
     text = _normalise(message)
-
-    # Small talk first, so one-letter phrases such as "k" are not caught by the unclear check below.
-    for name, pattern in _SMALL_TALK.items():
-        if pattern.match(text):
-            return Intent("small_talk", settings.SMALL_TALK_RESPONSES[name])
-
-    if sum(ch.isalnum() for ch in text) < settings.UNCLEAR_MIN_ALNUM_CHARS:
-        return Intent("unclear", settings.UNCLEAR_RESPONSE)
-    if " " not in text and _is_keyboard_mash(text):
-        return Intent("unclear", settings.UNCLEAR_RESPONSE)
+    fixed = fixed_reply(message)
+    if fixed:
+        return fixed
 
     cleaned = clean(message) if clean else message
     cleaned_text = _normalise(cleaned) or text
@@ -118,6 +133,9 @@ def route(message: str, top_score: Callable[[str], float] | None = None,
             return Intent("question", path="task_request", task=decision)
     if not settings.INTENT_CLASSIFIER_ENABLED or _is_obvious_question(cleaned, cleaned_text):
         return Intent("question", path="question_heuristic")
+    # Multi-turn (conversation.is_short_follow_up): a short, not clearly emotional follow-up inside a conversation is a question.
+    if not use_classifier:
+        return Intent("question", path="followup")
 
     label = classify(message)
     if label not in settings.EMOTIONAL_RESPONSES:
@@ -131,7 +149,8 @@ def route(message: str, top_score: Callable[[str], float] | None = None,
     if score is None or score >= settings.EMOTIONAL_OVERRIDE_MIN_SIMILARITY:
         return Intent("question", path="similarity_override", label=label, top_score=score)
     reply = settings.EMOTIONAL_RESPONSES[label]
-    offer = topic_offer(message, cleaned)
+    offer = topic_offer_match(message, cleaned)
     if offer:
-        reply = f"{reply}\n\n{offer}"
-    return Intent("emotional", reply, path="classifier", label=label, top_score=score)
+        reply = f"{reply}\n\n{offer[0]}"
+    return Intent("emotional", reply, path="classifier", label=label, top_score=score,
+                  offer_question=offer[1] if offer else None)

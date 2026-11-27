@@ -21,6 +21,7 @@ import streamlit as st
 from config import settings
 from src.app import styles
 from src.core import citations, guardrail, llm
+from src.core.conversation import Conversation
 from src.core.rag import RagPipeline
 
 st.set_page_config(page_title="Data Engineering Course Assistant", page_icon="💬")
@@ -129,10 +130,11 @@ with st.sidebar:
     (st.success if backend_ok else st.error)(backend_message)
     st.caption(f"Intent classifier: {settings.DEV_LLM_MODEL} · retrieval: {settings.EMBEDDING_MODEL} · "
                f"top {settings.TOP_K} chunks · fallback below similarity {settings.SIMILARITY_THRESHOLD}")
-    st.caption("Each question is answered on its own; earlier messages are not sent to the model.")
+    st.caption(settings.DEV_UI_HISTORY_CAPTION.format(n=settings.HISTORY_MAX_EXCHANGES))
     citation_counts_slot = st.empty()      # filled at the end of the page, so it includes an answer written in this run
-    if st.button("Clear chat"):
+    if st.button(settings.DEV_UI_NEW_CHAT_LABEL):     # clears the messages AND the conversation the model sees
         st.session_state.messages = []
+        st.session_state.conversation = Conversation()
         st.rerun()
 
 st.title("Data Engineering Course Assistant")
@@ -141,6 +143,8 @@ st.caption("Ask about SQL, ETL/ELT, pipelines, data cleaning, processing, qualit
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "conversation" not in st.session_state:     # multi-turn memory for this browser session (src/core/conversation.py)
+    st.session_state.conversation = Conversation()
 
 # ---------------------------------------------------------------- history
 for message in st.session_state.messages:
@@ -151,6 +155,8 @@ for message in st.session_state.messages:
             if message.get("coach_mode"):
                 st.info(settings.GUARDRAIL_UI_NOTE)
             st.markdown(message["content"])
+            if message.get("followup"):
+                st.caption(settings.DEV_UI_FOLLOWUP_NOTE)
             if message["role"] == "assistant":
                 st.caption(reply_caption(message.get("model"), message.get("used_fallback", False)))
             if message.get("usage"):
@@ -173,7 +179,7 @@ if question:
         else:
             pipeline = load_pipeline()
             with st.spinner("Searching the course materials..."):
-                result = pipeline.answer(question, model=selected_model)
+                result = pipeline.answer(question, model=selected_model, conversation=st.session_state.conversation)
             usage, failed = None, False
             answer_slot = st.empty()          # the raw answer goes here first, then the version with numbered citations
             if result.cloud_call:             # a cloud answer is not streamed: show the waiting state until it is ready
@@ -207,6 +213,8 @@ if question:
                     if result.coach_mode:
                         st.info(settings.GUARDRAIL_UI_NOTE)
                     st.markdown(shown)
+                    if result.search_mode == "combined":
+                        st.caption(settings.DEV_UI_FOLLOWUP_NOTE)
                 st.caption(reply_caption(result.model, result.used_fallback))
             if usage:
                 st.caption(usage_caption(usage))
@@ -218,6 +226,9 @@ if question:
                                               "model": result.model, "sources": sources,
                                               "used_fallback": result.used_fallback, "usage": usage, "failed": failed,
                                               "citations": check.to_dict() if check else None,
-                                              "coach_mode": result.coach_mode})
+                                              "coach_mode": result.coach_mode,
+                                              "followup": result.search_mode == "combined"})
+            # Multi-turn: remember the finished turn (the answer as shown, code already capped in coach mode).
+            st.session_state.conversation.record(result, answer, failed=failed)
 
 show_session_counts(citation_counts_slot)
