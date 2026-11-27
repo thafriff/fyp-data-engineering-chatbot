@@ -41,6 +41,7 @@ class RagResult:
     resolved_question: str | None = None   # an accepted topic offer's starter question ("yes" -> "What is SQL?")
     asked: str | None = None          # the question actually answered (resolved_question, or the message as typed)
     topic_text: str | None = None     # what a later refer-back follow-up is combined with
+    regenerated: str | None = None    # set when an answer made with history was regenerated without it, and why
 
 
 class RagPipeline:
@@ -127,9 +128,10 @@ class RagPipeline:
         coach = routed.path in ("task_request", "task_request_followup")
         # Comparison format for a question that compares things (read from this message only); coach mode wins.
         comparison = not coach and answer_format.detect_comparison(asked, own_search) is not None
-        # Earlier exchanges that fit the token budget beside this prompt and all its instructions ([] when single-turn).
+        # Earlier exchanges that fit the token budget beside this prompt and all its instructions, ONLY for a follow-up (searched
+        # combined). A message searched alone is a fresh question and gets exactly the single-turn prompt ([] when single-turn).
         history = []
-        if multi:
+        if multi and search_mode == "combined":
             base = llm.build_messages(asked, chunks, corrections=corrections)
             without_history = answer_format.app_transform(coach=coach, comparison=comparison)
             history = conversation_rules.select_history(conversation, without_history(base) if without_history else base)
@@ -138,13 +140,48 @@ class RagPipeline:
         extra = {"search_mode": search_mode, "history_exchanges": len(history), "resolved_question": resolved,
                  "asked": asked, "topic_text": topic_text}
         if llm.is_cloud_model(model):      # not streamed: the interface shows the waiting state, then the finished answer
-            return RagResult(chunks=chunks, answer_stream=iter(()), used_fallback=False, routing=routed, model=model,
-                             search_query=search_query, coach_mode=coach, comparison_format=comparison,
-                             cloud_call=lambda on_status=None: llm.cloud_generate(asked, chunks, model, on_status,
-                                                                                  corrections=corrections, transform=transform),
-                             **extra)
-        return RagResult(chunks=chunks,
-                         answer_stream=llm.stream_generate(asked, chunks, model=model, corrections=corrections,
-                                                           transform=transform),
-                         used_fallback=False, routing=routed, model=model, search_query=search_query, coach_mode=coach,
-                         comparison_format=comparison, **extra)
+            result = RagResult(chunks=chunks, answer_stream=iter(()), used_fallback=False, routing=routed, model=model,
+                               search_query=search_query, coach_mode=coach, comparison_format=comparison,
+                               cloud_call=lambda on_status=None: llm.cloud_generate(asked, chunks, model, on_status,
+                                                                                    corrections=corrections, transform=transform),
+                               **extra)
+        else:
+            result = RagResult(chunks=chunks,
+                               answer_stream=llm.stream_generate(asked, chunks, model=model, corrections=corrections,
+                                                                 transform=transform),
+                               used_fallback=False, routing=routed, model=model, search_query=search_query, coach_mode=coach,
+                               comparison_format=comparison, **extra)
+        if history:
+            self._guard_history_answer(result, asked, chunks, model, corrections, history,
+                                       answer_format.app_transform(coach=coach, comparison=comparison))
+        return result
+
+    @staticmethod
+    def _guard_history_answer(result: RagResult, asked: str, chunks: list, model: str, corrections, history: list,
+                              without_history) -> None:
+        """Safety net for an answer made WITH history: it is checked when complete, and if it repeats an earlier answer or
+        contains app-layer instruction text (conversation.history_answer_problem) it is generated ONCE more without history;
+        result.regenerated records why. A local answer is therefore shown when complete instead of streamed."""
+        if result.cloud_call is not None:
+            first_call = result.cloud_call
+
+            def guarded_cloud(on_status=None):
+                first = first_call(on_status)
+                problem = conversation_rules.history_answer_problem(first.text, history)
+                if not problem:
+                    return first
+                result.regenerated = problem
+                return llm.cloud_generate(asked, chunks, model, on_status, corrections=corrections, transform=without_history)
+            result.cloud_call = guarded_cloud
+            return
+        first_stream = result.answer_stream
+
+        def guarded_stream():
+            answer = "".join(first_stream)
+            problem = conversation_rules.history_answer_problem(answer, history)
+            if problem:
+                result.regenerated = problem
+                answer = "".join(llm.stream_generate(asked, chunks, model=model, corrections=corrections,
+                                                     transform=without_history))
+            yield answer
+        result.answer_stream = guarded_stream()

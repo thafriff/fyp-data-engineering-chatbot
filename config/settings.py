@@ -759,6 +759,21 @@ EMOTIONAL_CUE_PATTERNS = [
     r"\bannoyed\b", r"\bangry\b", r"\bscared\b", r"\bafraid\b", r"\bworried\b", r"\blonely\b", r"\bugh+\b", r"\brough day\b",
     r"\bbad day\b", r"\bfed up\b", r"\bcant do this\b", r"\bhopeless\b", r"\bpenat\b", r"\bsedih\b", r"\bstres\b",
 ]
+# History only for follow-ups (author, 2026-11-27): earlier exchanges are sent ONLY when the message is searched COMBINED (a refer-back,
+# a pronoun follow-up, a rescued short follow-up or a coach follow-up). A message searched alone is a fresh question and gets exactly
+# the single-turn prompt: no history, no history instruction. Why: in Streamlit, "what is a star schema" -> "please explain it simpler"
+# -> "what is etl" retrieved the ETL chunks, but qwen3.5:2b repeated the star-schema answer and printed HISTORY_INSTRUCTION.
+# Safety net for an answer made WITH history: if it repeats an earlier answer (at least HISTORY_REPEAT_MAX_OVERLAP of its word
+# HISTORY_REPEAT_NGRAM-grams occur in an earlier answer that was sent) or contains app-layer instruction text (any
+# APP_INSTRUCTION_LEAK_NGRAM-word run of HISTORY_INSTRUCTION, ANSWER_OPENING_INSTRUCTION, COMPARISON_FORMAT_INSTRUCTION or
+# GUARDRAIL_COACH_INSTRUCTION), it is generated ONCE more without history; RagResult.regenerated records why. Thresholds fixed in
+# evaluation/multiturn_cases_v3.json before the code.
+HISTORY_REPEAT_NGRAM = 5
+HISTORY_REPEAT_MAX_OVERLAP = 0.5
+APP_INSTRUCTION_LEAK_NGRAM = 8
+DEV_UI_REGENERATED_NOTE = "Regenerated without the conversation history: the first answer {reason}."
+DEV_UI_REGENERATED_REASONS = {"repeats_earlier_answer": "repeated an earlier answer",
+                              "app_instruction_text": "contained instruction text"}
 DEV_UI_NEW_CHAT_LABEL = "New chat"
 DEV_UI_HISTORY_CAPTION = ("Follow-up questions are understood from the last {n} answered exchanges; each answer still comes "
                           "only from the course materials. New chat clears the conversation.")

@@ -212,6 +212,46 @@ def select_history(conversation: "Conversation | None", current_messages: list[d
     return chosen
 
 
+def _ngrams(text: str, n: int) -> list[tuple[str, ...]]:
+    """Word n-grams of a text, lower case, punctuation removed."""
+    words = _words(text)
+    return [tuple(words[i:i + n]) for i in range(len(words) - n + 1)]
+
+
+def repeat_share(answer: str, earlier: str) -> float:
+    """Share of the answer's word HISTORY_REPEAT_NGRAM-grams that also occur in an earlier answer (0 when the answer is shorter
+    than one n-gram)."""
+    grams = _ngrams(answer, settings.HISTORY_REPEAT_NGRAM)
+    if not grams:
+        return 0.0
+    seen = set(_ngrams(earlier, settings.HISTORY_REPEAT_NGRAM))
+    return sum(g in seen for g in grams) / len(grams)
+
+
+def _instruction_grams() -> set[tuple[str, ...]]:
+    """Every APP_INSTRUCTION_LEAK_NGRAM-word run of the app-layer instructions an answer must never contain."""
+    texts = (settings.HISTORY_INSTRUCTION, settings.ANSWER_OPENING_INSTRUCTION, settings.COMPARISON_FORMAT_INSTRUCTION,
+             settings.GUARDRAIL_COACH_INSTRUCTION)
+    return {g for t in texts for g in _ngrams(t, settings.APP_INSTRUCTION_LEAK_NGRAM)}
+
+
+def contains_app_instruction(answer: str) -> bool:
+    """True when the answer contains an APP_INSTRUCTION_LEAK_NGRAM-word run of any app-layer instruction."""
+    grams = _instruction_grams()
+    return any(g in grams for g in _ngrams(answer, settings.APP_INSTRUCTION_LEAK_NGRAM))
+
+
+def history_answer_problem(answer: str, exchanges: list[Exchange]) -> str | None:
+    """Why an answer made with history must be regenerated without it, or None: "app_instruction_text" when it contains
+    app-layer instruction text; "repeats_earlier_answer" when at least HISTORY_REPEAT_MAX_OVERLAP of it repeats an earlier answer
+    that was sent with it."""
+    if contains_app_instruction(answer):
+        return "app_instruction_text"
+    if any(repeat_share(answer, e.answer) >= settings.HISTORY_REPEAT_MAX_OVERLAP for e in exchanges):
+        return "repeats_earlier_answer"
+    return None
+
+
 def with_history(messages: list[dict], exchanges: list[Exchange]) -> list[dict]:
     """The messages with the earlier exchanges inserted as chat turns before the current message, and the history instruction
     appended to the current message. Unchanged when there is no exchange."""

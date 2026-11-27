@@ -33,10 +33,12 @@ os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
 from config import settings  # noqa: E402
 from src.core import citations, guardrail  # noqa: E402
+from src.core import conversation as conversation_rules  # noqa: E402
 from src.core.conversation import Conversation  # noqa: E402
 from src.core.rag import RagPipeline  # noqa: E402
 
-CASE_FILES = [ROOT / "evaluation" / "multiturn_cases.json", ROOT / "evaluation" / "multiturn_cases_holdout2.json"]
+CASE_FILES = [ROOT / "evaluation" / "multiturn_cases.json", ROOT / "evaluation" / "multiturn_cases_holdout2.json",
+              ROOT / "evaluation" / "multiturn_cases_v3.json"]
 OLD_EXAMPLE = "OLTP databases are normalized"      # the v2b opening-rule example, replaced on 2026-11-26
 TABLE_SEPARATOR = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$")
 
@@ -50,8 +52,8 @@ def has_table(answer: str) -> bool:
     return False
 
 
-def observe(result, answer: str, previous_top5: list[str] | None) -> dict:
-    """Everything the case file can check for one turn."""
+def observe(result, answer: str, previous_top5: list[str] | None, previous_answer: str | None = None) -> dict:
+    """Everything the case files can check for one turn."""
     top5 = [c.chunk_id for c in result.chunks]
     check = citations.check(answer, top5) if result.model else None
     return {
@@ -66,6 +68,10 @@ def observe(result, answer: str, previous_top5: list[str] | None) -> dict:
         "valid_citations": check.counts["valid"] if check else 0,
         "outside_set": check.outside_set if check else [], "malformed": check.malformed if check else [],
         "is_fallback_sentence": answer.strip() == settings.FALLBACK_MESSAGE, "table": has_table(answer),
+        "repeat_share_of_previous": (round(conversation_rules.repeat_share(answer, previous_answer), 3)
+                                     if result.model and previous_answer else None),
+        "app_instruction_text": bool(result.model) and conversation_rules.contains_app_instruction(answer),
+        "regenerated": result.regenerated,
         "answer": answer,
     }
 
@@ -100,6 +106,10 @@ def answer_results(expected: dict, seen: dict) -> dict[str, bool]:
                   and not seen["outside_set"] and not seen["malformed"])
         elif key == "table":
             ok = seen["table"]
+        elif key == "fresh":           # multiturn_cases_v3.json: under 50% of its word 5-grams repeat the previous answer
+            ok = seen["model_called"] and (seen["repeat_share_of_previous"] or 0.0) < 0.5
+        elif key == "no_app_instruction":
+            ok = seen["model_called"] and not seen["app_instruction_text"]
         else:
             raise ValueError(f"unknown answer check {key}")
         out[key] = ok == want
@@ -109,11 +119,11 @@ def answer_results(expected: dict, seen: dict) -> dict[str, bool]:
 def play(pipeline: RagPipeline, conversation_case: dict) -> list[dict]:
     """One run of one conversation from an empty conversation; returns one record per user turn."""
     conversation = Conversation()
-    previous_top5, records = None, []
+    previous_top5, previous_answer, records = None, None, []
     for number, turn in enumerate(conversation_case["turns"], 1):
         if turn.get("action") == "new_chat":
             conversation.clear()
-            previous_top5 = None
+            previous_top5 = previous_answer = None
             continue
         start = time.perf_counter()
         result = pipeline.answer(turn["user"], conversation=conversation)
@@ -121,9 +131,9 @@ def play(pipeline: RagPipeline, conversation_case: dict) -> list[dict]:
         if result.coach_mode:                       # the app caps long code blocks in coach mode before showing them
             answer, _ = guardrail.cap_code_blocks(answer)
         conversation.record(result, answer)
-        seen = observe(result, answer, previous_top5)
+        seen = observe(result, answer, previous_top5, previous_answer)
         if seen["model_called"]:
-            previous_top5 = seen["top5"]
+            previous_top5, previous_answer = seen["top5"], answer
         seen["seconds"] = round(time.perf_counter() - start, 1)
         det = deterministic_failures(turn.get("deterministic", {}), seen)
         ans = answer_results(turn.get("answer", {}), seen)
@@ -208,7 +218,11 @@ def main() -> None:
             "S06-0205_cited_outside_retrieved": sum("S06-0205" in t["outside_set"] for t in answers),
             "old_example_sentence": sum(OLD_EXAMPLE in t["answer"] for t in answers),
             "S06-0322_cited_outside_retrieved": sum("S06-0322" in t["outside_set"] for t in answers),
-            "any_outside_set": sum(bool(t["outside_set"]) for t in answers)}
+            "any_outside_set": sum(bool(t["outside_set"]) for t in answers),
+            # multiturn_cases_v3.json global check: no model answer may contain app-layer instruction text (target 0)
+            "app_instruction_text": sum(bool(t.get("app_instruction_text")) for t in answers),
+            "regenerated": {reason: sum(t.get("regenerated") == reason for t in answers)
+                            for reason in ("repeats_earlier_answer", "app_instruction_text")}}
     data["meta"]["leak"] = leak
     save(args.out, data)
     print("leak:", leak)

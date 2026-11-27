@@ -6,3 +6,4 @@ evaluation/intent_classifier_cases.json -text
 # The multi-turn test set is checked against a recorded SHA-256 (evaluation/multiturn_cases.sha256).
 evaluation/multiturn_cases.json -text
 evaluation/multiturn_cases_holdout2.json -text
+evaluation/multiturn_cases_v3.json -text

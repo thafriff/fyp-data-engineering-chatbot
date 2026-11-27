@@ -1,0 +1,33 @@
+{
+ "purpose": "Third multi-turn case file (author, 2026-11-27), written and hashed (multiturn_cases_v3.sha256) BEFORE the fix for the bug the author found in Streamlit (a fresh question after a follow-up got the earlier answer repeated and the history instruction printed); never edited afterwards. C12 is a design case (the bug). H07 and H08 were written by the author and are HELD OUT: the fix is not tuned to them and they are reported separately. Same pass rule as evaluation/multiturn_cases.json.",
+ "new_answer_checks": {
+  "fresh": "the answer does not repeat the previous model answer of the run: fewer than 50% of its word 5-grams (lower case, punctuation removed) also occur in that previous answer",
+  "no_app_instruction": "the answer contains no 8-word run (lower case, punctuation removed) of any app-layer instruction: settings.HISTORY_INSTRUCTION, ANSWER_OPENING_INSTRUCTION, COMPARISON_FORMAT_INSTRUCTION or GUARDRAIL_COACH_INSTRUCTION"
+ },
+ "global_check": "No model answer in the whole re-run may contain app-layer instruction text (the no_app_instruction test applied to every model answer).",
+ "expectations_made_obsolete_by_the_fix": {
+  "rule": "The author's fix 1: history is sent ONLY for follow-ups (searched combined: refer-back, pronoun, rescue or coach follow-up). A message searched alone is a fresh question: no history.",
+  "listed_before_the_run": [
+   "C03 turn 2 'what about snowflake schema?' expects history_exchanges 1; searched alone, so the fix sends 0",
+   "C09 turn 2 'what is the difference between OLTP and OLAP?' expects history_exchanges 1; searched alone, so 0",
+   "H06 turn 2 'and spark?' expects history_exchanges 1; 0 if it is searched alone (it gets history only if the rescue combines it)",
+   "C06 turn 3 expects 2 earlier exchanges: already accepted on 2026-11-26 as too strict (the budget guard leaves room for 1)",
+   "C08 turn 3 expects search 'alone': already superseded on 2026-11-26 by the approved rescue (combined)"
+  ]
+ },
+ "commit_criterion": "Commit and push only if: C12, H07 and H08 pass; no model answer contains app-layer instruction text; every other failing check is one listed above; all tests and check_parity.py pass; SYSTEM_PROMPT SHA 677e8b3b.",
+ "conversations": [
+  {"id": "C12", "group": "design", "case": "the author's Streamlit bug: a fresh question after a follow-up", "turns": [
+   {"user": "what is a star schema", "deterministic": {"kind": "question", "search": "alone", "fallback": false, "history_exchanges": 0}, "answer": {"answered": true}},
+   {"user": "please explain it simpler", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true, "no_app_instruction": true}},
+   {"user": "what is etl", "deterministic": {"kind": "question", "search": "alone", "fallback": false, "history_exchanges": 0, "top5_contains_all": ["etl"]}, "answer": {"answered": true, "fresh": true, "no_app_instruction": true}}]},
+  {"id": "H07", "group": "held_out", "case": "data lake, an example, then a fresh question", "turns": [
+   {"user": "explain data lake", "deterministic": {"kind": "question", "fallback": false}, "answer": {"answered": true}},
+   {"user": "give example", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true, "no_app_instruction": true}},
+   {"user": "what is normalization", "deterministic": {"kind": "question", "search": "alone", "fallback": false, "history_exchanges": 0}, "answer": {"answered": true, "fresh": true, "no_app_instruction": true}}]},
+  {"id": "H08", "group": "held_out", "case": "kafka, why people use it, then a fresh question", "turns": [
+   {"user": "whats kafka", "deterministic": {"kind": "question", "fallback": false}, "answer": {"answered": true}},
+   {"user": "why ppl use it", "deterministic": {"kind": "question", "search": "combined", "fallback": false, "history_exchanges": 1}, "answer": {"answered": true, "no_app_instruction": true}},
+   {"user": "ok what is dbt", "deterministic": {"kind": "question", "search": "alone", "fallback": false, "history_exchanges": 0}, "answer": {"answered": true, "fresh": true, "no_app_instruction": true}}]}
+ ]
+}

@@ -157,6 +157,9 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
             if message.get("followup"):
                 st.caption(settings.DEV_UI_FOLLOWUP_NOTE)
+            if message.get("regenerated"):
+                st.caption(settings.DEV_UI_REGENERATED_NOTE.format(
+                    reason=settings.DEV_UI_REGENERATED_REASONS.get(message["regenerated"], message["regenerated"])))
             if message["role"] == "assistant":
                 st.caption(reply_caption(message.get("model"), message.get("used_fallback", False)))
             if message.get("usage"):
@@ -215,6 +218,9 @@ if question:
                     st.markdown(shown)
                     if result.search_mode == "combined":
                         st.caption(settings.DEV_UI_FOLLOWUP_NOTE)
+                    if result.regenerated:
+                        st.caption(settings.DEV_UI_REGENERATED_NOTE.format(
+                            reason=settings.DEV_UI_REGENERATED_REASONS.get(result.regenerated, result.regenerated)))
                 st.caption(reply_caption(result.model, result.used_fallback))
             if usage:
                 st.caption(usage_caption(usage))
@@ -227,7 +233,8 @@ if question:
                                               "used_fallback": result.used_fallback, "usage": usage, "failed": failed,
                                               "citations": check.to_dict() if check else None,
                                               "coach_mode": result.coach_mode,
-                                              "followup": result.search_mode == "combined"})
+                                              "followup": result.search_mode == "combined",
+                                              "regenerated": result.regenerated})
             # Multi-turn: remember the finished turn (the answer as shown, code already capped in coach mode).
             st.session_state.conversation.record(result, answer, failed=failed)
 

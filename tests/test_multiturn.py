@@ -328,6 +328,108 @@ class ShortFollowUps(unittest.TestCase):
         self.assertEqual((r.intent, r.routing.path), ("emotional", "classifier"))
 
 
+LONG_STAR = ("A star schema has one central fact table that holds the measures and several dimension tables around it that hold "
+             "the descriptive attributes [S05-0010]. Queries join the fact table to the dimensions to slice the measures.")
+
+
+class FreshQuestionsGetNoHistory(unittest.TestCase):
+    """Fix 1 (author, 2026-11-27): history only for follow-ups (searched combined). The Streamlit bug: "what is a star schema" ->
+    "please explain it simpler" -> "what is etl" repeated the star answer and printed the history instruction."""
+
+    def test_the_authors_bug_case(self):
+        f, c = Fake(), Conversation()
+        f.ask("what is a star schema", c, answer=LONG_STAR)
+        r2, _ = f.ask("please explain it simpler", c, answer="Simpler: facts sit in the middle and descriptions around them.")
+        self.assertEqual((r2.search_mode, r2.history_exchanges), ("combined", 1))
+        r3, _ = f.ask("what is etl", c, answer="ETL means extract, transform and load [S05-0010].")
+        self.assertEqual((r3.search_mode, r3.history_exchanges), ("alone", 0))
+        self.assertEqual(f.searches[-1], "what is etl")
+        sent = f.sent[-1]
+        self.assertEqual([m["role"] for m in sent], ["system", "user"])                  # exactly the single-turn shape
+        self.assertNotIn(settings.HISTORY_INSTRUCTION, sent[-1]["content"])
+        single = Fake()                                                                   # ...and equal to the single-turn prompt
+        single.ask("what is etl")
+        self.assertEqual(sent, single.sent[0])
+
+    def test_a_new_topic_without_a_pronoun_gets_no_history(self):
+        f, c = Fake(), Conversation()
+        f.ask("what is a star schema?", c)
+        r, _ = f.ask("what about snowflake schema?", c)
+        self.assertEqual((r.search_mode, r.history_exchanges, len(f.sent[-1])), ("alone", 0, 2))
+
+    def test_follow_ups_still_get_history(self):
+        for follow_up in ("explain that simpler", "how is it different from a data lake?", "why?"):
+            f, c = Fake(), Conversation()
+            f.ask("what is a data warehouse?", c)
+            r, _ = f.ask(follow_up, c)
+            self.assertEqual((r.search_mode, r.history_exchanges), ("combined", 1), follow_up)
+
+
+class SafetyNet(unittest.TestCase):
+    """Fix 2 (author, 2026-11-27): an answer made with history that repeats an earlier answer or contains app-layer instruction
+    text is generated once more without history, and the reason is recorded."""
+
+    def run_follow_up(self, answers):
+        f, c = Fake(), Conversation()
+        f.ask("what is a star schema?", c, answer=LONG_STAR)
+        replies = iter(answers)
+        calls = []
+
+        def fake_stream(question, chunks, model=None, corrections=None, transform=None):
+            messages = llm.build_messages(question, chunks, corrections=corrections)
+            calls.append(transform(messages) if transform else messages)
+            yield next(replies)
+        with mock.patch.object(llm, "stream_generate", fake_stream):
+            result = f.pipeline.answer("explain that simpler", model="qwen3.5:2b", conversation=c)
+            text = "".join(result.answer_stream)
+        return result, text, calls
+
+    def test_a_repeat_is_regenerated_without_history(self):
+        result, text, calls = self.run_follow_up([LONG_STAR, "Facts in the middle, descriptions around them [S05-0010]."])
+        self.assertEqual(result.regenerated, "repeats_earlier_answer")
+        self.assertEqual(text, "Facts in the middle, descriptions around them [S05-0010].")
+        self.assertEqual(len(calls), 2)
+        self.assertGreater(len(calls[0]), 2)                                              # first try: with history
+        self.assertEqual(len(calls[1]), 2)                                                # retry: no history
+        self.assertNotIn(settings.HISTORY_INSTRUCTION, calls[1][-1]["content"])
+
+    def test_instruction_text_is_regenerated_without_history(self):
+        leaked = "A star schema is simple. " + settings.HISTORY_INSTRUCTION
+        result, text, calls = self.run_follow_up([leaked, "Facts in the middle [S05-0010]."])
+        self.assertEqual((result.regenerated, text, len(calls)), ("app_instruction_text", "Facts in the middle [S05-0010].", 2))
+
+    def test_a_clean_answer_is_kept(self):
+        result, text, calls = self.run_follow_up(["Think of a shop's sales list in the middle and its product lists around it."])
+        self.assertEqual((result.regenerated, len(calls)), (None, 1))
+
+    def test_at_most_one_retry(self):
+        result, text, calls = self.run_follow_up([LONG_STAR, LONG_STAR])
+        self.assertEqual((len(calls), text), (2, LONG_STAR))                              # the retry's answer is kept as it is
+
+    def test_the_checks(self):
+        self.assertEqual(conv.repeat_share(LONG_STAR, LONG_STAR), 1.0)
+        self.assertEqual(conv.repeat_share("too short", LONG_STAR), 0.0)
+        self.assertLess(conv.repeat_share("Facts sit in the middle of a star and the descriptions sit around them.", LONG_STAR), 0.5)
+        for text in (settings.HISTORY_INSTRUCTION, settings.ANSWER_OPENING_INSTRUCTION, settings.GUARDRAIL_COACH_INSTRUCTION):
+            self.assertTrue(conv.contains_app_instruction("Intro. " + text + " End."), text[:40])
+        self.assertFalse(conv.contains_app_instruction("The course materials highlight that a star schema has a fact table."))
+
+    def test_cloud_answers_are_guarded_too(self):
+        f, c = Fake(), Conversation()
+        f.ask("what is a star schema?", c, answer=LONG_STAR)
+        replies = iter([LONG_STAR, "A fresh, simpler answer about facts and dimensions [S05-0010]."])
+        sent = []
+
+        def fake_cloud(question, chunks, model, on_status=None, corrections=None, transform=None):
+            sent.append(transform(llm.build_messages(question, chunks, corrections=corrections)))
+            return SimpleNamespace(text=next(replies))
+        with mock.patch.object(llm, "is_cloud_model", lambda m: True), mock.patch.object(llm, "cloud_generate", fake_cloud):
+            result = f.pipeline.answer("explain that simpler", model="gemini-3.8-flash", conversation=c)
+            reply = result.cloud_call()
+        self.assertEqual((result.regenerated, reply.text, len(sent), len(sent[1])),
+                         ("repeats_earlier_answer", "A fresh, simpler answer about facts and dimensions [S05-0010].", 2, 2))
+
+
 class GroundingLeak(unittest.TestCase):
     def test_no_course_content_in_any_app_instruction_example(self):
         """Target after the 2026-11-26 swap: no app-layer instruction carries a chunk ID or course content an answer could copy."""
