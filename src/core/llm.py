@@ -223,23 +223,29 @@ def _google_contents(messages: list[dict]):
     return [{"role": "model" if m["role"] == "assistant" else "user", "parts": [{"text": m["content"]}]} for m in turns]
 
 
-def _cloud_request(model: str, messages: list[dict]) -> dict:
+def _cloud_request(model: str, messages: list[dict], max_tokens: int | None = None, json_output: bool = False) -> dict:
     """The SDK call's arguments, built the same way as notebook 04's (providers.build_request; a test holds them equal for a
     single-turn prompt). A model that cannot turn thinking off gets a reasoning allowance on top of the answer cap, so that
-    reasoning cannot take answer tokens."""
+    reasoning cannot take answer tokens. max_tokens and json_output are for app features that need JSON (the quiz); with their
+    defaults the request is the chat request, unchanged."""
     config = settings.DEV_CLOUD_MODELS[model]
-    budget = settings.DEV_LLM_MAX_ANSWER_TOKENS + config["reasoning_allowance_tokens"]
+    budget = (max_tokens or settings.DEV_LLM_MAX_ANSWER_TOKENS) + config["reasoning_allowance_tokens"]
     if config["api"] == "openai_compatible":
         request = {"model": config["model_id"], "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
                    config["max_tokens_param"]: budget}
         if config["temperature"] is not None:
             request["temperature"] = config["temperature"]
         request.update(config["request_options"])          # DeepSeek: extra_body {"thinking": {"type": "disabled"}}
+        if json_output:
+            request["response_format"] = {"type": "json_object"}
         return request
-    return {"model": config["model_id"], "contents": _google_contents(messages),
-            "config": {"system_instruction": messages[0]["content"], "temperature": config["temperature"],
-                       "max_output_tokens": budget,
-                       "thinking_config": {"thinking_level": config["request_options"]["thinking_level"]}}}
+    request = {"model": config["model_id"], "contents": _google_contents(messages),
+               "config": {"system_instruction": messages[0]["content"], "temperature": config["temperature"],
+                          "max_output_tokens": budget,
+                          "thinking_config": {"thinking_level": config["request_options"]["thinking_level"]}}}
+    if json_output:
+        request["config"]["response_mime_type"] = "application/json"
+    return request
 
 
 def _send_google(key: str, request: dict) -> _Reply:
@@ -425,6 +431,35 @@ def cloud_generate(question: str, chunks: list[RetrievedChunk], model: str,
     return CloudAnswer(text=_apply_answer_guards(reply), input_tokens=reply.input_tokens, output_tokens=reply.output_tokens,
                        reasoning_tokens=reply.reasoning_tokens, latency_seconds=round(latency, 1), retries=retries,
                        retry_wait_seconds=waited, cost_usd_list=cost)
+
+
+def cloud_complete(model: str, messages: list[dict], max_tokens: int, json_output: bool = False,
+                   on_status: Callable[[str], None] | None = None) -> CloudAnswer:
+    """Send prepared messages to a cloud model and return the raw text, with the same key handling, retries, timeout and cost
+    as cloud_generate. No answer guards (cut notes would break JSON): the caller parses and checks the text. Raises CloudError."""
+    key = _key_for(model)
+    if not key:
+        raise CloudError(settings.DEV_CLOUD_MSG_MISSING_KEY.format(model=model, key_name=_key_name(model)))
+    request = _cloud_request(model, messages, max_tokens=max_tokens, json_output=json_output)
+    reply, latency, retries, waited = _call_with_retries(model, key, request, on_status or (lambda text: None))
+    if not reply.text.strip():
+        raise CloudError(settings.DEV_CLOUD_MSG_BLOCKED.format(model=model, finish=reply.finish))
+    config = settings.DEV_CLOUD_MODELS[model]
+    cost = (reply.input_tokens * config["input_usd_per_m"] + reply.output_tokens * config["output_usd_per_m"]) / 1_000_000
+    return CloudAnswer(text=reply.text, input_tokens=reply.input_tokens, output_tokens=reply.output_tokens,
+                       reasoning_tokens=reply.reasoning_tokens, latency_seconds=round(latency, 1), retries=retries,
+                       retry_wait_seconds=waited, cost_usd_list=cost)
+
+
+def local_complete_json(messages: list[dict], model: str, max_tokens: int, schema: dict) -> str:
+    """Ollama structured output: the reply is JSON in the given schema (Ollama's "format"). Thinking stays off for the models in
+    DEV_LLM_THINK_OFF_MODELS, as for chat. Errors are raised to the caller."""
+    body = _request_body(messages, stream=False, model=model)
+    body["options"]["num_predict"] = max_tokens
+    body["format"] = schema
+    response = requests.post(f"{settings.OLLAMA_BASE_URL}/api/chat", json=body, timeout=settings.DEV_LLM_TIMEOUT_SECONDS)
+    response.raise_for_status()
+    return response.json()["message"]["content"]
 
 
 def check_backend(model: str | None = None) -> tuple[bool, str]:

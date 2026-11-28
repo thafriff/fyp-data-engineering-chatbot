@@ -12,7 +12,7 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 
 from config import settings
-from src.core import answer_format, intent, llm
+from src.core import answer_format, intent, llm, quiz
 from src.core import conversation as conversation_rules
 from src.core import course_terms
 from src.core.conversation import Conversation
@@ -42,6 +42,9 @@ class RagResult:
     asked: str | None = None          # the question actually answered (resolved_question, or the message as typed)
     topic_text: str | None = None     # what a later refer-back follow-up is combined with
     regenerated: str | None = None    # set when an answer made with history was regenerated without it, and why
+    # Quiz me (feature B): call quiz_call(on_status) to write and check the quiz (quiz.make_quiz); quiz_topic is what it is about.
+    quiz_call: Callable[..., dict] | None = None
+    quiz_topic: str | None = None
 
 
 class RagPipeline:
@@ -95,6 +98,8 @@ class RagPipeline:
             routed = intent.route(asked, top_score=self._top_score, clean=self.search_text,
                                   use_classifier=not conversation_rules.is_short_follow_up(asked, conversation))
         routed = routed or intent.route(asked, top_score=self._top_score, clean=self.search_text)
+        if routed.kind == "quiz":
+            return self._quiz(routed.quiz_topic, model, conversation if multi else None, routed)
         if routed.kind != "question":
             return RagResult(chunks=[], answer_stream=iter([routed.reply]), used_fallback=False,
                              intent=routed.kind, routing=routed)
@@ -155,6 +160,32 @@ class RagPipeline:
             self._guard_history_answer(result, asked, chunks, model, corrections, history,
                                        answer_format.app_transform(coach=coach, comparison=comparison))
         return result
+
+    def quiz_search(self, question: str) -> list[RetrievedChunk]:
+        """The search a quiz question gets in its grounding check: exactly a student message's search (same text cleaning, top_k)."""
+        return self.retriever.retrieve(self.search_text(question), top_k=settings.TOP_K)
+
+    def quiz_for_topic(self, topic: str, model: str | None = None) -> RagResult:
+        """A quiz on a named topic, without the chat router (the Quiz page and the study plan's checkpoints)."""
+        return self._quiz(topic, model, None, Intent("quiz", path="quiz", quiz_topic=topic))
+
+    def _quiz(self, topic: str, model: str | None, conversation: Conversation | None, routed: Intent) -> RagResult:
+        """Feature B: resolve the topic (the earlier one for "quiz me on that"), retrieve as for a question, apply the same threshold,
+        and return a quiz_call that writes and checks the quiz. No topic and no earlier one -> ask for a topic."""
+        resolved = quiz.resolve_topic(topic or "", conversation)
+        if resolved is None:
+            ask = Intent("quiz_ask", settings.QUIZ_ASK_TOPIC, path="quiz")
+            return RagResult(chunks=[], answer_stream=iter([ask.reply]), used_fallback=False, intent=ask.kind, routing=ask)
+        search = self.search_text(resolved)
+        chunks = self.retriever.retrieve(search)
+        common = {"routing": routed, "search_query": search, "quiz_topic": resolved, "intent": "quiz", "asked": resolved,
+                  "topic_text": search}
+        if not chunks or chunks[0].score < settings.SIMILARITY_THRESHOLD:
+            return RagResult(chunks=chunks, answer_stream=iter([settings.FALLBACK_MESSAGE]), used_fallback=True, **common)
+        model = model or settings.DEV_LLM_MODEL
+        return RagResult(chunks=chunks, answer_stream=iter(()), used_fallback=False, model=model,
+                         quiz_call=lambda on_status=None: quiz.make_quiz(resolved, chunks, model, self.quiz_search, on_status),
+                         **common)
 
     @staticmethod
     def _guard_history_answer(result: RagResult, asked: str, chunks: list, model: str, corrections, history: list,

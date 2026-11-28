@@ -45,3 +45,4 @@ Thumbs.db
 evaluation/baselines/offline_model_check/*
 !evaluation/baselines/offline_model_check/*.py
 !evaluation/baselines/offline_model_check/run_all.sh
+evaluation/features/runs/

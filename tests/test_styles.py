@@ -45,8 +45,9 @@ class DarkBold(unittest.TestCase):
     def test_sources_heading_uses_the_same_bold_rule(self):
         """The Sources heading and the chunk IDs in the Sources list are markdown bold, which is what the rule styles, so they
         match the answer's bold text (no separate colour)."""
-        app = (ROOT / "src" / "app" / "app.py").read_text(encoding="utf-8")
-        self.assertIn('st.markdown("**Sources**")', app)
+        # The Sources helpers moved to src/app/shared.py on 2026-11-28 (shared by the chat, Quiz and Study plan pages).
+        shared = (ROOT / "src" / "app" / "shared.py").read_text(encoding="utf-8")
+        self.assertIn('st.markdown("**Sources**")', shared)
         self.assertIn("[data-testid=\"stMarkdownContainer\"] strong", styles.dark_bold_css("dark"))
         self.assertNotIn("#FF", styles.dark_bold_css("dark").upper().replace(settings.DEV_UI_DARK_BOLD_COLOR.upper(), ""))
 

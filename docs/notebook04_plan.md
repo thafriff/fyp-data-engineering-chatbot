@@ -1316,7 +1316,7 @@ resampled question indices over the 100 questions shared by all five models (pai
 the mean over the resampled questions that have a reachable core point; primary Accuracy's own interval and its pairwise differences resample the
 94 reachable questions (a second matrix from the same generator); Gemini's Response Time in a resample is the mean re-measured latency of the
 resampled questions among Q01-Q20 (pre-registration a); Ease is constant. Pairs: all ten, not significant when the paired 95% interval includes
-0, no multiplicity correction. The page `src/app/pages/1_Model_comparison.py` ("Model comparison" in the app's sidebar) shows the JSON and has one
+0, no multiplicity correction. The page `src/app/pages/3_Model_comparison.py` ("Model comparison" in the app's sidebar) shows the JSON and has one
 button, "Recompute scores from saved results", which reruns the same scoring from saved files (recomputing gives the identical file); it never
 calls a model or a judge (tested with `providers.send` set to fail).
 

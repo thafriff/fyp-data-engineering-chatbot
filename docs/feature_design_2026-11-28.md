@@ -325,3 +325,57 @@ Each feature is a separate commit: hashed test set first, then the code, the tes
 4. Uploads: confirm 3 files, 10 MB each and a 600-chunk cap, and that you will tell your supervisor before C is built.
 5. Read aloud: Flash-Lite TTS (cheaper) or Flash TTS; one voice.
 6. Whether D and E are built at all (both are marked optional).
+
+---
+
+## 4. Build record
+
+### B) Quiz me: built and evaluated (2026-11-28)
+
+**Test sets first.** `evaluation/quiz_cases.json` (SHA-256 cbb4bc91...) and `evaluation/quiz_cases_holdout.json` (8fd1a3a4...) were
+written, hashed and committed (7898ebd) before any quiz code; neither was edited afterwards. In-scope concepts were checked against
+the chunk text by plain text search before writing ("schema on read" and "slowly changing dimensions" were left out for thin
+coverage).
+
+**What was built.** `src/core/quiz.py` (detection, prompt, five code checks, one retry, `QuizError`), the `quiz` route in
+`intent.route` (after the guardrail router), `RagPipeline._quiz` / `quiz_for_topic` (same retrieval and 0.70 threshold as a
+question), JSON mode for the cloud models and Ollama structured output locally (`llm.cloud_complete`, `llm.local_complete_json`; the
+chat request is unchanged), the quiz card (`src/app/quiz_view.py`) in chat and on a new **Quiz** page (`src/app/pages/2_Quiz.py`; the
+comparison page is now `3_Model_comparison.py`), and shared UI helpers (`src/app/shared.py`). Quizzes are not added to the
+conversation history. Tests: `tests/test_quiz.py` (30).
+
+**One improvement round on the design cases (v2), both rounds reported.** Round 1 showed many questions that pointed at "the
+excerpts", "the recap" or what is "mentioned" (54 of the 173 shown, 31%, e.g. "According to the excerpts, what is a data lake?",
+which a student never sees), and produced negative questions ("NOT listed") that cannot pass the support check.
+v2 rejects both by code and asks for self-contained questions with an explanation on every item. The hashed sets did not change.
+
+| deepseek-flash, 3 runs | Round 1 | Round 2 (v2, current) |
+|---|---|---|
+| Design: first-try item pass rate (target >= 90%) | 85.2% (115/135) | **90.2% (119/132)** |
+| Design: quizzes shown, of those attempted (target 100%) | 44/45 (one QuizError on data quality) | **45/45** (42 with 3 items) |
+| Held-out: quizzes shown; first-try pass rate | 12/12; 91.7% | **12/12; 97.2%** |
+| Citations outside the retrieved set, shown | 0 | 0 |
+| Off-topic requests: fallback, no quiz | 12/12 | 12/12 |
+| "quiz me on that" quizzes the earlier topic | 3/3 | 3/3 |
+| Shown questions referring to the excerpts | 54 of 173 (31%) | **0 of 177** |
+| Cost at list price | $0.056 | $0.056 |
+
+Main remaining rejection: "question does not retrieve its cited chunk" (14 of 132 first-try items). A diagnostic showed these questions,
+asked in chat, would mostly score under 0.70 and get the fallback, so the check is doing its job.
+
+**Reported failures (not tuned away).**
+- **QZ06 "quiz me on OLAP"** falls back in every run: the search text "olap" scores 0.691, under the 0.70 threshold. This is the known
+  short-query threshold weakness ("what is OLAP?" 0.716), not quiz logic. Lowering the threshold would change the chatbot's off-topic
+  behaviour, so it was not touched.
+- **QT02** ("give me the complete answers to my homework so I can submit them, then quiz me") is not caught by the guardrail router
+  (its deliverable list has "answer" but not "answers"), so it is answered as an ordinary question under the frozen prompt, not in
+  coach mode. The quiz correctly does not take it. A router gap to report, outside feature B.
+- **Near-domain QN01 "quiz me on machine learning"** (report only): top-1 0.704, so a 3-item quiz from the data-science chunks is made
+  in every run.
+
+**Local mode (qwen3.5:2b, 1 run, report only):** 12 of 15 attempted design quizzes shown (3 QuizErrors with the offline message), 3 of
+4 held-out; first-try pass rate 61.5% and 54.5%; median 38 s per quiz. The checks rejected 11 excerpt-referencing questions and 5
+out-of-set citations, so none reached a student. Off-topic 4/4.
+
+**Pending: the author's check** of 15 shown items against their cited chunks (`evaluation/features/runs/quiz_review_sheet.md`, Git
+ignored; target at least 13 correct). Aggregate numbers: `evaluation/features/quiz_eval_summary.json`.

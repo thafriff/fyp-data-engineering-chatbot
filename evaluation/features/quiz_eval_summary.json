@@ -1,0 +1,373 @@
+{
+ "meta": {
+  "feature": "B Quiz me",
+  "generated": "2026-11-28T09:49:29+00:00",
+  "contents": "aggregate numbers only (no quiz text)",
+  "case_sha256": {
+   "quiz_cases": "cbb4bc913fd3803fdffd31ee5b3fb3b4579a78021e08bd30e0e72bf0536a9619",
+   "quiz_cases_holdout": "8fd1a3a4b8fc7b029d0f3197cfcc7556ff1d46533f6ce44ce654e5b421941cd3"
+  }
+ },
+ "models": {
+  "deepseek-flash": {
+   "model": "deepseek-flash",
+   "round": "round1",
+   "routing": {
+    "quiz_cases:in_scope": {
+     "cases": 15,
+     "as_expected": 15,
+     "misses": []
+    },
+    "quiz_cases:off_topic": {
+     "cases": 3,
+     "as_expected": 3,
+     "misses": []
+    },
+    "quiz_cases:near_domain": {
+     "cases": 1,
+     "as_expected": 0,
+     "misses": []
+    },
+    "quiz_cases:task": {
+     "cases": 2,
+     "as_expected": 1,
+     "misses": [
+      "QT02"
+     ]
+    },
+    "quiz_cases:not_quiz": {
+     "cases": 6,
+     "as_expected": 6,
+     "misses": []
+    },
+    "quiz_cases_holdout:in_scope": {
+     "cases": 4,
+     "as_expected": 4,
+     "misses": []
+    },
+    "quiz_cases_holdout:off_topic": {
+     "cases": 1,
+     "as_expected": 1,
+     "misses": []
+    },
+    "quiz_cases_holdout:not_quiz": {
+     "cases": 1,
+     "as_expected": 1,
+     "misses": []
+    }
+   },
+   "runs": 3,
+   "groups": {
+    "design": {
+     "quiz_attempts": 48,
+     "shown_with_2_or_more_items": 44,
+     "shown_with_3_items": 40,
+     "fallback_below_threshold": 3,
+     "errors": {
+      "QuizError": 1
+     },
+     "first_try_items_generated": 135,
+     "first_try_items_passed": 115,
+     "first_try_pass_rate": 0.852,
+     "quizzes_needing_the_retry": 13,
+     "failure_reasons": {
+      "question does not retrieve its cited chunk": 21,
+      "no explanation": 4,
+      "answer not supported by its cited chunks": 1
+     },
+     "outside_set_citations_shown": 0,
+     "follow_up_topic_ok": [
+      true,
+      true,
+      true
+     ],
+     "seconds_median": 1.8,
+     "cost_usd_list_total": 0.044796
+    },
+    "held_out": {
+     "quiz_attempts": 12,
+     "shown_with_2_or_more_items": 12,
+     "shown_with_3_items": 12,
+     "fallback_below_threshold": 0,
+     "errors": {},
+     "first_try_items_generated": 36,
+     "first_try_items_passed": 33,
+     "first_try_pass_rate": 0.917,
+     "quizzes_needing_the_retry": 3,
+     "failure_reasons": {
+      "question does not retrieve its cited chunk": 2,
+      "answer not supported by its cited chunks": 1
+     },
+     "outside_set_citations_shown": 0,
+     "follow_up_topic_ok": [],
+     "seconds_median": 1.8,
+     "cost_usd_list_total": 0.012285
+    }
+   },
+   "off_topic": {
+    "cases": 12,
+    "fallback_no_quiz": 12
+   },
+   "near_domain": [
+    {
+     "id": "QN01",
+     "run": 1,
+     "top1": 0.704,
+     "fallback": false,
+     "items": 3
+    },
+    {
+     "id": "QN01",
+     "run": 2,
+     "top1": 0.704,
+     "fallback": false,
+     "items": 3
+    },
+    {
+     "id": "QN01",
+     "run": 3,
+     "top1": 0.704,
+     "fallback": false,
+     "items": 3
+    }
+   ]
+  },
+  "deepseek-flash_v2": {
+   "model": "deepseek-flash",
+   "round": "v2",
+   "routing": {
+    "quiz_cases:in_scope": {
+     "cases": 15,
+     "as_expected": 15,
+     "misses": []
+    },
+    "quiz_cases:off_topic": {
+     "cases": 3,
+     "as_expected": 3,
+     "misses": []
+    },
+    "quiz_cases:near_domain": {
+     "cases": 1,
+     "as_expected": 0,
+     "misses": []
+    },
+    "quiz_cases:task": {
+     "cases": 2,
+     "as_expected": 1,
+     "misses": [
+      "QT02"
+     ]
+    },
+    "quiz_cases:not_quiz": {
+     "cases": 6,
+     "as_expected": 6,
+     "misses": []
+    },
+    "quiz_cases_holdout:in_scope": {
+     "cases": 4,
+     "as_expected": 4,
+     "misses": []
+    },
+    "quiz_cases_holdout:off_topic": {
+     "cases": 1,
+     "as_expected": 1,
+     "misses": []
+    },
+    "quiz_cases_holdout:not_quiz": {
+     "cases": 1,
+     "as_expected": 1,
+     "misses": []
+    }
+   },
+   "runs": 3,
+   "groups": {
+    "design": {
+     "quiz_attempts": 48,
+     "shown_with_2_or_more_items": 45,
+     "shown_with_3_items": 42,
+     "fallback_below_threshold": 3,
+     "errors": {},
+     "first_try_items_generated": 132,
+     "first_try_items_passed": 119,
+     "first_try_pass_rate": 0.902,
+     "quizzes_needing_the_retry": 13,
+     "failure_reasons": {
+      "question does not retrieve its cited chunk": 14,
+      "question refers to the excerpts, not the topic": 2
+     },
+     "outside_set_citations_shown": 0,
+     "follow_up_topic_ok": [
+      true,
+      true,
+      true
+     ],
+     "seconds_median": 1.8,
+     "cost_usd_list_total": 0.045388
+    },
+    "held_out": {
+     "quiz_attempts": 12,
+     "shown_with_2_or_more_items": 12,
+     "shown_with_3_items": 12,
+     "fallback_below_threshold": 0,
+     "errors": {},
+     "first_try_items_generated": 36,
+     "first_try_items_passed": 35,
+     "first_try_pass_rate": 0.972,
+     "quizzes_needing_the_retry": 1,
+     "failure_reasons": {
+      "question refers to the excerpts, not the topic": 1
+     },
+     "outside_set_citations_shown": 0,
+     "follow_up_topic_ok": [],
+     "seconds_median": 1.7,
+     "cost_usd_list_total": 0.011063
+    }
+   },
+   "off_topic": {
+    "cases": 12,
+    "fallback_no_quiz": 12
+   },
+   "near_domain": [
+    {
+     "id": "QN01",
+     "run": 1,
+     "top1": 0.704,
+     "fallback": false,
+     "items": 3
+    },
+    {
+     "id": "QN01",
+     "run": 2,
+     "top1": 0.704,
+     "fallback": false,
+     "items": 3
+    },
+    {
+     "id": "QN01",
+     "run": 3,
+     "top1": 0.704,
+     "fallback": false,
+     "items": 3
+    }
+   ]
+  },
+  "qwen3.5_2b_v2": {
+   "model": "qwen3.5:2b",
+   "round": "v2",
+   "routing": {
+    "quiz_cases:in_scope": {
+     "cases": 15,
+     "as_expected": 15,
+     "misses": []
+    },
+    "quiz_cases:off_topic": {
+     "cases": 3,
+     "as_expected": 3,
+     "misses": []
+    },
+    "quiz_cases:near_domain": {
+     "cases": 1,
+     "as_expected": 0,
+     "misses": []
+    },
+    "quiz_cases:task": {
+     "cases": 2,
+     "as_expected": 1,
+     "misses": [
+      "QT02"
+     ]
+    },
+    "quiz_cases:not_quiz": {
+     "cases": 6,
+     "as_expected": 6,
+     "misses": []
+    },
+    "quiz_cases_holdout:in_scope": {
+     "cases": 4,
+     "as_expected": 4,
+     "misses": []
+    },
+    "quiz_cases_holdout:off_topic": {
+     "cases": 1,
+     "as_expected": 1,
+     "misses": []
+    },
+    "quiz_cases_holdout:not_quiz": {
+     "cases": 1,
+     "as_expected": 1,
+     "misses": []
+    }
+   },
+   "runs": 1,
+   "groups": {
+    "design": {
+     "quiz_attempts": 16,
+     "shown_with_2_or_more_items": 12,
+     "shown_with_3_items": 8,
+     "fallback_below_threshold": 1,
+     "errors": {
+      "QuizError": 3
+     },
+     "first_try_items_generated": 39,
+     "first_try_items_passed": 24,
+     "first_try_pass_rate": 0.615,
+     "quizzes_needing_the_retry": 12,
+     "failure_reasons": {
+      "options are not exactly A, B, C and D": 2,
+      "no answer": 5,
+      "cites outside the retrieved set": 5,
+      "negative question": 2,
+      "repeats a question already kept": 1,
+      "question does not retrieve its cited chunk": 2,
+      "answer not supported by its cited chunks": 1,
+      "question refers to the excerpts, not the topic": 11,
+      "no key points": 1
+     },
+     "outside_set_citations_shown": 0,
+     "follow_up_topic_ok": [
+      true
+     ],
+     "seconds_median": 38.2,
+     "cost_usd_list_total": 0
+    },
+    "held_out": {
+     "quiz_attempts": 4,
+     "shown_with_2_or_more_items": 3,
+     "shown_with_3_items": 2,
+     "fallback_below_threshold": 0,
+     "errors": {
+      "QuizError": 1
+     },
+     "first_try_items_generated": 11,
+     "first_try_items_passed": 6,
+     "first_try_pass_rate": 0.545,
+     "quizzes_needing_the_retry": 3,
+     "failure_reasons": {
+      "options are not exactly A, B, C and D": 2,
+      "no answer": 3,
+      "question does not retrieve its cited chunk": 2,
+      "answer not supported by its cited chunks": 1,
+      "no key points": 1
+     },
+     "outside_set_citations_shown": 0,
+     "follow_up_topic_ok": [],
+     "seconds_median": 35.2,
+     "cost_usd_list_total": 0
+    }
+   },
+   "off_topic": {
+    "cases": 4,
+    "fallback_no_quiz": 4
+   },
+   "near_domain": [
+    {
+     "id": "QN01",
+     "run": 1,
+     "top1": 0.704,
+     "fallback": false,
+     "items": 2
+    }
+   ]
+  }
+ }
+}

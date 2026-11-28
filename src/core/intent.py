@@ -21,7 +21,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from config import settings
-from src.core import guardrail, llm
+from src.core import guardrail, llm, quiz
 
 # Compiled once: each small-talk pattern must match the WHOLE normalised message.
 _SMALL_TALK = {name: re.compile(rf"^(?:{pattern})$") for name, pattern in settings.SMALL_TALK_PATTERNS.items()}
@@ -33,13 +33,14 @@ _TOPICS = [(re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE), topic, question)
 @dataclass
 class Intent:
     """The routing decision for one message."""
-    kind: str                   # "small_talk", "unclear", "emotional" or "question"
+    kind: str                   # "small_talk", "unclear", "emotional", "question" or "quiz"
     reply: str | None = None    # fixed reply for small_talk / unclear / emotional; None for questions
     path: str = "pattern"       # "pattern", "task_request", "question_heuristic", "classifier" or "similarity_override"
     label: str | None = None    # raw classifier output (when the classifier was called)
     top_score: float | None = None   # top-1 course similarity (when the override check ran)
     task: object | None = None  # guardrail.TaskDecision when the message is a task request (answered in coach mode)
     offer_question: str | None = None   # starter question of a topic offer in an emotional reply ("What is SQL?")
+    quiz_topic: str | None = None    # for kind "quiz": the topic named ("" for "quiz me"), see quiz.detect
 
 
 def _normalise(message: str) -> str:
@@ -131,6 +132,12 @@ def route(message: str, top_score: Callable[[str], float] | None = None,
         decision = guardrail.detect_task_request(cleaned)
         if decision.is_task:
             return Intent("question", path="task_request", task=decision)
+    # Quiz requests (feature B, 2026-11-28): the whole cleaned message is "quiz me on X" or similar. After the task check, so an
+    # assessed task stays coach mode; before the question checks, so "give me questions on Kafka" is not answered as a question.
+    if settings.QUIZ_ENABLED:
+        topic = quiz.detect(cleaned)
+        if topic is not None:
+            return Intent("quiz", path="quiz", quiz_topic=topic)
     if not settings.INTENT_CLASSIFIER_ENABLED or _is_obvious_question(cleaned, cleaned_text):
         return Intent("question", path="question_heuristic")
     # Multi-turn (conversation.is_short_follow_up): a short, not clearly emotional follow-up inside a conversation is a question.

@@ -1,5 +1,5 @@
 """
-Offline tests for the read-only "Model comparison" page (src/app/pages/1_Model_comparison.py), driven by streamlit.testing (AppTest).
+Offline tests for the read-only "Model comparison" page (src/app/pages/3_Model_comparison.py), driven by streamlit.testing (AppTest).
 
 What must hold: the page renders from results_summary.json; its only button is "Recompute scores from saved results"; loading it and
 pressing the button never call a model or a judge (providers.send fails the test if anything does); the button runs
@@ -28,7 +28,7 @@ import providers  # noqa: E402
 import results_summary  # noqa: E402
 from config import settings  # noqa: E402
 
-PAGE = PROJECT_ROOT / "src" / "app" / "pages" / "1_Model_comparison.py"
+PAGE = PROJECT_ROOT / "src" / "app" / "pages" / "3_Model_comparison.py"
 HAVE_SUMMARY = settings.NB04_RESULTS_SUMMARY_FILE.exists()
 
 
