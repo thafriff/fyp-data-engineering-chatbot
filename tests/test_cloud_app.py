@@ -229,6 +229,16 @@ class Interface(unittest.TestCase):
                          [f"{settings.DEV_MODEL_GROUP_LOCAL} · {m}" for m in settings.DEV_LLM_MODEL_OPTIONS]
                          + [f"{settings.DEV_MODEL_GROUP_CLOUD} · {m}" for m in settings.DEV_CLOUD_MODELS])
 
+    def test_privacy_note_under_the_input_in_cloud_mode_only(self):
+        """Author, 2026-11-28: the exact note for the default (DeepSeek); the provider is named for Gemini; none in local mode."""
+        exact = "Don't type personal information. Questions are sent to a cloud AI service (DeepSeek) to generate answers."
+        at = self.app()
+        self.assertIn(exact, [c.value for c in at.caption])
+        at.selectbox[0].set_value("gemini-3.8-flash").run()
+        self.assertIn(exact.replace("DeepSeek", "Google"), [c.value for c in at.caption])
+        at.selectbox[0].set_value(settings.DEV_LLM_MODEL).run()
+        self.assertFalse([c.value for c in at.caption if c.value.startswith("Don't type personal information")])
+
     def test_cloud_answer_captions_and_numbered_citation(self):
         with mock.patch.object(llm, "_send_google", lambda key, request: GOOD):
             message = self.ask(self.app(), "gemini-3.8-flash", "what is OLAP?")

@@ -1100,6 +1100,10 @@ DEV_CLOUD_MSG_OVERLOADED = ("{model} is overloaded right now: {host} still repor
                             "try again in a minute, or choose another model in the sidebar.")
 DEV_CLOUD_MSG_RATE_LIMITED = ("{model} hit the {host} rate limit and was still limited after {attempts} attempts. Please "
                               "try again later, or choose another model in the sidebar.")
+# Privacy note under the chat input, shown only when a cloud model answers (author, 2026-11-28). With deepseek-flash, the default, it
+# reads exactly: "Don't type personal information. Questions are sent to a cloud AI service (DeepSeek) to generate answers."
+# Report Section 1.5 and the SUS consent text must say the same (Report TODO 23).
+DEV_CLOUD_PRIVACY_NOTE = "Don't type personal information. Questions are sent to a cloud AI service ({host}) to generate answers."
 DEV_CLOUD_MSG_BACKEND = ("{model} answers through the {host} API. What you type, with the retrieved course excerpts, is sent to "
                          "{host}. Replies can take a while when {host} is busy.")
 DEV_CLOUD_MSG_TIMEOUT = ("{model} did not answer within {seconds} seconds, so the request was abandoned. It may be overloaded. "

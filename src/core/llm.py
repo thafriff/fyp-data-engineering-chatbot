@@ -178,6 +178,11 @@ def _host(model: str) -> str:
     return settings.DEV_CLOUD_HOSTS[_provider(model)]
 
 
+def cloud_host(model: str) -> str | None:
+    """The provider a cloud model sends questions to (e.g. "DeepSeek"), or None for a local model."""
+    return _host(model) if is_cloud_model(model) else None
+
+
 def _key_name(model: str) -> str:
     return settings.API_KEY_ENV_VARS[_provider(model)]
 

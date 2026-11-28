@@ -173,6 +173,8 @@ for message in st.session_state.messages:
 
 # ---------------------------------------------------------------- new question
 question = st.chat_input("Type your question...")
+if llm.is_cloud_model(selected_model):        # privacy note under the input, in cloud mode only (author, 2026-11-28)
+    st.bottom.caption(settings.DEV_CLOUD_PRIVACY_NOTE.format(host=llm.cloud_host(selected_model)))
 if question:
     st.session_state.messages.append({"role": "user", "content": question})
     with st.chat_message("user"):
