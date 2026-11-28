@@ -41,8 +41,8 @@ Q43_REQUIRED_TEXT = "fct_monthly_zone_revenue: select"
 
 
 def all_models() -> dict:
-    """The six candidates plus the fallback hosts."""
-    return {**settings.NB04_CANDIDATES, **settings.NB04_FALLBACK_HOSTS}
+    """The six candidates. (The Llama fallback hosts were removed on 2026-11-27, when DeepSeek replaced the LLaMA slot.)"""
+    return dict(settings.NB04_CANDIDATES)
 
 
 def _stored_chunks(item: dict) -> list[RetrievedChunk]:

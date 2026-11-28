@@ -66,6 +66,8 @@ class RunnerTestCase(unittest.TestCase):
                    mock.patch.object(settings, "NB04_JUDGE_DIR", Path(self.tmp.name) / "judge"),
                    mock.patch.object(providers, "send", send), mock.patch.object(providers, "_client", blocked_client),
                    mock.patch.object(run_generation.time, "sleep", self.sleeps.append),
+                   # Pacing off here, so self.sleeps holds back-off waits only; FreeTierPacing tests it on its own.
+                   mock.patch.object(settings, "NB04_FREE_TIER_MIN_INTERVAL_SECONDS", {}),
                    mock.patch("dotenv.load_dotenv", lambda *a, **k: False),
                    mock.patch.dict(os.environ, {"GOOGLE_API_KEY": "fake-key-not-real"}),
                    mock.patch.object(run_generation.check_parity, "run_checks", lambda **kwargs: [])]
@@ -182,6 +184,18 @@ class Backoff(RunnerTestCase):
     def test_retry_after_longer_than_the_cap_is_still_respected(self):
         self.generate(rate_limited(retry_after=900), OK)
         self.assertEqual(self.sleeps, [900])
+
+    def test_a_very_long_host_wait_is_cut_to_the_ceiling(self):
+        # Google's daily-reset delay (57,954 s on 27 Nov) is re-checked after the ceiling; the host's figure stays in the log.
+        self.generate(rate_limited(retry_after=57954), OK)
+        self.assertEqual(self.sleeps, [settings.NB04_RATE_LIMIT_HOST_WAIT_MAX_SECONDS])
+        record = self.cache()["results"]["Q01"]
+        self.assertEqual(record["rate_limit_wait_seconds"], settings.NB04_RATE_LIMIT_HOST_WAIT_MAX_SECONDS)
+        entry = record["call_log"][0]
+        self.assertEqual((entry["retry_after_seconds"], entry["waited_after_seconds"]),
+                         (57954, settings.NB04_RATE_LIMIT_HOST_WAIT_MAX_SECONDS))
+        self.assertEqual(self.cache()["run_settings"]["rate_limit_host_wait_max_seconds"],
+                         settings.NB04_RATE_LIMIT_HOST_WAIT_MAX_SECONDS)
 
     def test_5xx_back_off_is_unchanged(self):
         self.generate(*[overloaded() for _ in range(7)], OK)
@@ -514,6 +528,246 @@ class ParityCheck8(unittest.TestCase):
         self.assertEqual(tolerant, [])
         self.assertEqual(len(unknown), 1)
         self.assertIn("Q999", unknown[0])
+
+
+MESSAGES = [{"role": "system", "content": "SYSTEM"}, {"role": "user", "content": "USER"}]
+
+
+def fake_openai_response(content, completion_tokens=1000, details=None, prompt_details=None, **usage_extra):
+    """An object shaped like the OpenAI SDK's chat completion, for the adapter's parsing (no network)."""
+    usage = SimpleNamespace(prompt_tokens=1600, completion_tokens=completion_tokens, completion_tokens_details=details,
+                            prompt_tokens_details=prompt_details, **usage_extra)
+    return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=content), finish_reason="stop")],
+                           usage=usage, model="served-model")
+
+
+class CandidateLineup(unittest.TestCase):
+    """2026-11-27: DeepSeek replaces the LLaMA slot; Groq and its fallback hosts are gone; Mistral is DROPPED (its free mode has no
+    API access and paid access needs a $10 minimum top-up), so five candidates remain."""
+
+    def test_five_candidates_one_per_slot_no_groq_no_mistral(self):
+        self.assertEqual(list(settings.NB04_CANDIDATES), ["gpt-4o", "gemini-3.8-flash", "claude-sonnet-5-5", "deepseek-flash",
+                                                          "gemma-4-31b-it"])
+        self.assertEqual({c["slot"] for c in settings.NB04_CANDIDATES.values()}, {"GPT", "Gemini", "Claude", "DeepSeek", "Gemma"})
+        self.assertEqual(run_generation.check_parity.all_models(), settings.NB04_CANDIDATES)
+        self.assertFalse(hasattr(settings, "NB04_FALLBACK_HOSTS"))
+        self.assertEqual(set(settings.API_KEY_ENV_VARS), {"google", "openai", "anthropic", "deepseek"})
+        self.assertEqual(settings.API_KEY_ENV_VARS["deepseek"], "DEEPSEEK_API_KEY")
+        # 2026-11-28: gemini-3.8-flash moved to Google's paid tier; only Gemma (no paid tier) is still paced and free.
+        self.assertEqual(set(settings.NB04_FREE_TIER_MIN_INTERVAL_SECONDS), {"gemma-4-31b-it"})
+        self.assertEqual({m for m, c in settings.NB04_CANDIDATES.items() if c["free_tier"]}, {"gemma-4-31b-it"})
+        for candidate in settings.NB04_CANDIDATES.values():
+            self.assertNotIn("groq", (candidate["base_url"] or "") + candidate["key"])
+            self.assertNotIn("mistral", (candidate["base_url"] or "") + candidate["key"])
+
+    def test_judge_calls_follow_the_five_candidates(self):
+        self.assertEqual({job: entry["calls"] for job, entry in settings.NB04_JUDGE_JOBS.items()},
+                         {"rubric": 500, "ragas": 500, "guardrail": 150, "crosscheck": 100})
+
+    def test_deepseek_request_turns_thinking_off(self):
+        candidate = settings.NB04_CANDIDATES["deepseek-flash"]
+        request = providers.build_request(candidate, MESSAGES)
+        self.assertEqual(request, {"model": "deepseek-flash", "messages": MESSAGES, "max_tokens": 800, "temperature": 0.2,
+                                   "extra_body": {"thinking": {"type": "disabled"}}})
+        self.assertEqual(candidate["base_url"], "https://api.deepseek.com")
+        self.assertEqual(providers.request_messages(candidate, request), MESSAGES)
+
+    def test_an_allowance_is_added_on_the_openai_style_path_too(self):
+        """A model that cannot turn reasoning off gets its allowance on top of the 800, on any API style (none does now)."""
+        candidate = {**settings.NB04_CANDIDATES["deepseek-flash"], "reasoning_allowance_tokens": 1200}
+        self.assertEqual(providers.build_request(candidate, MESSAGES)["max_tokens"], 2000)
+
+    def test_gpt_4o_request_is_unchanged(self):
+        request = providers.build_request(settings.NB04_CANDIDATES["gpt-4o"], MESSAGES)
+        self.assertEqual(request, {"model": "gpt-4o", "messages": MESSAGES, "max_completion_tokens": 800, "temperature": 0.2})
+
+    def test_estimates_follow_the_new_prices(self):
+        est = {name: round(run_generation.estimated_spend_usd(c), 4) for name, c in settings.NB04_CANDIDATES.items()}
+        self.assertAlmostEqual(est["deepseek-flash"], 130 * (1605 * 0.30 + 400 * 1.20) / 1e6, places=4)
+        self.assertEqual(est["gemma-4-31b-it"], 0.0)
+
+
+class OpenAiStyleParsing(unittest.TestCase):
+    """The adapter reads a plain string answer, and Mistral's [thinking chunk, text chunk] answer, without showing the thinking."""
+
+    def send(self, response, model="deepseek-flash"):
+        client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **kw: response)))
+        with mock.patch.object(providers, "_client", lambda candidate: client):
+            return providers.send(settings.NB04_CANDIDATES[model], {"model": "x"})
+
+    def test_plain_string(self):
+        result = self.send(fake_openai_response("An answer [S06-0204].", completion_tokens=100), model="deepseek-flash")
+        self.assertEqual((result.text, result.reasoning_tokens, result.reasoning_tokens_estimated), ("An answer [S06-0204].", 0, False))
+
+    def test_mistral_chunks_keep_only_the_text_and_estimate_the_reasoning(self):
+        thinking = "t" * 300
+        content = [{"type": "thinking", "thinking": [{"type": "text", "text": thinking}]}, {"type": "text", "text": "a" * 100}]
+        result = self.send(fake_openai_response(content, completion_tokens=1000))
+        self.assertEqual(result.text, "a" * 100)
+        self.assertEqual((result.reasoning_tokens, result.reasoning_tokens_estimated), (750, True))
+        self.assertEqual(result.output_tokens, 1000, "cost still uses every output token")
+
+    def test_a_reported_reasoning_figure_wins(self):
+        content = [{"type": "thinking", "thinking": [{"type": "text", "text": "t" * 300}]}, {"type": "text", "text": "answer"}]
+        result = self.send(fake_openai_response(content, details=SimpleNamespace(reasoning_tokens=420)))
+        self.assertEqual((result.reasoning_tokens, result.reasoning_tokens_estimated), (420, False))
+
+    def test_sdk_objects_as_chunks(self):
+        content = [SimpleNamespace(type="thinking", thinking=[SimpleNamespace(type="text", text="hmm")]),
+                   SimpleNamespace(type="text", text="Answer.")]
+        self.assertEqual(self.send(fake_openai_response(content)).text, "Answer.")
+
+    def test_masked_key_fragments_in_host_errors_are_redacted(self):
+        for text in ("Authentication Fails, Your api key: ****1ed5 is invalid", "Incorrect API key provided: sk-ab***wxyz."):
+            saved = providers.describe_error(Exception(text))["error_text"]
+            self.assertNotIn("1ed5", saved)
+            self.assertNotIn("wxyz", saved)
+            self.assertIn("[redacted]", saved)
+
+    def test_cached_tokens_are_read_from_either_field(self):
+        openai_style = self.send(fake_openai_response("x", prompt_details=SimpleNamespace(cached_tokens=1024)), model="gpt-4o")
+        deepseek_style = self.send(fake_openai_response("x", prompt_cache_hit_tokens=896), model="deepseek-flash")
+        self.assertEqual((openai_style.cached_input_tokens, deepseek_style.cached_input_tokens), (1024, 896))
+
+
+class ParallelRunsOnWindows(RunnerTestCase):
+    """Several models run at once; a cache being read by another process cannot be replaced for a moment on Windows."""
+
+    def test_a_busy_rename_is_retried_and_the_cache_saved(self):
+        real_replace, calls = Path.replace, []
+
+        def flaky_replace(self_path, target):
+            calls.append(target)
+            if len(calls) <= 2:
+                raise PermissionError("[WinError 5] Access is denied")
+            return real_replace(self_path, target)
+        with mock.patch.object(Path, "replace", flaky_replace):
+            run_generation.save_cache(self.raw / "x.json", {"results": {}, "spend": {"list_usd_total": 1.5}})
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(json.loads((self.raw / "x.json").read_text(encoding="utf-8"))["spend"]["list_usd_total"], 1.5)
+        self.assertEqual(len(self.sleeps), 2, "two short waits, recorded by the patched sleep")
+
+    def test_a_rename_that_never_clears_still_raises(self):
+        with mock.patch.object(Path, "replace", side_effect=PermissionError("busy")):
+            with self.assertRaises(PermissionError):
+                run_generation.save_cache(self.raw / "x.json", {"results": {}})
+
+
+class FreeTierPacing(RunnerTestCase):
+    def test_pace_waits_only_the_rest_of_the_interval(self):
+        with mock.patch.object(settings, "NB04_FREE_TIER_MIN_INTERVAL_SECONDS", {MODEL: 4.0}), \
+                mock.patch.object(run_generation.time, "monotonic", lambda: 101.0):
+            self.assertEqual(run_generation.pace(MODEL, None), 0.0)
+            self.assertEqual(run_generation.pace(MODEL, 100.0), 3.0)
+            self.assertEqual(run_generation.pace(MODEL, 90.0), 0.0)
+            self.assertEqual(run_generation.pace("gpt-4o", 100.0), 0.0)
+        self.assertEqual(self.sleeps, [3.0])
+
+    def test_a_run_records_the_pacing_and_keeps_it_out_of_latency(self):
+        with mock.patch.object(settings, "NB04_FREE_TIER_MIN_INTERVAL_SECONDS", {MODEL: 4.0}):
+            self.outcomes = [OK, OK]
+            self.run_main("--model", MODEL, "--only", "Q01,Q02")
+        results = self.cache()["results"]
+        self.assertEqual(results["Q01"]["pacing_wait_seconds"], 0.0)
+        self.assertGreater(results["Q02"]["pacing_wait_seconds"], 3.0)
+        self.assertEqual(len(self.sleeps), 1)
+        self.assertLess(results["Q02"]["latency_seconds"], 1.0)
+        self.assertEqual(self.cache()["run_settings"]["min_interval_seconds"], 4.0)
+
+
+class AccessTier(RunnerTestCase):
+    """Author, 2026-11-28: a model moving from Google's free tier to the paid tier keeps both kinds of answer, labelled per answer."""
+
+    def paid(self):
+        return mock.patch.dict(settings.NB04_CANDIDATES, {MODEL: {**CANDIDATE, "free_tier": False, "access_note": "paid tier"}})
+
+    def test_each_answer_records_the_tier_it_was_made_on(self):
+        self.generate(OK, only="Q01")
+        with self.paid():
+            self.generate(OK, only="Q02")
+        results, run = self.cache()["results"], self.cache()["run_settings"]
+        self.assertEqual((results["Q01"]["access_tier"], results["Q02"]["access_tier"]), ("free", "paid"))
+        self.assertTrue(run["free_tier"], "run_settings keeps the tier the run started on")
+        self.assertEqual([c["access_tier"] for c in run["access_changes"]], ["paid"])
+        self.assertEqual(run["access_changes"][0]["access_note"], "paid tier")
+
+    def test_the_change_is_logged_once(self):
+        self.generate(OK, only="Q01")
+        with self.paid():
+            self.generate(OK, only="Q02")
+            self.generate(OK, only="Q03")
+        self.assertEqual(len(self.cache()["run_settings"]["access_changes"]), 1)
+
+    FREE_TIER_429 = ("429 RESOURCE_EXHAUSTED. Quota exceeded for metric: generativelanguage.googleapis.com/"
+                     "generate_content_free_tier_requests, limit: 20 (quotaId GenerateRequestsPerDayPerProjectPerModel-FreeTier)")
+
+    def test_a_free_tier_quota_error_stops_a_model_set_to_paid(self):
+        with self.paid():
+            code, out = self.generate(providers.RateLimited(self.FREE_TIER_429, 13099.0), OK)
+        self.assertEqual((code, self.calls, self.sleeps), (run_generation.EXIT_BLOCKED, 1, []), out)
+        cache = self.cache()
+        self.assertEqual(cache["results"], {}, "no answer is labelled paid")
+        self.assertIn("free_tier_requests", cache["access_blocked"][0]["call_log"][0]["error_text"])   # Google's own text
+        self.assertIn("set to the paid tier", out)
+
+    def test_on_the_free_tier_the_same_error_is_waited_out(self):
+        code, _ = self.generate(providers.RateLimited(self.FREE_TIER_429, 13099.0), OK)
+        self.assertEqual((code, self.sleeps), (0, [settings.NB04_RATE_LIMIT_HOST_WAIT_MAX_SECONDS]))
+        self.assertEqual(self.cache()["results"]["Q01"]["access_tier"], "free")
+
+    def test_answers_saved_before_the_field_get_their_runs_tier(self):
+        self.generate(OK, only="Q01")
+        path = self.raw / f"{MODEL}.json"
+        cache = json.loads(path.read_text(encoding="utf-8"))
+        del cache["results"]["Q01"]["access_tier"]
+        run_generation.save_cache(path, cache)
+        with self.paid():
+            self.generate(OK, only="Q02")
+        self.assertEqual(self.cache()["results"]["Q01"]["access_tier"], "free")
+        self.assertEqual(self.cache()["results"]["Q02"]["access_tier"], "paid")
+
+
+class RemeasureLatency(RunnerTestCase):
+    """Pre-registration (a): the first 20 frozen questions again, into raw/remeasure/; the answer cache is never touched."""
+
+    def remeasure(self, *outcomes):
+        self.outcomes = list(outcomes)
+        return self.run_main("--model", MODEL, "--remeasure-latency")
+
+    def test_first_twenty_questions_go_to_their_own_file(self):
+        self.generate(OK, only="Q01")
+        before = (self.raw / f"{MODEL}.json").read_bytes()
+        code, out = self.remeasure(*[OK] * settings.NB04_REMEASURE_QUESTIONS)
+        self.assertEqual(code, 0, out)
+        self.assertEqual((self.raw / f"{MODEL}.json").read_bytes(), before, "the answer cache is untouched")
+        saved = json.loads((run_generation.remeasure_dir() / f"{MODEL}.json").read_text(encoding="utf-8"))
+        questions = [i["id"] for i in json.loads(settings.NB04_CONTEXTS_FILE.read_text(encoding="utf-8"))["items"]
+                     if i["kind"] == "question"][:settings.NB04_REMEASURE_QUESTIONS]
+        self.assertEqual(list(saved["results"]), questions)
+        self.assertEqual(questions[0], "Q01")
+        self.assertIn("pre-registration (a)", saved["run_settings"]["purpose"])
+        self.assertTrue(all(r["access_tier"] == "free" for r in saved["results"].values()))   # this test model is Gemma
+
+    def test_its_spend_counts_towards_the_total_and_it_is_never_read_as_answers(self):
+        self.remeasure(*[OK] * settings.NB04_REMEASURE_QUESTIONS)
+        saved = json.loads((run_generation.remeasure_dir() / f"{MODEL}.json").read_text(encoding="utf-8"))
+        with mock.patch.dict(settings.NB04_CANDIDATES, {MODEL: {**CANDIDATE, "input_usd_per_m": 1.0, "output_usd_per_m": 1.0}}):
+            self.remove_remeasure()
+            self.remeasure(*[OK] * settings.NB04_REMEASURE_QUESTIONS)
+        priced = json.loads((run_generation.remeasure_dir() / f"{MODEL}.json").read_text(encoding="utf-8"))
+        self.assertEqual(saved["spend"]["list_usd_total"], 0.0)
+        self.assertAlmostEqual(priced["spend"]["list_usd_total"], 20 * 1100 / 1e6)
+        self.assertAlmostEqual(run_generation.total_spend_usd(), 20 * 1100 / 1e6)
+        self.assertFalse((self.raw / f"{MODEL}.json").exists())
+
+    def remove_remeasure(self):
+        (run_generation.remeasure_dir() / f"{MODEL}.json").unlink()
+
+    def test_only_and_items_are_refused(self):
+        with contextlib.redirect_stderr(io.StringIO()):
+            code, _ = self.run_main("--model", MODEL, "--remeasure-latency", "--only", "Q01")
+        self.assertEqual(code, 2)
+        self.assertEqual(self.calls, 0)
 
 
 if __name__ == "__main__":

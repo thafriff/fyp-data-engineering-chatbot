@@ -41,12 +41,15 @@ with the open-weight models "accessed through the Groq API".
 
 | Slot | Recommended model (exact string) | Host / API | Free tier | Input $/1M | Output $/1M | Context window | Status vs report |
 |---|---|---|---|---|---|---|---|
-| GPT | `gpt-4o` | OpenAI API | No [official] | 2.50 [official] | 10.00 [official] | not shown on pricing page [unverified] | Named model still listed. **Keep.** |
+| GPT | `gpt-4o` | OpenAI API | No [official] | 2.50 [official] | 10.00 [official] | not shown on pricing page [unverified] | Named model still listed. **Keep.** **Marked "Deprecated" by OpenAI** on its model page (checked 2026-11-27), **with no shutdown date**; the pre-flight call was served by `gpt-4o-2024-08-06`. |
 | Gemini | `gemini-3.8-flash` | Gemini API (Google AI Studio) | Yes, "Free of charge" [official] | 0.75 to 31 Dec 2026, 1.50 from 1 Jan 2027 [official] | 3.75 to 31 Dec 2026, 7.50 from 1 Jan 2027 [official] | not shown [unverified] | Report says only "Gemini". Current Flash tier. |
 | Claude | `claude-sonnet-5-5` | Anthropic API | No; "a small amount of free credits" for new users [official] | 2.00 [official] | 10.00 [official] | 1M tokens [official] | Report says "a current Claude model". Claude 3.5 Sonnet is not in the current or legacy list. |
-| LLaMA | `llama-3.3-70b-versatile` | Groq API | **At risk**: Groq lists it as "Production (Enterprise)" [official]; third-party reports (Aug–Oct 2026) say Llama moved to contact-sales pricing [unverified] | 0.59 last public [unverified] | 0.79 last public [unverified] | 131,072 [official] | **Flag:** Groq access may need Enterprise. Fallback below. |
+| ~~LLaMA~~ (until 2026-11-27) | ~~`llama-3.3-70b-versatile`~~ | ~~Groq API~~ | Free access withdrawn (section 13) | | | | **Replaced by DeepSeek on 2026-11-27** (row below). |
+| DeepSeek (the LLaMA slot, from 2026-11-27) | `deepseek-flash` (served by DeepSeek-V4.1-Flash-1017) | **DeepSeek API** (OpenAI-compatible, `https://api.deepseek.com`) | No (prepaid credit) | 0.30 peak / 0.15 off-peak, cache miss [official] | 1.20 peak / 0.60 off-peak [official] | 1M [official] | Open-weight, MIT licence [official, Hugging Face card]. Not in the report: Section 3.7 and Chapter 2 must add it (Report TODO 43). |
 | Gemma | `gemma-4-31b-it` | **Gemini API** (not Groq) | Yes, Gemma 4 "Free of charge"; paid "Not available" [official] | 0 | 0 | not shown [unverified] | **Flag:** Groq lists no Gemma model [official]. Host change from the report. |
-| Mistral | Mistral Large 4 (API ID to confirm, e.g. `mistral-large-latest`) | **Mistral API (La Plateforme)** (not Groq) | Not stated for the API [unverified] | 0.50 [official: "Mistral Large costs $0.5 /M tokens in"] | 1.50 [official] | not shown [unverified] | **Flag:** Groq lists no Mistral model [official]. Host change from the report. |
+| ~~Mistral~~ (until 2026-11-27) | ~~Mistral Large 4, `mistral-large-4-0`~~ | Mistral API | **Not on the free plan** (HTTP 403 `tier_not_allowed`, 2026-11-27; section 15) | 0.70 [official, 2026-11-27; was 0.50 on 1 Nov] | 2.10 [official; was 1.50] | 1M [official] | **Replaced by Mistral Small 4** (author, 2026-11-27). Large 4 also always reasons (section 15). |
+| ~~Mistral~~ (option B, 2026-11-27, same day) | ~~Mistral Small 4, `mistral-small-2603`~~ | Mistral API | Free mode has no API access (HTTP 402) | 0.15 [official] | 0.60 [official] | 256K [official] | **Slot DROPPED** (row below). |
+| **Mistral: DROPPED** (author, 2026-11-27, before any result) | none | | Mistral's free mode has no API access (403 Large 4, 402 Small 4); paid access needs a $10 minimum top-up | | | | **Five candidates remain.** A deviation (section 15, Report TODO 45). |
 | *Dev baseline, NOT a candidate* | `llama3.2:3b` | Local Ollama (GTX 1650) | n/a (local) | 0 | 0 | 4,096 used | Baseline only, commit `d7a3cae`. hit@5 0.97, 0 fallbacks, mean 12.7 s. Not part of the selection. |
 
 **Substitutions and why:**
@@ -80,7 +83,10 @@ Gemma and Mistral (and possibly LLaMA) on other hosts, that sentence must change
 
 | Model | Setting sent | Can it be disabled? |
 |---|---|---|
-| `gpt-4o`, Llama, Mistral Large 4 | none | No thinking mode |
+| `gpt-4o` (and Llama, until 2026-11-27) | none | No thinking mode |
+| `deepseek-flash` (from 2026-11-27) | `{"thinking": {"type": "disabled"}}`, sent in `extra_body` | **Yes.** Thinking is ON by default; this is DeepSeek's documented off switch |
+| ~~Mistral Large 4~~ (corrected, then replaced, 2026-11-27) | would have been `reasoning_effort` `low` | **No.** The 1 Nov entry "no thinking mode" was wrong: Mistral's reasoning docs say "Mistral Large 4 always reasons"; `low` is the lowest level and still returns a thinking chunk |
+| Mistral Small 4 `mistral-small-2603` (from 2026-11-27) | `reasoning_effort` `none` | **Yes.** Mistral's reasoning docs: with `none` "the model thinks minimally and the thinking chunk is omitted from the response" |
 | `gemini-3.8-flash` | thinking level `low` | **No.** `low` is the lowest level the Gemini docs list for this model, so it keeps some billed thinking. Report this. See the output budget below. |
 | `claude-sonnet-5-5` | thinking type `between_tools` | Yes. This is the documented way to turn it off; type `disabled` returns a 400. |
 | `gemma-4-31b-it` | thinking level `minimal` | Yes, per the Gemma on Gemini API docs. That page is marked deprecated, so confirm it in the integration trial. |
@@ -91,6 +97,7 @@ disable thinking gets a reasoning allowance on top:
 | Model | Answer cap | Reasoning allowance | Output budget sent |
 |---|---|---|---|
 | `gemini-3.8-flash` | 800 | 1,200 | 2,000 |
+| ~~Mistral Large 4~~ (would have needed it by the rule below; replaced 2026-11-27) | 800 | 1,200 | 2,000 |
 | All others | 800 | 0 | 800 |
 
 - The 1,200 is an assumption, set before any measurement. The Q01-Q03 integration trial checks it.
@@ -692,6 +699,47 @@ needed because the full comparison stayed within budget" (Report TODO 30).
   requests omit it and it runs at the API default: a known parity limit, reported and logged under Ease of
   Implementation. Claude's refusal fallback option is not used, because it would let a different model answer.
 
+### 6a. Free-tier access and the scoring of Response Time, Cost and uncertainty (PRE-REGISTERED 2026-11-27, before any result)
+**Registered by the author on 2026-11-27. At this point no candidate has answered beyond the Q01-Q03 integration trial (Gemini and Gemma only), and
+no answer has been judged or scored.** The weights (section 3), the anchors and the ranking rule do not change.
+
+**Access.** Google billing is not active (the card was declined), so `gemini-3.8-flash` and `gemma-4-31b-it` run on Google's FREE tier.
+Mistral was planned on Mistral's free mode (the pre-flight found that free mode has no API access: section 15). On a free tier the model is the
+same as on the paid tier; only the rate limits differ. Requests are paced to stay
+under the free-tier per-minute limits (`NB04_FREE_TIER_MIN_INTERVAL_SECONDS`; the wait is recorded per answer and is never latency). Overloaded
+(5xx) or empty responses are retried later: a saved answer is never re-sent or re-paid (the per-item resume rule). Free-tier requests may be used by
+the provider for training or product improvement (Google's pricing page: free tier "Used to improve our products: Yes"). Only course questions,
+the fixed guardrail probes and open-licensed chunks are sent: no personal data. **Free-tier access is a stated limitation in Chapter 4.**
+
+**(a) Response Time.** Answers from free-tier models are scored as they are. For Response Time only: if paid access is enabled before scoring
+(Google billing for Gemini; Mistral's Scale plan for Mistral), that model's latency is measured again on the paid tier over the first 20 frozen
+questions (Q01-Q20) and that paid-tier mean is used for its Response Time score; its answers are unchanged. Otherwise the free-tier latency is used,
+labelled as free tier. Gemma has no paid tier, so its free-tier latency is always used. The ranking without Response Time (already one of the two
+pre-registered sensitivity analyses, section 3) is always reported beside the main ranking.
+*How (a) is carried out, added 2026-11-28 before any result was scored (mechanics only; the rule above is unchanged):* every answer records the
+tier it was made on (`access_tier`, from the candidate's setting at that moment), so a model that moves from the free to the paid tier mid-run
+keeps both kinds of answer, labelled; the time of the change is logged in the run settings. `run_generation.py --model <m> --remeasure-latency`
+sends Q01-Q20 again into `raw/remeasure/<m>.json`, a separate file that is never read as the model's answers and never judged; its spend counts
+towards the RM96 total. Response Time for `gemini-3.8-flash` uses that file's latencies once all 20 are saved without an error on the paid tier
+(`settings.NB04_RESPONSE_TIME_FROM_REMEASURE`); otherwise it uses the generation latency, and `--report` states which source each model's
+Response Time came from and how many of its answers came from each tier. Gemma's re-measure, if run, is descriptive only.
+
+**(b) Cost.** The Cost criterion uses the official PAID list price for Gemini and Mistral; they are free here only because of how they were accessed.
+Gemma 4 has no paid price on the Gemini API ("Not available"), so it is scored as free of charge, with a note. DeepSeek's price is its full
+(peak-hour) rate; off-peak is half, and what was actually charged is shown in the cost summary. As for every candidate, input is priced at the
+uncached rate.
+
+**(c) Uncertainty.** Each model's weighted score, and each criterion, is reported with a 95% bootstrap confidence interval. The report states which
+differences between models are not significant. This is DESCRIPTIVE only: the frozen weights and the ranking rule decide the winner, and the
+intervals do not change it. Method details (drafted by Claude Code and **ACCEPTED BY THE AUTHOR on 2026-11-27, before any result: now fixed**):
+- resample the questions with replacement (100 for the all-points measures, the 94 with a reachable core point for primary Accuracy), 10,000
+  resamples, seed 42, percentile intervals; the weighted score is recomputed on each resample, with its Cost and Response Time normalised from
+  that resample's mean;
+- Ease of Implementation is one score per model, so it has no interval and enters every resample unchanged;
+- because every model answers the same questions, two models are compared PAIRED: the same resampled questions for both, and the difference
+  counts as not significant when the 95% interval of the difference includes 0. Every pair is reported; there is no correction for multiple
+  comparisons, so the table is read as descriptive.
+
 ---
 
 ## 7. Run mechanics
@@ -797,8 +845,37 @@ cross-check judge (RM63.6 expected; RM95.4 with the 50% contingency); with it, t
 - **PLANNED for the paying phase, NOT implemented:** the judges at half price with the same models and prompts: OpenAI Batch (or Flex) for
   the rubric, RAGAS and guardrail jobs, Anthropic Message Batches for the cross-check. Both providers list half the standard rate (checked
   2026-11-24). Expected total about RM45 if all four judge jobs use it. Needs runner changes and the batch prices in `settings.py`.
+  **IMPLEMENTED 2026-11-27 (STEP 3), NOT RUN:** `evaluation/notebook04/batch_judging.py`; see section 15.
 - **Kept as they are:** 20 cross-check answers per candidate and the `gpt-5.4-mini` RAGAS judge.
 - **Llama slot** (paid OpenRouter route or drop): decided in the paying phase (section 13).
+
+**Re-estimated 2026-11-27 (DeepSeek in the LLaMA slot; prices re-checked on the providers' own pages; USD 1 = RM 4.1179, the BNM Kuala Lumpur
+USD/MYR reference rate for 27 Nov 2026, replacing the unverified 4.40).** Printed by `budget_table.py`. Changed inputs: DeepSeek added at its peak
+rate (0.30 / 1.20), Mistral Large 4 0.70 / 2.10 (was 0.50 / 1.50) with 800 estimated output tokens because it always reasons (section 15), Llama
+removed. Everything else unchanged.
+
+| Item | Expected USD | Expected RM | Max RM (120%) | Billed? |
+|---|---|---|---|---|
+| `gpt-4o`, 130 answers | 1.04 | 4.29 | 5.15 | yes (OpenAI credit) |
+| `gemini-3.8-flash` | 0.55 | 2.25 | 2.70 | no (free tier) |
+| `claude-sonnet-5-5` | 1.27 | 5.21 | 6.25 | yes (Anthropic credit) |
+| `deepseek-flash` | 0.12 | 0.51 | 0.62 | yes (DeepSeek credit) |
+| `gemma-4-31b-it` | 0 | 0 | 0 | no (free tier) |
+| ~~Mistral Large 4~~ (replaced) | ~~0.36~~ | ~~1.50~~ | ~~1.80~~ | |
+| ~~Mistral Small 4~~ (dropped 2026-11-27) | ~~0.06~~ | ~~0.26~~ | ~~0.31~~ | |
+| **Generation, 650 answers (five candidates)** | **2.98** | **12.27** | **14.72** | |
+| Rubric judge `gpt-5.4` x 500 (five candidates; 600 with six) | 5.38 | 22.13 | 26.56 | yes |
+| RAGAS judge `gpt-5.4-mini` x 500 | 3.04 | 12.51 | 15.01 | yes |
+| Guardrail judge `gpt-5.4` x 150 | 1.13 | 4.66 | 5.60 | yes |
+| Cross-check judge `claude-opus-5-5` x 100 | 2.19 | 9.03 | 10.83 | yes |
+| **All, at list price** (five candidates) | **14.72** | **60.60** | **72.72** | |
+| All, actually billed (the Google free tier bills nothing) | 14.17 | 58.35 | 70.02 | |
+
+Judge calls now follow the number of candidates (`NB04_JUDGE_JOBS` computes them: 100 questions, 30 probe answers and 20 cross-checks per
+candidate), so each job's 120% stop is built on five candidates. Hard stop unchanged at RM96 (USD 23.31 at the new rate). Generation fits the
+prepaid credit: OpenAI $1.04 (max $1.25) of $5, Anthropic $1.27 ($1.52) of $5, DeepSeek $0.12 ($0.15) of $2. OpenAI judging at standard price
+($9.55 for the three OpenAI jobs) would NOT fit what is left of the $5 OpenAI credit; at the planned half price (Batch) it is $4.77, so OpenAI
+still needs a top-up before judging (STEP 3 gives the figure).
 
 **Hard stop rule:**
 - After every API call the runner adds the call's cost (from returned token counts × recorded price) to a
@@ -1079,7 +1156,147 @@ The two trial caches were deleted deliberately by the author's decision and Q01-
 
 ---
 
-## Sources (checked 2026-11-01)
+## 15. Staged run: DeepSeek in the LLaMA slot, free-tier access, pre-flight (author, 2026-11-27; no result seen, no scoring rule changed)
+
+**The author's staged plan:** STEP 0 line-up change; STEP 1 pre-flight, then stop; STEP 2 generation only, after the author's "go"; STEP 3 half-price
+judging prepared but not run; STEP 4 the results page, after judging. Pre-registrations (a)-(c) are in section 6a.
+
+**Line-up change (STEP 0).** DeepSeek takes the LLaMA slot: free Llama 3.3 70B access was withdrawn (section 13), and DeepSeek is also open-weight
+(MIT), so the report's open-weight grouping holds (GPT, Gemini and Claude closed; DeepSeek, Gemma and Mistral open-weight). The five other candidates
+are unchanged. Groq, Cerebras and OpenRouter are no longer used, and their settings and fallback hosts were removed.
+- Exact model: `deepseek-flash`, DeepSeek's current chat model name, "now served by DeepSeek-V4.1-Flash-1017" (api-docs.deepseek.com, read 2026-11-27).
+  The legacy names `deepseek-chat` / `deepseek-reasoner` were announced on 2026-04-24 for discontinuation on 2026-07-24, so they are not used.
+  `deepseek-flash` is an alias with no pinned version: each answer records the served model, and a change during the run would be reported.
+- Thinking: ON by default ("Thinking mode is enabled by default, with the default effort being high"); turned off with `{"thinking": {"type": "disabled"}}`,
+  which the OpenAI SDK sends in `extra_body` (DeepSeek thinking-mode guide). No reasoning allowance, as for every model that can turn thinking off.
+- Licence: MIT ("This repository and the model weights are licensed under the MIT License", Hugging Face card for DeepSeek-V4.1-Flash-1017).
+- Price: cache-miss input $0.30 and output $1.20 per million at peak (01:00-04:00 and 06:00-10:00 UTC, Monday to Friday); off-peak half. The runner counts
+  the peak rate (it can only over-count); the cost summary shows what was actually charged.
+- Data: only course questions, the guardrail probes and open-licensed chunks are sent; no personal data. DeepSeek's privacy policy says it stores personal
+  data in the People's Republic of China and lists training among its purposes; the API terms do not say whether API inputs are used for training.
+
+**Mistral Large 4 correction.** Section 1 listed it as having no thinking mode. Mistral's reasoning docs (read 2026-11-27): "Mistral Large 4 always
+reasons, so no level matches none"; `low` is the lowest `reasoning_effort` and "still returns a thinking chunk". By the section 1 rule (a model found to
+reason gets an allowance before its full run, logged under Ease of Implementation) it would have sent `reasoning_effort: low` with the 1,200-token
+allowance, its estimate using 800 output tokens as for Gemini. (SUPERSEDED the same day: Large 4 was replaced by Mistral Small 4, below. The adapter
+handling described next stays, because it is general.) Its reply is a list of chunks (thinking, then text); the adapter keeps only the text chunks, so the
+thinking is never shown or judged. If the host reports no reasoning-token figure, the output tokens are split by the characters of thinking and answer
+text (an estimate, flagged per answer as `reasoning_tokens_estimated`) so that the 800-token answer cap applies to the answer alone; cost still uses every
+output token. Model string was pinned to `mistral-large-4-0` (was `mistral-large-latest`, whose target the docs do not state); now
+`mistral-small-2603`.
+
+**Pre-flight (STEP 1, 2026-11-27, `evaluation/notebook04/key_check.py`, record in `key_check.json`).** One tiny request per model with its real settings
+(the prompt is a fixed connectivity line, no course text). Total list-price cost $0.0071.
+
+| Model | Result |
+|---|---|
+| `gpt-4o` | OK, served `gpt-4o-2024-08-06` (OpenAI's model page marks gpt-4o Deprecated, no shutdown date) |
+| `gemini-3.8-flash` | HTTP 503 "high demand" twice (14:13 and 14:20 UTC), free tier. The key is valid (Gemma below uses the same key; the 24 Nov trial answers exist) |
+| `claude-sonnet-5-5` | OK |
+| `deepseek-flash` | **HTTP 401 "Authentication Fails"**: the value stored in `.env` has the shape of a UUID, not of a DeepSeek secret key. The author must replace it |
+| `gemma-4-31b-it` | 503 at 14:13, then OK at 14:21 (58.7 s for a tiny request) |
+| Mistral Large 4 | **HTTP 403 `tier_not_allowed`: "This model is not available in your subscription tier"**. The free-mode key lists 51 models and no Large model; the general chat models it lists are `mistral-medium-2604` (Medium 3.5), `mistral-small-2603` and `ministral-3b/8b/14b-2512`. Logged in `ease_log.json` as an access blocker. **The author decides** |
+| Judges `gpt-5.4`, `gpt-5.4-mini`, `claude-opus-5-5` | OK with their job settings (json_object; Opus with the forced JSON schema and low effort) |
+
+**Author's decisions after the first pre-flight (2026-11-27):** DeepSeek key replaced; Mistral **option B**; bootstrap method (section 6a)
+accepted and fixed; gpt-4o's deprecation noted (section 1).
+
+**CANDIDATE CHANGE in the Mistral slot (author, 2026-11-27, option B): Mistral Small 4 replaces Mistral Large 4.** Reason: Large 4 is not
+available on Mistral's free plan (the 403 above). Mistral Small 4: `mistral-small-2603` (model card v26.03, GA; aliases `mistral-small-latest`;
+262,144-token context on the model list), open-weight under **Apache 2.0** (weights `mistralai/Mistral-Small-4-2603`; 119B total, 6.5B active
+parameters), official list price **$0.15 / $0.60** per million tokens, used for the Cost criterion. Reasoning OFF through `reasoning_effort: none`
+(no allowance). It is a smaller model than Large 4 (6.5B against 52B active parameters), so the Mistral slot now holds a smaller-class model than the
+report's other candidates: reported in Chapter 4 beside the line-up. The open-weight grouping holds (DeepSeek MIT, Gemma, Mistral Small 4 Apache 2.0).
+Report TODO 45.
+
+**Second pre-flight (2026-11-27, 14:46 UTC):**
+
+| Model | Result |
+|---|---|
+| `deepseek-flash` | **OK** with the replaced key: served `deepseek-flash`, 0 reasoning tokens with thinking disabled, 2.7 s. Model list: `deepseek-flash` (DeepSeek-V4.1-Flash, 1,048,576-token context) and `deepseek-v4-pro`; `deepseek-chat` absent |
+| `gemini-3.8-flash` | 503 "high demand" a third time (free tier). The key is valid |
+| Mistral Small 4 | **HTTP 402 "You need a subscription to access this API" (`billing_no_api_budget_configured`)**. The key can LIST models (Small 4 is listed) but cannot generate. Mistral's docs (Usage and limits, read 2026-11-27): free mode "doesn't include API access. Creating API keys and using the API require billing activation and pay-as-you-go." So no Mistral model can be called on free mode; the 403 for Large 4 had the same cause. Logged in `ease_log.json`. **The author decides how the Mistral slot is accessed** |
+
+**MISTRAL DROPPED (author, 2026-11-27, BEFORE ANY RESULT): a deviation.** Mistral's free mode has no API access: Large 4 returned HTTP 403
+`tier_not_allowed` and Small 4 HTTP 402 "You need a subscription to access this API". Paid access needs a $10 minimum top-up, so
+the slot was excluded before any results: no answer had been generated by any of the remaining candidates (beyond the 24 Nov Q01-Q03 trial), so no
+result informed the decision. **Five candidates remain:** `gpt-4o`, `gemini-3.8-flash`, `claude-sonnet-5-5`, `deepseek-flash` and `gemma-4-31b-it`. The Mistral
+candidate is removed from `settings.NB04_CANDIDATES`, the budget table and the parity check (`check_parity.py` passes for the 5 configurations);
+`MISTRAL_API_KEY` is no longer mapped; the judge call counts follow the five candidates. The two Mistral access blockers stay in `ease_log.json`
+and `key_check.json` as the record. The open-weight group is now DeepSeek and Gemma; the closed group GPT, Gemini and Claude. Chapter 4 reports this
+beside the line-up; Report TODO 45.
+
+**Prices re-checked 2026-11-27** on the providers' own pages: unchanged for `gpt-4o` (2.50 / 10.00), `gpt-5.4` (2.50 / 15.00), `gpt-5.4-mini` (0.75 / 4.50),
+`claude-sonnet-5-5` (2 / 10), `claude-opus-5-5` (4 / 20), `gemini-3.8-flash` (0.75 / 3.75 to 31 Dec 2026, then 1.50 / 7.50) and Gemma 4 (free; paid "Not
+available"). Changed: Mistral Large 4 0.70 / 2.10. Added: DeepSeek. Batch prices for STEP 3: `gpt-5.4` 1.25 / 7.50, `gpt-5.4-mini` 0.375 / 2.25,
+`claude-opus-5-5` 2 / 10 (half the standard rate on both pricing pages).
+
+**STEP 3: half-price judging PREPARED, NOT RUN (2026-11-27).** `evaluation/notebook04/batch_judging.py` runs the four judge jobs through
+the OpenAI Batch API (rubric, RAGAS, guardrail) and Anthropic Message Batches (cross-check). **Only the pricing route changes**: the judge
+models, the prompts, the request settings (temperature 0 and reasoning effort none for `gpt-5.4`/`gpt-5.4-mini`; low effort and the forced
+JSON schema for `claude-opus-5-5`), the work units and their shuffled order, the validators, the one malformed-output retry, the RAGAS prompts,
+the scoring rules and the cache files that `--report` reads are `run_judging.py`'s own code, called unchanged. Mechanism: each pass runs the
+normal judging code with `call_judge` answered from the batch replies already received; a call with no reply is collected and submitted as one
+batch; RAGAS takes two rounds (statements, then NLI on them). Every judgement gets its own request, as on the standard route, even when two
+answers are identical. Billing uses the official batch prices (`settings.NB04_JUDGE_BATCH_PRICES`: `gpt-5.4` 1.25 / 7.50, `gpt-5.4-mini`
+0.375 / 2.25, `claude-opus-5-5` 2 / 10 per million) into the same judge caches and the shared RM96 total; each job's 120% stop is built on its
+batch-price estimate; a batch is checked against the stops BEFORE it is sent (projected cost), and its ID is saved before waiting, so an
+interrupted run resumes it rather than paying twice. A batch cache records `pricing_route: batch` and the batch prices, and `run_judging.py`'s
+resume lock (which includes the prices) refuses to mix the routes in one cache. Tests: `test_batch_judging.py` (14, offline, network guard).
+Dry run (`batch_judging.py --dry-run`, fake batch clients, temporary folders): the cached `gpt-4o` and `deepseek-flash` answers to Q01
+(rubric, OpenAI route) and Q02 (cross-check, Anthropic route): requests identical to `run_judging.build_request`, both judgements valid, cost
+$0.004 and $0.006 per call against $0.008 and $0.012 at standard price, route and batch prices recorded, real judge folder untouched.
+
+**Judging at batch price, five candidates** (plan section 4 estimates): rubric $2.69, RAGAS $1.52, guardrail $0.57 (OpenAI $4.77; 120% stops
+$5.73) and cross-check $1.10 (Anthropic; stop $1.32). Total $5.87 = RM24.17 (standard price $11.74 = RM48.33).
+
+**STEP 2 progress and the Google daily quota (2026-11-28, no result seen).** Generation finished for `gpt-4o`, `claude-sonnet-5-5` and `deepseek-flash`
+(27 Nov) and `gemma-4-31b-it` (03:48 UTC on 28 Nov, after 16 runs through Google's 503 "high demand" errors): 130 answers each, 0 errors. `gemini-3.8-flash`
+stopped at 5 answers (Q01-Q05): at 15:54 UTC on 27 Nov Google's free tier returned a 429 asking for a 57,954 s wait; on 28 Nov the 429 text
+named the quota: `generate_content_free_tier_requests`, **limit 20 requests per day per project per model**, "Free Tier". The runner had honoured the
+wait in full and slept, although a test request at 03:51 UTC succeeded before the stated reset. Changed (no answer, latency or score is affected,
+since waits are never latency): a host's requested wait is honoured up to `NB04_RATE_LIMIT_HOST_WAIT_MAX_SECONDS` = 1,800 s, then the runner checks
+again; the host's figure stays in the call log.
+
+**Paid access for Google (author, 2026-11-28).** The author activated Google billing on the project and asked: confirm the paid tier with one tiny
+request, finish Gemini on the paid tier keeping the five free-tier answers (same model) with each answer's tier recorded, apply (a), report
+whether Gemma is faster under billing and confirm it is not charged. The confirmation request (about 04:20 UTC) still returned the FREE-TIER
+quota error above, so the key in `.env` was not yet on a paid tier; Gemini was left stopped at its five free-tier answers. Prepared meanwhile:
+the per-answer `access_tier` and the re-measure mode (section 6a), and a **prepaid-credit check for batch judging**: neither OpenAI nor Anthropic
+reports a prepaid key's balance through its API, so `credit_ledger.py` keeps a ledger (credit stated on 27 Nov minus every recorded cost at list or
+batch price, an upper bound on the bill); before each batch the projected cost must fit what is left (each request reserves the larger of its
+estimate and the mean reply cost so far, times 1.2; a RAGAS statements request also reserves its NLI request); if only part fits, that part is sent,
+and when nothing more fits, or a provider replies that the credit is used up, the run stops (exit 5) and prints the top-up needed
+(`batch_judging.py --credit` prints it at any time). The spend limits are checked first, unchanged. Ledger on 28 Nov: OpenAI $4.21 left,
+Anthropic $3.76.
+
+**Paid tier confirmed and generation complete (2026-11-28).** At 04:58-05:00 UTC five tiny requests to `gemini-3.8-flash` succeeded although the
+free tier had reported its 20-a-day quota used up until 08:00 UTC; the `x-gemini-service-tier: standard` response header is Google's service class
+(Gemma's free-tier response carries it too), not the billing tier, so it is not evidence either way. Decisive: the run then saved 125 answers in 9
+minutes (05:02-05:11 UTC) with no free-tier quota error, far past 20 a day. A guard was added first: a model set to paid that receives Google's
+free-tier quota error stops at once (logged as an access blocker), so no answer can be labelled paid wrongly. **All five candidates: 130 answers,
+0 errors.** Gemini: 5 free-tier answers (Q01-Q05, 24 and 27 Nov) and 125 paid-tier answers, each labelled; list-price spend $0.32; question
+latency on the paid tier median 3.97 s (95 answers) against 56.9 s for its 5 free-tier answers. **Pre-registration (a)**: Q01-Q20 re-measured on
+the paid tier at 05:11-05:13 UTC, alone, 0 retries: median 3.91 s, mean 4.18 s, p95 5.00 s, $0.045; this mean is Gemini's Response Time.
+**Gemma** (descriptive only; its Response Time stays its free-tier generation latency, as registered): the same 20 questions from the billed
+project at 05:14-05:17 UTC took median 8.56 s, mean 8.63 s, p95 11.17 s, against median 36.4 s, mean 40.1 s for those questions in its free-tier
+generation (24-28 Nov), with 0 retries against 340 in generation; charged $0 (no paid price; the Google billing report is the authority). The
+time of day and the billing status changed together, so the speed-up cannot be put on billing alone; it supports TODO 41 (free-tier latency
+partly measures provider load) and is why the ranking without Response Time is reported beside the main one.
+
+**Batch size (2026-11-28, before any batch was sent).** OpenAI limits how many tokens a low-tier organisation may have queued in batches per model
+(shown only in its dashboard) and rejects a larger batch as a whole, at no cost. A batch holds at most `NB04_BATCH_MAX_REQUESTS` = 500 requests
+(more are sent in parts, one after another); after an enqueued-token rejection the job's later batches are half the size, down to 10, and a
+rejection at that size, or any other whole-batch rejection, stops the run with the provider's message.
+
+---
+
+## Sources (checked 2026-11-01; re-checked 2026-11-27 where marked)
+- 2026-11-27: OpenAI https://developers.openai.com/api/docs/pricing ; Anthropic https://platform.claude.com/docs/en/about-claude/pricing ; Google
+  https://aistudio.google.com/docs/pricing (moved from ai.google.dev) and https://gemma.ai/deployment/gemini-api/ ; Mistral https://docs.mistral.ai/inference/pricing ,
+  https://docs.mistral.ai/models/mistral-large-4-0 , https://docs.mistral.ai/inference/conversations/reasoning ; DeepSeek https://api-docs.deepseek.com/quick_start/pricing ,
+  https://api-docs.deepseek.com/updates/ , https://api-docs.deepseek.com/guides/thinking_mode , https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017 ,
+  https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html ; exchange rate https://www.bnm.gov.my/kuala-lumpur-usd/myr-reference-rate
 - OpenAI pricing: https://developers.openai.com/api/docs/pricing
 - Gemini API pricing: https://ai.google.dev/gemini-api/docs/pricing ; models: https://ai.google.dev/gemini-api/docs/models ; Gemma on the Gemini API: https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api
 - Anthropic models: https://platform.claude.com/docs/en/docs/about-claude/models/overview ; pricing: https://platform.claude.com/docs/en/about-claude/pricing

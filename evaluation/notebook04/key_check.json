@@ -1,0 +1,498 @@
+{
+ "meta": {
+  "purpose": "Pre-flight key check for notebook 04 (STEP 1 of the author's staged plan, 2026-11-27). NOT part of the run.",
+  "date": "2026-11-27T14:46:41+00:00",
+  "prices_checked": "2026-11-27",
+  "prompt": [
+   {
+    "role": "system",
+    "content": "This is a connectivity test. Reply with a short JSON object only."
+   },
+   {
+    "role": "user",
+    "content": "Return {\"ok\": true} as JSON."
+   }
+  ],
+  "note": "not part of the run; spend not in the run caches",
+  "total_cost_usd_list": 0.007114
+ },
+ "calls": [
+  {
+   "name": "gpt-4o",
+   "model_id": "gpt-4o",
+   "api": "openai_compatible",
+   "key_variable": "OPENAI_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:13:21+00:00",
+   "request_settings": {
+    "model": "gpt-4o",
+    "max_completion_tokens": 800,
+    "temperature": 0.2
+   },
+   "ok": true,
+   "seconds": 5.03,
+   "served_model": "gpt-4o-2024-08-06",
+   "finish": "stop",
+   "input_tokens": 34,
+   "output_tokens": 5,
+   "reasoning_tokens": 0,
+   "reasoning_tokens_estimated": false,
+   "cached_input_tokens": 0,
+   "text": "{\"ok\": true}",
+   "cost_usd_list": 0.000135,
+   "reply_shape": {
+    "content_type": "str",
+    "chunk_types": null,
+    "usage_fields": {
+     "completion_tokens": 5,
+     "prompt_tokens": 34,
+     "total_tokens": 39,
+     "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+     },
+     "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+     }
+    }
+   }
+  },
+  {
+   "name": "claude-sonnet-5-5",
+   "model_id": "claude-sonnet-5-5",
+   "api": "anthropic",
+   "key_variable": "ANTHROPIC_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:13:33+00:00",
+   "request_settings": {
+    "model": "claude-sonnet-5-5",
+    "max_tokens": 800,
+    "thinking": {
+     "type": "between_tools"
+    }
+   },
+   "ok": true,
+   "seconds": 3.06,
+   "served_model": "claude-sonnet-5-5",
+   "finish": "stop",
+   "input_tokens": 43,
+   "output_tokens": 9,
+   "reasoning_tokens": 0,
+   "reasoning_tokens_estimated": false,
+   "cached_input_tokens": 0,
+   "text": "{\"ok\": true}",
+   "cost_usd_list": 0.000176
+  },
+  {
+   "name": "mistral-large-4",
+   "model_id": "mistral-large-4-0",
+   "api": "openai_compatible",
+   "key_variable": "MISTRAL_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:13:59+00:00",
+   "request_settings": {
+    "model": "mistral-large-4-0",
+    "max_tokens": 2000,
+    "temperature": 0.2,
+    "reasoning_effort": "low"
+   },
+   "ok": false,
+   "seconds": 0.79,
+   "translated_as": "AccessBlocked",
+   "error_type": "PermissionDeniedError",
+   "status_code": 403,
+   "error_text": "Error code: 403 - {'object': 'error', 'message': 'This model is not available in your subscription tier', 'type': 'tier_not_allowed', 'param': None, 'code': '1910', 'raw_status_code': 403}"
+  },
+  {
+   "name": "gpt-5.4",
+   "model_id": "gpt-5.4",
+   "api": "openai_compatible",
+   "key_variable": "OPENAI_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:14:00+00:00",
+   "request_settings": {
+    "model": "gpt-5.4",
+    "max_completion_tokens": 1500,
+    "temperature": 0,
+    "reasoning_effort": "none",
+    "response_format": {
+     "type": "json_object"
+    }
+   },
+   "ok": true,
+   "seconds": 2.98,
+   "served_model": "gpt-5.4-2026-03-05",
+   "finish": "stop",
+   "input_tokens": 33,
+   "output_tokens": 11,
+   "reasoning_tokens": 0,
+   "reasoning_tokens_estimated": false,
+   "cached_input_tokens": 0,
+   "text": "{\"ok\":true}",
+   "cost_usd_list": 0.000247,
+   "reply_shape": {
+    "content_type": "str",
+    "chunk_types": null,
+    "usage_fields": {
+     "completion_tokens": 11,
+     "prompt_tokens": 33,
+     "total_tokens": 44,
+     "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+     },
+     "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+     }
+    }
+   }
+  },
+  {
+   "name": "gpt-5.4-mini",
+   "model_id": "gpt-5.4-mini",
+   "api": "openai_compatible",
+   "key_variable": "OPENAI_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:14:03+00:00",
+   "request_settings": {
+    "model": "gpt-5.4-mini",
+    "max_completion_tokens": 4000,
+    "temperature": 0,
+    "reasoning_effort": "none",
+    "response_format": {
+     "type": "json_object"
+    }
+   },
+   "ok": true,
+   "seconds": 1.59,
+   "served_model": "gpt-5.4-mini-2026-03-17",
+   "finish": "stop",
+   "input_tokens": 33,
+   "output_tokens": 11,
+   "reasoning_tokens": 0,
+   "reasoning_tokens_estimated": false,
+   "cached_input_tokens": 0,
+   "text": "{\"ok\":true}",
+   "cost_usd_list": 7.4e-05,
+   "reply_shape": {
+    "content_type": "str",
+    "chunk_types": null,
+    "usage_fields": {
+     "completion_tokens": 11,
+     "prompt_tokens": 33,
+     "total_tokens": 44,
+     "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+     },
+     "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+     }
+    }
+   }
+  },
+  {
+   "name": "claude-opus-5-5",
+   "model_id": "claude-opus-5-5",
+   "api": "anthropic",
+   "key_variable": "ANTHROPIC_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:14:04+00:00",
+   "request_settings": {
+    "model": "claude-opus-5-5",
+    "max_tokens": 4000,
+    "output_config": {
+     "effort": "low",
+     "format": {
+      "type": "json_schema",
+      "schema": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "points",
+        "contradicts_excerpts",
+        "contradiction_quote",
+        "relevance",
+        "clarity",
+        "alignment",
+        "reasons"
+       ],
+       "properties": {
+        "points": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+           "index",
+           "mark"
+          ],
+          "properties": {
+           "index": {
+            "type": "integer"
+           },
+           "mark": {
+            "type": "string",
+            "enum": [
+             "covered",
+             "missing",
+             "partial"
+            ]
+           }
+          }
+         }
+        },
+        "contradicts_excerpts": {
+         "type": "boolean"
+        },
+        "contradiction_quote": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "relevance": {
+         "type": "integer"
+        },
+        "clarity": {
+         "type": "integer"
+        },
+        "alignment": {
+         "type": "integer"
+        },
+        "reasons": {
+         "type": "object",
+         "additionalProperties": false,
+         "required": [
+          "relevance",
+          "clarity",
+          "alignment"
+         ],
+         "properties": {
+          "relevance": {
+           "type": "string"
+          },
+          "clarity": {
+           "type": "string"
+          },
+          "alignment": {
+           "type": "string"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "ok": true,
+   "seconds": 4.29,
+   "served_model": "claude-opus-5-5",
+   "finish": "stop",
+   "input_tokens": 657,
+   "output_tokens": 192,
+   "reasoning_tokens": 0,
+   "reasoning_tokens_estimated": false,
+   "cached_input_tokens": 0,
+   "text": "{\"points\":[],\"contradicts_excerpts\":false,\"contradiction_quote\":null,\"relevance\":0,\"clarity\":0,\"alignment\":0,\"reasons\":{",
+   "cost_usd_list": 0.006468
+  },
+  {
+   "name": "gemma-4-31b-it",
+   "model_id": "gemma-4-31b-it",
+   "api": "gemini",
+   "key_variable": "GOOGLE_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:21:23+00:00",
+   "request_settings": {
+    "model": "gemma-4-31b-it",
+    "config": {
+     "system_instruction": "This is a connectivity test. Reply with a short JSON object only.",
+     "temperature": 0.2,
+     "max_output_tokens": 800,
+     "thinking_config": {
+      "thinking_level": "MINIMAL"
+     }
+    }
+   },
+   "ok": true,
+   "seconds": 58.72,
+   "served_model": "gemma-4-31b-it",
+   "finish": "stop",
+   "input_tokens": 25,
+   "output_tokens": 10,
+   "reasoning_tokens": 0,
+   "reasoning_tokens_estimated": false,
+   "cached_input_tokens": 0,
+   "text": "```json\n{\"ok\": true}\n```",
+   "cost_usd_list": 0.0
+  },
+  {
+   "name": "gemini-3.8-flash",
+   "model_id": "gemini-3.8-flash",
+   "api": "gemini",
+   "key_variable": "GOOGLE_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:46:41+00:00",
+   "request_settings": {
+    "model": "gemini-3.8-flash",
+    "config": {
+     "system_instruction": "This is a connectivity test. Reply with a short JSON object only.",
+     "temperature": 0.2,
+     "max_output_tokens": 2000,
+     "thinking_config": {
+      "thinking_level": "LOW"
+     }
+    }
+   },
+   "ok": false,
+   "seconds": 7.53,
+   "translated_as": "TemporaryFailure",
+   "error_type": "ServerError",
+   "status_code": 503,
+   "error_text": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+   "name": "deepseek-flash",
+   "model_id": "deepseek-flash",
+   "api": "openai_compatible",
+   "key_variable": "DEEPSEEK_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:46:48+00:00",
+   "request_settings": {
+    "model": "deepseek-flash",
+    "max_tokens": 800,
+    "temperature": 0.2,
+    "extra_body": {
+     "thinking": {
+      "type": "disabled"
+     }
+    }
+   },
+   "ok": true,
+   "seconds": 2.68,
+   "served_model": "deepseek-flash",
+   "finish": "stop",
+   "input_tokens": 28,
+   "output_tokens": 5,
+   "reasoning_tokens": 0,
+   "reasoning_tokens_estimated": false,
+   "cached_input_tokens": 0,
+   "text": "{\"ok\": true}",
+   "cost_usd_list": 1.4e-05,
+   "reply_shape": {
+    "content_type": "str",
+    "chunk_types": null,
+    "usage_fields": {
+     "completion_tokens": 5,
+     "prompt_tokens": 28,
+     "total_tokens": 33,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 0
+     },
+     "prompt_cache_hit_tokens": 0,
+     "prompt_cache_miss_tokens": 28
+    }
+   }
+  },
+  {
+   "name": "mistral-small-4",
+   "model_id": "mistral-small-2603",
+   "api": "openai_compatible",
+   "key_variable": "MISTRAL_API_KEY",
+   "key_set": true,
+   "started_at": "2026-11-27T14:46:51+00:00",
+   "request_settings": {
+    "model": "mistral-small-2603",
+    "max_tokens": 800,
+    "temperature": 0.2,
+    "reasoning_effort": "none"
+   },
+   "ok": false,
+   "seconds": 0.9,
+   "translated_as": "APIStatusError",
+   "error_type": "APIStatusError",
+   "status_code": 402,
+   "error_text": "Error code: 402 - {'object': 'error', 'message': 'You need a subscription to access this API.', 'type': 'billing_no_api_budget_configured', 'param': None, 'code': '2314', 'raw_status_code': 402}"
+  }
+ ],
+ "model_lists": {
+  "openai": {
+   "models_listed": 103,
+   "ids_of_interest": {
+    "gpt-4o": {
+     "id": "gpt-4o",
+     "owned_by": "system"
+    },
+    "gpt-5.4": {
+     "id": "gpt-5.4",
+     "owned_by": "system"
+    },
+    "gpt-5.4-mini": {
+     "id": "gpt-5.4-mini",
+     "owned_by": "system"
+    }
+   }
+  },
+  "deepseek": {
+   "models_listed": 2,
+   "ids_of_interest": {
+    "deepseek-flash": {
+     "id": "deepseek-flash",
+     "name": "DeepSeek-V4.1-Flash",
+     "owned_by": "deepseek",
+     "context_window": 1048576
+    },
+    "deepseek-chat": null
+   }
+  },
+  "mistral": {
+   "models_listed": 51,
+   "ids_of_interest": {
+    "mistral-small-2603": {
+     "id": "mistral-small-2603",
+     "name": "mistral-small-2603",
+     "aliases": [
+      "mistral-small-latest",
+      "mistral-vibe-cli-fast",
+      "magistral-small-latest"
+     ],
+     "deprecation": null,
+     "owned_by": "mistralai",
+     "max_context_length": 262144
+    },
+    "mistral-small-latest": {
+     "id": "mistral-small-latest",
+     "name": "mistral-small-2603",
+     "aliases": [
+      "mistral-small-2603",
+      "mistral-vibe-cli-fast",
+      "magistral-small-latest"
+     ],
+     "deprecation": null,
+     "owned_by": "mistralai",
+     "max_context_length": 262144
+    },
+    "mistral-large-4-0": null,
+    "mistral-large-latest": null
+   },
+   "mistral-small-latest_is_alias_of": [
+    "mistral-small-2603",
+    "mistral-vibe-cli-fast",
+    "magistral-small-latest"
+   ],
+   "mistral-large-latest_is_alias_of": []
+  }
+ }
+}

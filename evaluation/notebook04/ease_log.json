@@ -205,6 +205,32 @@
    ],
    "score": null
   },
+  "deepseek-flash": {
+   "logged_at": null,
+   "host_used": "DeepSeek official API (https://api.deepseek.com), OpenAI-compatible",
+   "package": "openai",
+   "package_version": null,
+   "langchain_integration": "langchain-deepseek exists; not used, because LangChain is not used (Report TODO 27)",
+   "setup_steps": [
+    "DeepSeek platform account and prepaid credit ($2); DEEPSEEK_API_KEY in .env (author). Pre-flight check 2026-11-27T14:13:36Z: HTTP 401 'Authentication Fails': the stored value has the shape of a UUID, not of a DeepSeek secret key (sk- + 32 hex). Author to replace it; not a host difficulty.",
+    "2026-11-27T14:46:48Z: the author replaced DEEPSEEK_API_KEY with the real secret; one tiny request then succeeded (served deepseek-flash, 0 reasoning tokens with thinking disabled, 2.7 s). The key's model list (free) holds deepseek-flash (DeepSeek-V4.1-Flash, 1,048,576-token context) and deepseek-v4-pro; deepseek-chat is absent."
+   ],
+   "adapter_lines": null,
+   "special_handling": [
+    {
+     "logged_at": "2026-11-27T14:15:30+00:00",
+     "note": "deepseek-flash (served by DeepSeek-V4.1-Flash-1017) thinks by default; thinking is turned off with {\"thinking\": {\"type\": \"disabled\"}}, which the OpenAI SDK sends in extra_body (api-docs.deepseek.com/guides/thinking_mode). The alias has no pinned version, so each answer records the served model."
+    }
+   ],
+   "trial_questions": [
+    "Q01",
+    "Q02",
+    "Q03"
+   ],
+   "trial_errors": [],
+   "access_blockers": [],
+   "score": null
+  },
   "gemma-4-31b-it": {
    "logged_at": "2026-11-07T15:11:40+00:00",
    "host_used": "Gemini API (Google AI Studio), default endpoint",
@@ -329,14 +355,77 @@
    "langchain_integration": null,
    "setup_steps": [],
    "adapter_lines": null,
-   "special_handling": [],
+   "special_handling": [
+    {
+     "logged_at": "2026-11-27T14:15:30+00:00",
+     "note": "Mistral Large 4 always reasons (docs.mistral.ai/inference/conversations/reasoning: 'Mistral Large 4 always reasons, so no level matches none'); reasoning_effort low is the lowest level and still returns a thinking chunk. Sent: reasoning_effort low with a 1,200-token reasoning allowance (plan section 1 rule). The reply's content is a list of chunks (thinking, then text): the adapter keeps only the text chunks. Documented, not yet observed: the 403 above."
+    }
+   ],
    "trial_questions": [
     "Q01",
     "Q02",
     "Q03"
    ],
    "trial_errors": [],
-   "access_blockers": [],
+   "access_blockers": [
+    {
+     "event": "access_blocker",
+     "logged_at": "2026-11-27T14:15:30+00:00",
+     "observed_at_approx": "2026-11-27T14:13:59+00:00",
+     "observed_during": "pre-flight key check (evaluation/notebook04/key_check.py); one tiny request, not part of the run",
+     "host": "Mistral API (La Plateforme), free mode",
+     "model_string": "mistral-large-4-0",
+     "status_code": 403,
+     "error": "Error code: 403 - {'object': 'error', 'message': 'This model is not available in your subscription tier', 'type': 'tier_not_allowed', 'code': '1910'}",
+     "model_list_check": {
+      "checked_at": "2026-11-27T14:14:10+00:00",
+      "result": "The key lists 51 models. No mistral-large ID is among them (mistral-large-4-0, mistral-large-4, mistral-large, mistral-large-latest all absent). General chat models listed: mistral-medium-2604 (aliases mistral-medium-3-5, mistral-medium-latest), mistral-small-2603 (alias mistral-small-latest), ministral-3b/8b/14b-2512."
+     },
+     "score_assigned": false,
+     "score_reasoning": "No score here. Whether Mistral Large 4 runs on a paid tier or the slot changes model is the author's decision."
+    }
+   ],
+   "score": null
+  },
+  "mistral-small-4": {
+   "logged_at": null,
+   "host_used": "Mistral API (La Plateforme), free mode",
+   "package": "openai",
+   "package_version": null,
+   "langchain_integration": "langchain-mistralai exists; not used, because LangChain is not used (Report TODO 27)",
+   "setup_steps": [],
+   "adapter_lines": null,
+   "special_handling": [
+    {
+     "logged_at": "2026-11-27T14:47:23+00:00",
+     "note": "Candidate change (author, 2026-11-27, option B): Mistral Small 4 (mistral-small-2603, Apache 2.0) replaces Mistral Large 4, which free mode does not serve. Reasoning off through reasoning_effort none (Mistral reasoning docs: the thinking chunk is omitted)."
+    }
+   ],
+   "trial_questions": [
+    "Q01",
+    "Q02",
+    "Q03"
+   ],
+   "trial_errors": [],
+   "access_blockers": [
+    {
+     "event": "access_blocker",
+     "logged_at": "2026-11-27T14:47:23+00:00",
+     "observed_at_approx": "2026-11-27T14:46:51+00:00",
+     "observed_during": "pre-flight key check (evaluation/notebook04/key_check.py); one tiny request, not part of the run",
+     "host": "Mistral API (La Plateforme), free mode",
+     "model_string": "mistral-small-2603",
+     "status_code": 402,
+     "error": "Error code: 402 - {'object': 'error', 'message': 'You need a subscription to access this API.', 'type': 'billing_no_api_budget_configured', 'code': '2314'}",
+     "model_list_check": {
+      "checked_at": "2026-11-27T14:46:52+00:00",
+      "result": "The key lists 51 models, including mistral-small-2603 (aliases mistral-small-latest, magistral-small-latest; 262,144-token context; no deprecation). Listing is allowed; generation is not."
+     },
+     "reading": "Mistral's docs (Usage and limits page, read 2026-11-27): free mode 'doesn't include API access. Creating API keys and using the API require billing activation and pay-as-you-go.' So no Mistral model can be called on free mode; the 403 for Large 4 and this 402 have the same cause.",
+     "score_assigned": false,
+     "score_reasoning": "No score here; the author decides how the Mistral slot is accessed."
+    }
+   ],
    "score": null
   }
  }

@@ -40,8 +40,8 @@ def rows() -> list[tuple[str, str, str, float, bool]]:
 
 def main() -> None:
     table = rows()
-    print(f"USD 1 = RM {RM:.2f} (settings.NB04_USD_TO_MYR, an assumption); stop factor {FACTOR:.0%}; "
-          f"NB04_EST_INPUT_TOKENS {settings.NB04_EST_INPUT_TOKENS}\n")
+    print(f"USD 1 = RM {RM:.4f} ({settings.NB04_USD_TO_MYR_SOURCE}); prices checked {settings.NB04_PRICES_CHECKED}; "
+          f"stop factor {FACTOR:.0%}; NB04_EST_INPUT_TOKENS {settings.NB04_EST_INPUT_TOKENS}\n")
     print(f"| Item | Model | Provider | Expected RM | Max (stop) RM | Billed? |\n|---|---|---|---|---|---|")
     for group, name, provider, usd, billed in table:
         print(f"| {group} | {name} | {provider} | {usd * RM:.2f} | {usd * RM * FACTOR:.2f} | {'yes' if billed else 'no (free tier)'} |")
@@ -59,6 +59,15 @@ def main() -> None:
             by_provider[provider] = by_provider.get(provider, 0.0) + usd
     print("\nBilled by provider (top-up needed): " + "; ".join(
         f"{p} expected RM {u * RM:.2f}, max RM {u * RM * FACTOR:.2f}" for p, u in by_provider.items()))
+    gen_by_provider = {}
+    for group, _, provider, usd, is_billed in table:
+        if is_billed and group.startswith("Generation"):
+            gen_by_provider[provider] = gen_by_provider.get(provider, 0.0) + usd
+    print("\nGeneration only, against the prepaid credit (settings.NB04_PREPAID_CREDIT_USD):")
+    for provider, credit in settings.NB04_PREPAID_CREDIT_USD.items():
+        usd = gen_by_provider.get(provider, 0.0)
+        verdict = "fits" if usd * FACTOR <= credit else "DOES NOT FIT at the 120% stop"
+        print(f"  {provider}: expected ${usd:.2f}, max ${usd * FACTOR:.2f} of ${credit:.2f} credit -> {verdict}")
 
 
 if __name__ == "__main__":

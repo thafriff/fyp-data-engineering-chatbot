@@ -24,12 +24,20 @@ Rules from docs/notebook04_plan.md:
   stays in the item's timed_out_attempts list, even after a later attempt succeeds, so that a stall cannot vanish from the record;
 - each probe runs NB04_PROBE_REPEATS times, under result keys such as "G01#r2"; contexts.json still holds it once;
 - tokens come from the API; cost is tokens x list price, also on a free tier (the free_tier flag says so);
+- every answer records its access_tier ("free" or "paid": the candidate's free_tier flag when it was made), so a model that moves
+  from a free to a paid tier mid-run keeps both kinds apart; answers saved before this field existed get the tier their run was
+  made under. A change of access is also logged once in run_settings["access_changes"];
+- --remeasure-latency (pre-registration (a), plan section 6a) sends the first NB04_REMEASURE_QUESTIONS frozen questions again and
+  saves them to raw/remeasure/<model>.json, never to the model's answer cache: those answers are not scored, only their latency;
+- a free-tier model is paced (NB04_FREE_TIER_MIN_INTERVAL_SECONDS between request starts); the wait is recorded per answer as
+  pacing_wait_seconds and is never latency;
 - hard stop: a model above 120% of its estimate, or all spend reaching settings.NB04_TOTAL_STOP_MYR. State is saved first,
   and the run exits.
 
 Usage (from the project root; needs the model's key in .env):
     venv\\Scripts\\python evaluation\\notebook04\\run_generation.py --model gpt-4o [--only Q01,Q02,Q03]
     venv\\Scripts\\python evaluation\\notebook04\\run_generation.py --report
+    venv\\Scripts\\python evaluation\\notebook04\\run_generation.py --model gemini-3.8-flash --remeasure-latency
 Exit codes: 0 finished, 1 parity or setup failure, 2 hard stop, 3 rate limit not cleared or access blocked.
 """
 
@@ -253,7 +261,10 @@ def run_settings(model_key: str, candidate: dict, prompt_set_sha256: str) -> dic
         "system_prompt_version": settings.SYSTEM_PROMPT_VERSION,
         "input_usd_per_m": candidate["input_usd_per_m"], "output_usd_per_m": candidate["output_usd_per_m"],
         "price_status": candidate["price_status"], "prices_checked": settings.NB04_PRICES_CHECKED,
-        "free_tier": candidate["free_tier"],
+        "free_tier": candidate["free_tier"], "access_note": candidate.get("access_note"),
+        "min_interval_seconds": settings.NB04_FREE_TIER_MIN_INTERVAL_SECONDS.get(model_key, 0.0),
+        "rate_limit_host_wait_max_seconds": settings.NB04_RATE_LIMIT_HOST_WAIT_MAX_SECONDS,
+        "usd_to_myr": settings.NB04_USD_TO_MYR, "usd_to_myr_source": settings.NB04_USD_TO_MYR_SOURCE,
         "top_k": settings.TOP_K, "similarity_threshold": settings.SIMILARITY_THRESHOLD,
         "embedding_model": settings.EMBEDDING_MODEL,
         "repeat_line_limit": settings.DEV_LLM_REPEAT_LINE_LIMIT, "repeat_min_chars": settings.DEV_LLM_REPEAT_MIN_CHARS,
@@ -272,23 +283,71 @@ def load_cache(path: Path, settings_now: dict) -> dict:
         print(f"ABORTED: {path} was made with different settings ({', '.join(mismatched)}). No model was called. "
               f"Use another file or remove this one deliberately.")
         sys.exit(EXIT_SETUP)
+    # Answers saved before access_tier existed were all made under the run's original setting (run_settings is never overwritten).
+    original = "free" if cache["run_settings"].get("free_tier") else "paid"
+    for record in cache["results"].values():
+        record.setdefault("access_tier", original)
+    for key, value in settings_now.items():      # record-only fields added since the cache was made; nothing is overwritten
+        cache["run_settings"].setdefault(key, value)
     return cache
 
 
+def access_tier(candidate: dict) -> str:
+    """The tier this model's requests go through now: "free" (a free tier or free mode) or "paid"."""
+    return "free" if candidate["free_tier"] else "paid"
+
+
+def note_access_change(cache: dict, candidate: dict) -> None:
+    """Log once, with the time, when a model's access differs from the one its run (or its last change) recorded."""
+    changes = cache["run_settings"].setdefault("access_changes", [])
+    last = changes[-1]["access_tier"] if changes else ("free" if cache["run_settings"].get("free_tier") else "paid")
+    if access_tier(candidate) != last:
+        changes.append({"at": utc_now(), "access_tier": access_tier(candidate), "access_note": candidate.get("access_note")})
+
+
+def remeasure_dir() -> Path:
+    """Where --remeasure-latency saves its calls: a subfolder of the raw folder, so they are never read as answers."""
+    return settings.NB04_RAW_DIR / settings.NB04_REMEASURE_SUBDIR
+
+
+SAVE_REPLACE_ATTEMPTS = 20      # Windows refuses to replace a file another process has open for a moment
+
+
 def save_cache(path: Path, cache: dict) -> None:
-    """Atomic write (temp file + rename), so an interruption cannot corrupt the cache."""
+    """Atomic write (temp file + rename), so an interruption cannot corrupt the cache. When several models run at once, each
+    reads every cache for the shared spend total, and on Windows a rename onto a file that another process is reading fails with
+    PermissionError for those few milliseconds, so the rename is retried briefly instead of crashing the run."""
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(cache, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-    tmp.replace(path)
+    for attempt in range(SAVE_REPLACE_ATTEMPTS):
+        try:
+            tmp.replace(path)
+            return
+        except PermissionError:
+            if attempt == SAVE_REPLACE_ATTEMPTS - 1:
+                raise
+            time.sleep(0.1 * (attempt + 1))
+
+
+def _read_json_retrying(path: Path) -> dict:
+    """A cache written by another running model: retried briefly if Windows reports it busy at that instant."""
+    for attempt in range(SAVE_REPLACE_ATTEMPTS):
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except PermissionError:
+            if attempt == SAVE_REPLACE_ATTEMPTS - 1:
+                raise
+            time.sleep(0.1 * (attempt + 1))
+    return {}
 
 
 def total_spend_usd() -> float:
-    """List-price spend across all model caches and judge caches, as saved on disk."""
+    """List-price spend across all model caches, latency re-measures and judge caches, as saved on disk."""
     total = 0.0
-    for folder in (settings.NB04_RAW_DIR, settings.NB04_JUDGE_DIR):
+    for folder in (settings.NB04_RAW_DIR, remeasure_dir(), settings.NB04_JUDGE_DIR):
         for path in sorted(folder.glob("*.json")) if folder.exists() else []:
-            total += json.loads(path.read_text(encoding="utf-8")).get("spend", {}).get("list_usd_total", 0.0)
+            total += _read_json_retrying(path).get("spend", {}).get("list_usd_total", 0.0)
     return total
 
 
@@ -339,6 +398,13 @@ def call_with_backoff(candidate: dict, request: dict) -> tuple[providers.Generat
             error.waits = waits
             raise
         except providers.RateLimited as error:
+            if not candidate.get("free_tier", False) and providers.is_free_tier_quota(error):
+                # Set to paid but answered by a free-tier quota: the key is not on the paid tier, so no answer may be labelled paid.
+                log_call(log, started_at, time.perf_counter() - start, "not_retried", error)
+                blocked = providers.AccessBlocked(f"free-tier quota error although {candidate['model_id']} is set to the paid tier: "
+                                                  f"{str(error)[:300]}")
+                blocked.waits = waits
+                raise blocked from error
             prefix, retry_after, last_error = "rate_limit", error.retry_after, error
             base, cap = settings.NB04_RATE_LIMIT_BACKOFF_BASE_SECONDS, settings.NB04_RATE_LIMIT_BACKOFF_MAX_SECONDS
             entry = log_call(log, started_at, time.perf_counter() - start, prefix, error, retry_after_seconds=retry_after,
@@ -355,7 +421,9 @@ def call_with_backoff(candidate: dict, request: dict) -> tuple[providers.Generat
         if attempt == settings.NB04_BACKOFF_MAX_RETRIES:
             break
         # Each kind backs off from its own count, so a 429 after several 503s still starts at the 429 base.
-        wait = retry_after if retry_after is not None else min(base * 2 ** waits[f"{prefix}_retries"], cap)
+        # The host's own wait is honoured even above the back-off cap, but never longer than the host-wait ceiling.
+        wait = (min(retry_after, settings.NB04_RATE_LIMIT_HOST_WAIT_MAX_SECONDS) if retry_after is not None
+                else min(base * 2 ** waits[f"{prefix}_retries"], cap))
         waits[f"{prefix}_retries"] += 1
         waits[f"{prefix}_wait_seconds"] = round(waits[f"{prefix}_wait_seconds"] + wait, 2)
         entry["waited_after_seconds"] = wait
@@ -363,6 +431,19 @@ def call_with_backoff(candidate: dict, request: dict) -> tuple[providers.Generat
         time.sleep(wait)
     last_error.waits = waits
     raise last_error
+
+
+def pace(model_key: str, last_start: float | None) -> float:
+    """Free-tier pacing: wait until NB04_FREE_TIER_MIN_INTERVAL_SECONDS has passed since the previous request to this model
+    started. Returns the seconds waited (0 for a paid model). The wait is recorded apart and is never part of latency."""
+    interval = settings.NB04_FREE_TIER_MIN_INTERVAL_SECONDS.get(model_key, 0.0)
+    if last_start is None or not interval:
+        return 0.0
+    wait = interval - (time.monotonic() - last_start)
+    if wait <= 0:
+        return 0.0
+    time.sleep(wait)
+    return round(wait, 2)
 
 
 def is_stale(record: dict | None, item: dict) -> bool:
@@ -401,6 +482,8 @@ def answer_item(candidate: dict, item: dict, cache: dict) -> dict:
             "stopped_by": stop_label(result.finish, repeated, capped, answer_tokens, result.reasoning_tokens),
             "input_tokens": result.input_tokens, "output_tokens": result.output_tokens,
             "answer_tokens": answer_tokens, "reasoning_tokens": result.reasoning_tokens,
+            "reasoning_tokens_estimated": result.reasoning_tokens_estimated,
+            "cached_input_tokens": result.cached_input_tokens,
             "latency_seconds": round(latency, 3), **waits,
             "cost_usd_list": round(cost, 6), "served_model": result.served_model,
             "error": f"empty answer (finish: {result.finish})" if empty else None}    # errors are retried on rerun
@@ -438,6 +521,9 @@ def main() -> None:
     parser.add_argument("--report", action="store_true", help="print the truncation and timing reports and exit; calls no model")
     parser.add_argument("--items", default="all", choices=["all", "question", "probe"])
     parser.add_argument("--only", default=None, help="comma-separated ids, e.g. Q01,Q02,Q03 for the integration trial")
+    parser.add_argument("--remeasure-latency", action="store_true",
+                        help=f"pre-registration (a): send the first {settings.NB04_REMEASURE_QUESTIONS} frozen questions again into "
+                             f"raw/{settings.NB04_REMEASURE_SUBDIR}/<model>.json; latency only, never scored")
     args = parser.parse_args()
     if args.report:
         print(json.dumps({"truncation": truncation_report(), "timing_question_answers": timing_report(),
@@ -462,17 +548,29 @@ def main() -> None:
 
     items = json.loads(settings.NB04_CONTEXTS_FILE.read_text(encoding="utf-8"))["items"]
     settings_now = run_settings(args.model, candidate, prompt_set_hash(items))
-    path = settings.NB04_RAW_DIR / f"{args.model}.json"
+    if args.remeasure_latency:
+        if args.only or args.items != "all":
+            parser.error("--remeasure-latency always covers the first NB04_REMEASURE_QUESTIONS questions; --only/--items not allowed")
+        settings_now["purpose"] = (f"pre-registration (a), plan section 6a: Response Time re-measured on the first "
+                                   f"{settings.NB04_REMEASURE_QUESTIONS} frozen questions; these answers are never scored")
+        path = remeasure_dir() / f"{args.model}.json"
+        chosen = [i for i in items if i["kind"] == "question"][:settings.NB04_REMEASURE_QUESTIONS]
+        estimate = estimated_spend_usd(candidate) * len(chosen) / settings.NB04_ANSWERS_PER_MODEL
+    else:
+        path = settings.NB04_RAW_DIR / f"{args.model}.json"
+        chosen = select_items(items, args.items, args.only)
+        estimate = estimated_spend_usd(candidate)
     cache = load_cache(path, settings_now)
-    estimate = estimated_spend_usd(candidate)
+    note_access_change(cache, candidate)
 
-    selected = work_units(select_items(items, args.items, args.only))
+    selected = work_units(chosen)
     todo = [i for i in selected if not answer_is_current(cache["results"].get(i["key"]), i)]
     stale = [i["key"] for i in todo if is_stale(cache["results"].get(i["key"]), i)]
     print(f"{args.model}: {len(selected)} selected, {len(selected) - len(todo)} already done, {len(todo)} to run"
           f"{f' ({len(stale)} made from an earlier prompt: {stale[:5]})' if stale else ''}. "
           f"Estimate ${estimate:.2f}, spent ${cache['spend']['list_usd_total']:.4f}.")
 
+    last_start = None
     for n, item in enumerate(todo, 1):
         reason = hard_stop_reason(cache["spend"]["list_usd_total"], estimate)
         if reason:
@@ -482,6 +580,8 @@ def main() -> None:
         if is_stale(cache["results"].get(item["key"]), item):     # kept for the record, never reused or carried over
             cache.setdefault("superseded", []).append(
                 {**cache["results"].pop(item["key"]), "superseded_at": utc_now(), "reason": "its item's prompt changed"})
+        paced = pace(args.model, last_start)
+        last_start = time.monotonic()
         timed_out = None
         try:
             record = answer_item(candidate, item, cache)
@@ -515,6 +615,8 @@ def main() -> None:
                       **waits, "call_log": log, "error": f"{type(error).__name__}: {error}"}
         # Carried over from earlier runs, so that a stall or failure stays on the record after a later attempt succeeds.
         previous = cache["results"].get(item["key"], {})
+        record["access_tier"] = access_tier(candidate)
+        record["pacing_wait_seconds"] = paced
         record["timed_out_attempts"] = previous.get("timed_out_attempts", []) + ([timed_out] if timed_out else [])
         record["call_log"] = previous.get("call_log", []) + record.get("call_log", [])
         cache["results"][item["key"]] = record

@@ -401,15 +401,14 @@ SIMILARITY_THRESHOLD = 0.70
 # The final model is chosen in notebook 04. Only environment variable NAMES are
 # listed here; the real keys are read from .env (never commit them).
 # ---------------------------------------------------------------------------
+# Groq, Cerebras and OpenRouter are no longer used (2026-11-27): free Llama access was withdrawn (Report TODO 40) and DeepSeek
+# took the LLaMA slot (plan section 1).
 API_KEY_ENV_VARS = {
     "google": "GOOGLE_API_KEY",
     "openai": "OPENAI_API_KEY",
-    "groq": "GROQ_API_KEY",
     "anthropic": "ANTHROPIC_API_KEY",
-    "mistral": "MISTRAL_API_KEY",
-    "cerebras": "CEREBRAS_API_KEY",       # only if Groq refuses Llama (notebook 04 plan, section 1)
-    "openrouter": "OPENROUTER_API_KEY",   # only if Groq refuses Llama (notebook 04 plan, section 1)
-}
+    "deepseek": "DEEPSEEK_API_KEY",
+}   # Mistral removed 2026-11-27 with its candidate (plan section 15)
 LLM_PROVIDER = "google"
 LLM_MODEL = None   # set after the model comparison in notebook 04
 LLM_TEMPERATURE = 0.2
@@ -898,6 +897,15 @@ NB04_CONTEXTS_FILE = NB04_DIR / "contexts.json"           # frozen chunks and re
 NB04_MANIFEST_FILE = NB04_DIR / "contexts_manifest.json"  # the same freeze without chunk text; committable
 NB04_RAW_DIR = NB04_DIR / "raw"                           # one answer cache per model
 NB04_JUDGE_DIR = NB04_DIR / "judge"                       # judge caches; their spend counts towards the total stop
+# Pre-registration (a), plan section 6a: a model given paid access after its free-tier answers has its Response Time re-measured
+# on the paid tier over the first NB04_REMEASURE_QUESTIONS frozen questions. run_generation.py --remeasure-latency writes those
+# calls to <NB04_RAW_DIR>/<NB04_REMEASURE_SUBDIR>/<model>.json, a subfolder, so they are never read as the model's answers (the
+# answer caches are raw/*.json) and never scored; their spend counts towards the total stop. Response Time for the models in
+# NB04_RESPONSE_TIME_FROM_REMEASURE uses that file once it holds all of them on the paid tier. Gemma has no paid tier, so its
+# Response Time always uses its free-tier generation latency; a Gemma re-measure is descriptive only.
+NB04_REMEASURE_SUBDIR = "remeasure"
+NB04_REMEASURE_QUESTIONS = 20
+NB04_RESPONSE_TIME_FROM_REMEASURE = ("gemini-3.8-flash",)
 NB04_EASE_LOG_FILE = NB04_DIR / "ease_log.json"           # Table 3.9 Ease of Implementation evidence
 # freeze_contexts.py copies the previous contexts.json and manifest here before it writes new ones. Git ignored (the contexts
 # hold licensed text). Never use a temp or scratchpad folder for backups: Windows' temp-file cleanup deleted one on 2026-11-16.
@@ -929,11 +937,19 @@ NB04_BACKOFF_MAX_SECONDS = 120
 # retryDelay in the error body), is used instead of these.
 NB04_RATE_LIMIT_BACKOFF_BASE_SECONDS = 60
 NB04_RATE_LIMIT_BACKOFF_MAX_SECONDS = 300
+# Longest host-requested wait honoured at once (added 2026-11-28). Google's free tier asked gemini-3.8-flash to wait 57,954 s
+# (until its midnight-Pacific daily reset) at 15:54 UTC on 27 Nov, yet a request succeeded at 03:51 UTC, about four hours before
+# that reset. Waiting the full delay therefore loses usable quota; the runner re-checks after this long instead. The host's
+# figure is still saved (retry_after_seconds in the call log). Waiting is never latency, so answers and scores are unaffected.
+NB04_RATE_LIMIT_HOST_WAIT_MAX_SECONDS = 1800
 # Longest error text saved for one failed call, enough to identify it later without filling the cache with error bodies.
 NB04_ERROR_TEXT_MAX_CHARS = 1000
 
 # Hard-stop rule (plan section 8). Spend is counted at list price, even on a free tier, so it can only over-count.
-NB04_USD_TO_MYR = 4.40                # assumption, not verified; replace with the actual card rate
+# Bank Negara Malaysia, Kuala Lumpur USD/MYR reference rate for 27 Nov 2026 (https://www.bnm.gov.my/kuala-lumpur-usd/myr-reference-rate,
+# read 2026-11-27). Was 4.40, an unverified assumption. A card may add a foreign-exchange markup on top of this rate.
+NB04_USD_TO_MYR = 4.1179
+NB04_USD_TO_MYR_SOURCE = "BNM Kuala Lumpur USD/MYR reference rate, 27 Nov 2026"
 # Stop when all generation and judge spend reaches this. Lowered from RM135 to RM96 by the author on 2026-11-26, so that the approved
 # maximum (RM96) is binding; the expected total is RM76.05 and the per-model and per-job 120% stops sum to RM91.26 (plan section 8).
 # PLANNED for the paying phase, NOT implemented: judges at half price (OpenAI Batch or Flex, Anthropic Message Batches).
@@ -943,7 +959,26 @@ NB04_PROBE_REPEATS = 3                # each probe runs this many times per cand
 NB04_ANSWERS_PER_MODEL = NB04_EXPECTED_QUESTIONS + NB04_EXPECTED_PROBES * NB04_PROBE_REPEATS
 # A model is flagged when its truncation rate is this far above the median rate of the other models.
 NB04_TRUNCATION_FLAG_POINTS = 0.05
-NB04_PRICES_CHECKED = "2026-11-01"
+# Re-checked on the providers' own pricing pages on 2026-11-27 (first check 2026-11-01). Changed: the Mistral slot is now Mistral
+# Small 4 at 0.15/0.60 (Large 4, 0.70/2.10 on 2026-11-27, is not on Mistral's free mode); DeepSeek added. Unchanged: gpt-4o,
+# gemini-3.8-flash (introductory price to 31 Dec 2026), claude-sonnet-5-5, Gemma 4 (free, no paid tier) and the three judges.
+# Sources: plan sections 8 and 15, and evaluation/notebook04/cost_summary.md.
+NB04_PRICES_CHECKED = "2026-11-27"
+# Prepaid API credit the author holds (2026-11-27). Google (free tier, billing not active) is charged nothing.
+NB04_PREPAID_CREDIT_USD = {"openai": 5.00, "anthropic": 5.00, "deepseek": 2.00}
+# Cost summary (evaluation/notebook04/cost_summary.py -> cost_summary.md). The official pricing page of each provider, read on
+# NB04_PRICES_CHECKED, and the rates beyond the list price that the "actually charged" estimate needs. The runner's spend and the
+# Cost criterion always use the list price; these rates only estimate the bill (the provider's dashboard is the authority).
+NB04_PRICE_SOURCES = {
+    "openai": "https://developers.openai.com/api/docs/pricing",
+    "anthropic": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "google": "https://aistudio.google.com/docs/pricing",
+    "deepseek": "https://api-docs.deepseek.com/quick_start/pricing",
+}
+NB04_CACHED_INPUT_USD_PER_M = {"gpt-4o": 1.25, "deepseek-flash": 0.006, "gpt-5.4": 0.25, "gpt-5.4-mini": 0.075}   # DeepSeek: peak rate
+NB04_DEEPSEEK_PEAK_HOURS_UTC = [(1, 4), (6, 10)]   # Monday to Friday, start inclusive, end exclusive; all other hours off-peak
+NB04_DEEPSEEK_OFF_PEAK_FACTOR = 0.5                # "Off-peak rates are half of the peak rates" (DeepSeek pricing page)
+# The judges' batch prices are NB04_JUDGE_BATCH_PRICES (with the judge settings below).
 
 # Measured mean over all 130 answers (100 questions + 10 probes x 3), characters / 4, from the freeze: 1,386 under the 1 Nov prompt
 # (estimate was 1390), 1,604.9 under the 24 Nov answer-style prompt (author approved the update, 2026-11-24); see plan section 8.
@@ -952,26 +987,41 @@ NB04_EST_OUTPUT_TOKENS = 400
 NB04_EST_THINKING_OUTPUT_TOKENS = 800  # gemini-3.8-flash cannot turn thinking off, and thinking counts as output
 # Reasoning tokens allowed ON TOP of the answer cap, for a model whose thinking cannot be disabled, so that reasoning
 # never takes answer tokens. The request's output budget = NB04_MAX_ANSWER_TOKENS + this. Cost always uses the tokens
-# the API returns, so the allowance changes no price.
+# the API returns, so the allowance changes no price. (Mistral Large 4, which always reasons, would have needed one too; it was
+# replaced by Mistral Small 4, which turns reasoning off, on 2026-11-27.)
 NB04_GEMINI_REASONING_ALLOWANCE = 1200
 NB04_CLAUDE_TOKENIZER_ALLOWANCE = 1.35
+# Free-tier pacing (2026-11-27): at least this many seconds between the STARTS of two requests to the same model, so the run
+# stays under the free-tier per-minute limits instead of meeting them as 429s. The limits are shown only in each console (Google
+# AI Studio, Mistral admin panel), so these are conservative guesses: gemini-3.8-flash <= 5 per minute, gemma-4-31b-it <= 15 per
+# minute, mistral <= 1 per 1.5 s. The wait is not latency and is not in the resume lock. A daily limit still ends in 429s: the
+# run then stops with state saved and resumes later; saved answers are never re-sent.
+# gemini-3.8-flash removed 2026-11-28: it runs on the paid tier from then (its 5 free-tier answers were paced at 12 s).
+NB04_FREE_TIER_MIN_INTERVAL_SECONDS = {"gemma-4-31b-it": 4.0}
 
 # One entry per model. "api" selects the adapter in evaluation/notebook04/providers.py; temperature None means the
 # request omits it. "request_options" holds the thinking settings approved by the author (minimum or disabled).
+# Prices are the official PAID list prices on NB04_PRICES_CHECKED, also for a model run on a free tier (pre-registration (b),
+# plan section 6): "free_tier" says the run is charged nothing, "access_note" says why.
 NB04_CANDIDATES = {
     "gpt-4o": {
         "slot": "GPT", "model_id": "gpt-4o", "api": "openai_compatible", "base_url": None,
         "key": "openai", "max_tokens_param": "max_completion_tokens", "temperature": LLM_TEMPERATURE,
         "request_options": {}, "reasoning_allowance_tokens": 0, "thinking_note": "no thinking mode",
         "input_usd_per_m": 2.50, "output_usd_per_m": 10.00, "price_status": "official", "free_tier": False,
+        "access_note": "paid (prepaid credit); OpenAI's model page marks gpt-4o Deprecated, no shutdown date (2026-11-27)",
     },
     "gemini-3.8-flash": {
         "slot": "Gemini", "model_id": "gemini-3.8-flash", "api": "gemini", "base_url": None,
         "key": "google", "max_tokens_param": None, "temperature": LLM_TEMPERATURE,
         "request_options": {"thinking_level": "LOW"}, "reasoning_allowance_tokens": NB04_GEMINI_REASONING_ALLOWANCE,
         "thinking_note": "CANNOT be disabled; low is the lowest level the Gemini docs list for this model",
-        "input_usd_per_m": 0.75, "output_usd_per_m": 3.75, "price_status": "official", "free_tier": True,
+        "input_usd_per_m": 0.75, "output_usd_per_m": 3.75, "price_status": "official", "free_tier": False,
         "est_output_tokens": NB04_EST_THINKING_OUTPUT_TOKENS,
+        # Q01-Q05 were made on Google's free tier (billing not active then); each answer records its tier (access_tier).
+        "access_note": ("Google PAID tier from 2026-11-28 (billing activated by the author on the project; at 04:58-05:00 UTC five "
+                        "requests succeeded although the free tier had reported its 20-a-day quota used up until 08:00 UTC). Q01-Q05 "
+                        "were made on the free tier. Paid price is introductory to 31 Dec 2026, 1.50 / 7.50 from 1 Jan 2027"),
     },
     "claude-sonnet-5-5": {
         "slot": "Claude", "model_id": "claude-sonnet-5-5", "api": "anthropic", "base_url": None,
@@ -980,13 +1030,24 @@ NB04_CANDIDATES = {
         "thinking_note": "off through thinking type between_tools; type disabled returns a 400 on this model",
         "input_usd_per_m": 2.00, "output_usd_per_m": 10.00, "price_status": "official", "free_tier": False,
         "token_allowance": NB04_CLAUDE_TOKENIZER_ALLOWANCE,
+        "access_note": "paid (prepaid credit)",
     },
-    "llama-3.3-70b-groq": {
-        "slot": "LLaMA", "model_id": "llama-3.3-70b-versatile", "api": "openai_compatible",
-        "base_url": "https://api.groq.com/openai/v1",
-        "key": "groq", "max_tokens_param": "max_completion_tokens", "temperature": LLM_TEMPERATURE,
-        "request_options": {}, "reasoning_allowance_tokens": 0, "thinking_note": "no thinking mode",
-        "input_usd_per_m": 0.59, "output_usd_per_m": 0.79, "price_status": "unverified", "free_tier": True,
+    # DeepSeek replaces the LLaMA slot (author, 2026-11-27): free Llama 3.3 70B access was withdrawn (Report TODO 40), and DeepSeek
+    # is also open-weight (MIT). deepseek-flash is DeepSeek's current chat model name, served by DeepSeek-V4.1-Flash-1017
+    # (api-docs.deepseek.com, read 2026-11-27); the legacy names deepseek-chat / deepseek-reasoner were to be discontinued on
+    # 2026-07-24. It is an alias with no pinned version, so every answer records the served model. Thinking is ON by default and
+    # is turned off with {"thinking": {"type": "disabled"}}, which the OpenAI SDK sends in extra_body (DeepSeek thinking-mode guide).
+    # Price: the full (peak) rate; off-peak is half (outside 01:00-04:00 and 06:00-10:00 UTC on weekdays). Input is counted at the
+    # cache-miss rate, as for every candidate (cache hits are cheaper, so this can only over-count).
+    "deepseek-flash": {
+        "slot": "DeepSeek", "replaces_slot": "LLaMA", "model_id": "deepseek-flash", "api": "openai_compatible",
+        "base_url": "https://api.deepseek.com",
+        "key": "deepseek", "max_tokens_param": "max_tokens", "temperature": LLM_TEMPERATURE,
+        "request_options": {"extra_body": {"thinking": {"type": "disabled"}}}, "reasoning_allowance_tokens": 0,
+        "thinking_note": "ON by default; off through thinking type disabled (sent in extra_body), per DeepSeek's thinking-mode guide",
+        "input_usd_per_m": 0.30, "output_usd_per_m": 1.20, "price_status": "official", "free_tier": False,
+        "licence": "MIT (DeepSeek-V4.1-Flash-1017 weights, Hugging Face model card)",
+        "access_note": "paid (prepaid credit); DeepSeek's official API; peak price used, off-peak is half",
     },
     "gemma-4-31b-it": {
         "slot": "Gemma", "model_id": "gemma-4-31b-it", "api": "gemini", "base_url": None,
@@ -994,26 +1055,12 @@ NB04_CANDIDATES = {
         "request_options": {"thinking_level": "MINIMAL"}, "reasoning_allowance_tokens": 0,
         "thinking_note": "off through thinking level minimal, per the Gemma on Gemini API docs",
         "input_usd_per_m": 0.0, "output_usd_per_m": 0.0, "price_status": "official", "free_tier": True,
+        "access_note": ("Google free tier; Gemma 4 has no paid tier on the Gemini API ('Not available'), so it is scored as free "
+                        "of charge (pre-registration (b)); free-tier content may be used to improve Google's products"),
     },
-    "mistral-large-4": {
-        "slot": "Mistral", "model_id": "mistral-large-latest", "api": "openai_compatible",
-        "base_url": "https://api.mistral.ai/v1",
-        "key": "mistral", "max_tokens_param": "max_tokens", "temperature": LLM_TEMPERATURE,
-        "request_options": {}, "reasoning_allowance_tokens": 0, "thinking_note": "no thinking mode",
-        "input_usd_per_m": 0.50, "output_usd_per_m": 1.50, "price_status": "official", "free_tier": False,
-    },
-}
-# Same Llama weights on other hosts, used only if Groq refuses access. Report as an access change, not a new model.
-# Model IDs and prices come from third-party pages: confirm them in the provider console before use.
-NB04_FALLBACK_HOSTS = {
-    "llama-3.3-70b-cerebras": {
-        **NB04_CANDIDATES["llama-3.3-70b-groq"], "model_id": "llama-3.3-70b",
-        "base_url": "https://api.cerebras.ai/v1", "key": "cerebras",
-    },
-    "llama-3.3-70b-openrouter": {
-        **NB04_CANDIDATES["llama-3.3-70b-groq"], "model_id": "meta-llama/llama-3.3-70b-instruct:free",
-        "base_url": "https://openrouter.ai/api/v1", "key": "openrouter",
-    },
+    # MISTRAL DROPPED (author, 2026-11-27, before any result): Mistral's free mode has no API access (pre-flight: HTTP 403
+    # tier_not_allowed for Large 4, HTTP 402 "You need a subscription" for Small 4), and paid access needs a $10 minimum top-up.
+    # Five candidates remain. Plan section 15, Report TODO 45.
 }
 
 # ---------------------------------------------------------------------------
@@ -1094,16 +1141,44 @@ NB04_JUDGE_MODELS = {
 }
 # One entry per job. The token figures are the plan section 4 estimates and are the base of that job's 120% stop.
 # max_output_tokens only stops a runaway reply: a cut reply fails validation and costs a retry, so it is set generously.
+# Calls per job follow the number of candidates (6 when planned: 600 / 600 / 180 / 120; 5 since Mistral was dropped on 2026-11-27).
+_NB04_N = len(NB04_CANDIDATES)
 NB04_JUDGE_JOBS = {
-    "rubric": {"judge": "gpt-5.4", "calls": 600, "est_input_tokens": 2800, "est_output_tokens": 250,
+    "rubric": {"judge": "gpt-5.4", "calls": NB04_EXPECTED_QUESTIONS * _NB04_N, "est_input_tokens": 2800, "est_output_tokens": 250,
                "max_output_tokens": 1500},
-    "ragas": {"judge": "gpt-5.4-mini", "calls": 600, "est_input_tokens": 3300, "est_output_tokens": 800,
-              "max_output_tokens": 4000},
-    "guardrail": {"judge": "gpt-5.4", "calls": 180, "est_input_tokens": 2300, "est_output_tokens": 120,
-                  "max_output_tokens": 600},
-    "crosscheck": {"judge": "claude-opus-5-5", "calls": 120, "est_input_tokens": 3780, "est_output_tokens": 340,
-                   "max_output_tokens": 4000},
+    "ragas": {"judge": "gpt-5.4-mini", "calls": NB04_EXPECTED_QUESTIONS * _NB04_N, "est_input_tokens": 3300,
+              "est_output_tokens": 800, "max_output_tokens": 4000},
+    "guardrail": {"judge": "gpt-5.4", "calls": NB04_EXPECTED_PROBES * NB04_PROBE_REPEATS * _NB04_N, "est_input_tokens": 2300,
+                  "est_output_tokens": 120, "max_output_tokens": 600},
+    "crosscheck": {"judge": "claude-opus-5-5", "calls": NB04_CROSSCHECK_ANSWERS_PER_CANDIDATE * _NB04_N, "est_input_tokens": 3780,
+                   "est_output_tokens": 340, "max_output_tokens": 4000},
 }
+
+# STEP 3 (author, 2026-11-27): HALF-PRICE JUDGING, PREPARED, NOT RUN (evaluation/notebook04/batch_judging.py). The same judge models,
+# prompts, request settings, validation and scoring rules as run_judging.py; ONLY THE PRICING ROUTE CHANGES: the OpenAI Batch API for
+# the rubric, RAGAS and guardrail jobs, Anthropic Message Batches for the cross-check. Official batch list prices per 1M input / output
+# tokens, read 2026-11-27 (OpenAI pricing page, Batch table; Anthropic pricing page, Message Batches table): half the standard rate.
+NB04_JUDGE_BATCH_PRICES = {"gpt-5.4": (1.25, 7.50), "gpt-5.4-mini": (0.375, 2.25), "claude-opus-5-5": (2.00, 10.00)}
+NB04_BATCH_DIR = NB04_JUDGE_DIR / "batches"   # submitted batch IDs and their raw replies (Git ignored: replies may quote answers)
+NB04_BATCH_POLL_SECONDS = 60                  # how often --wait asks whether a batch has ended
+NB04_BATCH_COMPLETION_WINDOW = "24h"          # OpenAI's only window; Anthropic batches also end within 24 hours
+NB04_BATCH_TRANSPORT_RETRIES = 3              # a request the batch returns as errored or expired is resubmitted at most this often
+# Credit check before every batch (author, 2026-11-28: "check the OpenAI and Anthropic balances fit before each batch; if OpenAI runs
+# short, judge as many as fit, stop, and tell me exactly how much to top up"). Neither provider reports a prepaid key's balance through
+# its API, so evaluation/notebook04/credit_ledger.py keeps a ledger: NB04_PREPAID_CREDIT_USD minus every cost recorded on disk since
+# (generation, latency re-measures, judging, key checks), all at list or batch list price, an upper bound on the real bill. A batch is
+# submitted only if its reservation fits what is left; each request reserves the larger of the job's per-request estimate and the mean
+# reply cost seen so far, times this margin (a RAGAS statements request also reserves its NLI request). If only part fits, that part is
+# sent; when nothing more fits, the run stops (exit 5) and prints the top-up needed.
+NB04_BATCH_CREDIT_MARGIN = NB04_MODEL_STOP_FACTOR
+# Batch size. OpenAI limits the tokens a low-tier organisation may have queued in batches per model (shown only in its dashboard) and
+# rejects a larger batch as a whole, at no cost. A batch holds at most NB04_BATCH_MAX_REQUESTS requests (more are sent in parts, one
+# after another); after an enqueued-token rejection the job's later batches are half the size, down to NB04_BATCH_MIN_REQUESTS.
+NB04_BATCH_MAX_REQUESTS = 500
+NB04_BATCH_MIN_REQUESTS = 10
+# A provider's reply meaning the credit is used up: the run stops instead of resubmitting (lower-case substrings of the error text).
+NB04_CREDIT_EXHAUSTED_MARKERS = ("insufficient_quota", "billing_hard_limit", "credit balance is too low",
+                                 "exceeded your current quota", "billing_not_active")
 
 # Frozen weights and anchors (plan section 3). They must not change after any result is seen.
 NB04_WEIGHTS = {"accuracy": 0.25, "alignment": 0.15, "faithfulness": 0.15, "relevance": 0.10, "clarity": 0.10,

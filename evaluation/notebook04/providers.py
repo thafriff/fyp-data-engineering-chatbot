@@ -39,13 +39,17 @@ class AccessBlocked(Exception):
 
 @dataclass
 class GenerationResult:
-    """What one successful API call returned. output_tokens includes any billed reasoning tokens."""
+    """What one successful API call returned. output_tokens includes any billed reasoning tokens. cached_input_tokens is the
+    part of input_tokens the host served from its prompt cache (billed at a lower rate); cost still counts every input token at
+    the full list price, so it is recorded only for the cost summary's "actually charged" column."""
     text: str
     input_tokens: int
     output_tokens: int
     reasoning_tokens: int
     finish: str          # "stop", "length", "refusal" or the host's own word for anything else
     served_model: str | None
+    cached_input_tokens: int = 0
+    reasoning_tokens_estimated: bool = False     # True when the host gave no figure and it was split from the text
 
 
 def api_key(candidate: dict) -> str | None:
@@ -76,9 +80,10 @@ def build_request(candidate: dict, messages: list[dict]) -> dict:
                            + candidate["reasoning_allowance_tokens"],
                            "thinking_config": {"thinking_level": candidate["request_options"]["thinking_level"]}}}
     if api == "openai_compatible":
+        # A model that always reasons (Mistral Large 4) gets its reasoning allowance on top, as on Gemini; 0 for the others.
         request = {"model": candidate["model_id"],
                    "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-                   candidate["max_tokens_param"]: settings.NB04_MAX_ANSWER_TOKENS}
+                   candidate["max_tokens_param"]: settings.NB04_MAX_ANSWER_TOKENS + candidate["reasoning_allowance_tokens"]}
     elif api == "anthropic":
         request = {"model": candidate["model_id"], "system": system,
                    "messages": [{"role": "user", "content": user}],
@@ -152,6 +157,12 @@ def _retry_delay_from_body(error: Exception) -> float | None:
     return None
 
 
+def is_free_tier_quota(error: Exception) -> bool:
+    """True for Google's free-tier quota 429 (metric generate_content_free_tier_requests, quota id ...-FreeTier)."""
+    text = str(error.__cause__ or error).lower() + " " + str(error).lower()
+    return "free_tier" in text or "freetier" in text
+
+
 def describe_error(error: Exception) -> dict:
     """What the runner saves about one failed call: the SDK's own error type, the HTTP status where there was one, and its
     text with any API key removed and the length capped. Enough to tell a 5xx from a dropped connection later."""
@@ -161,6 +172,9 @@ def describe_error(error: Exception) -> dict:
         key = os.environ.get(variable)
         if key:
             text = text.replace(key, "[redacted]")
+    # Hosts echo masked fragments of a rejected key (DeepSeek "****1ed5", OpenAI "sk-ab***xyz"): never saved either.
+    text = re.sub(r"\*{2,}[A-Za-z0-9_\-]{1,12}", "[redacted]", text)
+    text = re.sub(r"\bsk-[A-Za-z0-9_\-*]{2,}", "[redacted]", text)
     return {"error_type": type(source).__name__, "status_code": _status_code(source),
             "error_text": text[:settings.NB04_ERROR_TEXT_MAX_CHARS]}
 
@@ -186,19 +200,74 @@ def _translate_error(error: Exception) -> Exception:
     return error      # anything else (e.g. a 400 for a rejected setting) is recorded against the question
 
 
+def _field(obj, name: str):
+    """A field of an SDK object or of a plain dict (hosts' extra fields can arrive as either)."""
+    return obj.get(name) if isinstance(obj, dict) else getattr(obj, name, None)
+
+
+def _message_text(content) -> str:
+    """The answer text of a chat message. Most hosts return a string. Mistral's reasoning models return a list of chunks, a
+    "thinking" chunk before the "text" chunk; only the text chunks are the answer, so the thinking is never shown or judged."""
+    if content is None:
+        return ""
+    if isinstance(content, str):
+        return content
+    return "".join(_field(part, "text") or "" for part in content if _field(part, "type") == "text")
+
+
+def _thinking_text(content) -> str:
+    """The text inside Mistral's "thinking" chunks ([{"type": "thinking", "thinking": [{"type": "text", "text": ...}]}]),
+    used only to estimate its token count when the host reports no reasoning-token figure."""
+    if not isinstance(content, list):
+        return ""
+    out = []
+    for part in content:
+        if _field(part, "type") != "thinking":
+            continue
+        inner = _field(part, "thinking")
+        out += [inner] if isinstance(inner, str) else [_field(p, "text") or "" for p in inner or []]
+    return "".join(out)
+
+
+def _reasoning_tokens(usage, content, output_tokens: int) -> tuple[int, bool]:
+    """Reasoning tokens inside output_tokens, and whether the figure is an estimate. The host's own figure is used when it
+    reports one (OpenAI-style completion_tokens_details.reasoning_tokens). Otherwise, when the message carries thinking chunks,
+    the output tokens are split in proportion to the characters of thinking and answer text, so the 800-token answer cap is
+    applied to the answer alone. That split is an estimate and is recorded as one; cost always uses every output token."""
+    details = _field(usage, "completion_tokens_details")
+    reported = _field(details, "reasoning_tokens") if details is not None else None
+    if reported:
+        return int(reported), False
+    thinking, answer = len(_thinking_text(content)), len(_message_text(content))
+    if not thinking:
+        return 0, False
+    return round(output_tokens * thinking / (thinking + answer)), True
+
+
+def _cached_tokens(usage) -> int:
+    """Prompt tokens served from the host's cache: OpenAI-style prompt_tokens_details.cached_tokens, or DeepSeek's
+    prompt_cache_hit_tokens. 0 when the host reports neither."""
+    details = _field(usage, "prompt_tokens_details")
+    cached = _field(details, "cached_tokens") if details is not None else None
+    return int(cached or _field(usage, "prompt_cache_hit_tokens") or 0)
+
+
 def _send_openai(candidate: dict, request: dict) -> GenerationResult:
-    """OpenAI, Groq, Mistral, Cerebras and OpenRouter all accept this request style."""
+    """OpenAI, DeepSeek and Mistral all accept this request style (DeepSeek's thinking switch rides in extra_body)."""
     response = _client(candidate).chat.completions.create(**request)
     choice = response.choices[0]
-    details = getattr(response.usage, "completion_tokens_details", None)
+    content = choice.message.content
+    reasoning, estimated = _reasoning_tokens(response.usage, content, response.usage.completion_tokens)
     finish = {"length": "length", "stop": "stop", "content_filter": "refusal"}
     return GenerationResult(
-        text=choice.message.content or "",
+        text=_message_text(content),
         input_tokens=response.usage.prompt_tokens,
         output_tokens=response.usage.completion_tokens,      # already includes reasoning tokens
-        reasoning_tokens=(getattr(details, "reasoning_tokens", 0) or 0) if details else 0,
+        reasoning_tokens=reasoning,
         finish=finish.get(choice.finish_reason, choice.finish_reason),
-        served_model=response.model)
+        served_model=response.model,
+        cached_input_tokens=_cached_tokens(response.usage),
+        reasoning_tokens_estimated=estimated)
 
 
 def _send_anthropic(candidate: dict, request: dict) -> GenerationResult:
@@ -212,7 +281,8 @@ def _send_anthropic(candidate: dict, request: dict) -> GenerationResult:
         output_tokens=response.usage.output_tokens,
         reasoning_tokens=0,                                  # not reported separately; billed inside output_tokens
         finish=finish.get(response.stop_reason, response.stop_reason),
-        served_model=response.model)
+        served_model=response.model,
+        cached_input_tokens=getattr(response.usage, "cache_read_input_tokens", None) or 0)
 
 
 def _send_gemini(candidate: dict, request: dict) -> GenerationResult:
@@ -228,7 +298,8 @@ def _send_gemini(candidate: dict, request: dict) -> GenerationResult:
         output_tokens=(usage.candidates_token_count or 0) + thoughts,
         reasoning_tokens=thoughts,
         finish=finish.get(reason, reason),
-        served_model=getattr(response, "model_version", None))
+        served_model=getattr(response, "model_version", None),
+        cached_input_tokens=getattr(usage, "cached_content_token_count", None) or 0)
 
 
 _SENDERS = {"openai_compatible": _send_openai, "anthropic": _send_anthropic, "gemini": _send_gemini}

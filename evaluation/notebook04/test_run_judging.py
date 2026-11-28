@@ -295,14 +295,14 @@ class RequestedBehaviours(JudgingTestCase):
                                   {"run_settings": {}, "spend": {"list_usd_total": 31.0, "billed_calls": 1}, "results": {}})
         self.assertAlmostEqual(run_generation.total_spend_usd(), 31.0)
         reason = run_generation.hard_stop_reason(0.0, 1.0)
-        self.assertIn("RM136.40", reason)
+        self.assertIn(f"RM{31.0 * settings.NB04_USD_TO_MYR:.2f}", reason)     # RM127.65 at the 27 Nov 2026 BNM rate
         self.assertIn("stop line", reason)
         print(f"\n  [4b] run_generation.hard_stop_reason with only judge spend on disk: {reason!r}")
 
     def test_4c_per_job_120_percent_stop(self):
         write_answer_cache(self.raw, "gpt-4o", ids={"Q01", "Q02", "Q03"})
         estimate = run_judging.estimated_job_usd("guardrail")
-        self.assertAlmostEqual(estimate, 1.359, places=3)
+        self.assertAlmostEqual(estimate, 1.1325, places=4)     # 150 calls for five candidates (1.359 for 180 with six)
         with mock.patch.object(run_judging, "estimated_job_usd", lambda job: 0.001):
             self.fake.input_tokens, self.fake.output_tokens = 1000, 100     # $0.004 a call; the job limit is $0.0012
             code, out = self.run_main("--job", "rubric", "--only", "Q01,Q02,Q03")
@@ -517,9 +517,11 @@ class PromptsAndBiasControls(JudgingTestCase):
             self.assertIn(rule, settings.NB04_GUARDRAIL_JUDGE_PROMPT)
 
     def test_estimates_match_the_plan(self):
+        """Plan section 4 per-call estimates; five candidates since Mistral was dropped (2026-11-27). With six they were 6.45, 3.65,
+        1.36 and 2.63 (14.09)."""
         got = {job: round(run_judging.estimated_job_usd(job), 2) for job in settings.NB04_JUDGE_JOBS}
-        self.assertEqual(got, {"rubric": 6.45, "ragas": 3.65, "guardrail": 1.36, "crosscheck": 2.63})
-        self.assertAlmostEqual(sum(got.values()), 14.09, places=2, msg="the plan adds the rounded figures")
+        self.assertEqual(got, {"rubric": 5.38, "ragas": 3.04, "guardrail": 1.13, "crosscheck": 2.19})
+        self.assertAlmostEqual(sum(got.values()), 11.74, places=2, msg="the plan adds the rounded figures")
 
     def test_judge_never_sees_a_model_name(self):
         for model in CANDIDATES:
@@ -528,7 +530,7 @@ class PromptsAndBiasControls(JudgingTestCase):
             args = ["--job", job, "--allow-incomplete"] + (["--only", only] if only else [])
             self.run_main(*args)
         self.assertGreater(len(self.fake.requests), 0)
-        names = set(CANDIDATES) | {c["model_id"] for c in settings.NB04_CANDIDATES.values()} | {"GPT-4o", "Gemini", "Gemma", "Llama", "Mistral"}
+        names = set(CANDIDATES) | {c["model_id"] for c in settings.NB04_CANDIDATES.values()} | {"GPT-4o", "Gemini", "Gemma", "Llama", "Mistral", "DeepSeek"}
         for _, request in self.fake.requests:
             sent = json.dumps({k: v for k, v in request.items() if k != "model"})
             for name in names:
@@ -538,10 +540,10 @@ class PromptsAndBiasControls(JudgingTestCase):
         for model in CANDIDATES:
             write_answer_cache(self.raw, model, ids=set(QUESTION_IDS[:10]))
         units = run_judging.work_units("rubric", run_judging.load_answer_caches(), INPUTS, None, None)
-        self.assertEqual(len(units), 60)
+        self.assertEqual(len(units), 10 * len(CANDIDATES))     # 50 with the five candidates left after Mistral was dropped
         order = [u["model"] for u in units]
         runs = sum(1 for a, b in zip(order, order[1:]) if a == b)
-        self.assertLess(runs, 25, "models are mixed, not grouped")
+        self.assertLess(runs, 20, "models are mixed, not grouped")     # 25 of 60 with six; grouped would give 45 of 50
         again = run_judging.work_units("rubric", run_judging.load_answer_caches(), INPUTS, None, None)
         self.assertEqual([u["key"] for u in units], [u["key"] for u in again], "same seed, same order")
 
@@ -596,11 +598,15 @@ class PromptsAndBiasControls(JudgingTestCase):
         self.assertEqual(len(self.fake.requests), 0)
 
     def test_two_models_in_one_slot_refused(self):
-        for model in CANDIDATES + ["llama-3.3-70b-cerebras"]:
+        for model in CANDIDATES:
             write_answer_cache(self.raw, model)
+        # A second cache in the DeepSeek slot (e.g. another DeepSeek model run by mistake) must block judging.
+        extra = json.loads((self.raw / "deepseek-flash.json").read_text(encoding="utf-8"))
+        extra["run_settings"]["model_id"] = "deepseek-v4-pro"
+        run_generation.save_cache(self.raw / "deepseek-v4-pro.json", extra)
         code, out = self.run_main("--job", "rubric")
         self.assertEqual(code, run_judging.EXIT_SETUP)
-        self.assertIn("slot LLaMA has answers from 2 models", out)
+        self.assertIn("slot DeepSeek has answers from 2 models", out)
 
     def test_crosscheck_sample(self):
         sample = run_judging.crosscheck_questions(INPUTS["key"])
@@ -704,29 +710,29 @@ class Report(JudgingTestCase):
     def full_setup(self):
         """Two candidates with known numbers. a: fast, dear, weaker. b: slow, cheap, stronger."""
         write_answer_cache(self.raw, "gpt-4o", latency=3.0, cost=0.05)          # $5.00 per 100 -> cost 0.0, time 1.0
-        write_answer_cache(self.raw, "mistral-large-4", latency=15.0, cost=0.0)  # $0 per 100 -> cost 1.0, time 0.0
-        self.write_judgements({"gpt-4o": ("partial", 3, 0.5), "mistral-large-4": ("covered", 5, 1.0)})
+        write_answer_cache(self.raw, "deepseek-flash", latency=15.0, cost=0.0)  # $0 per 100 -> cost 1.0, time 0.0
+        self.write_judgements({"gpt-4o": ("partial", 3, 0.5), "deepseek-flash": ("covered", 5, 1.0)})
 
     def test_totals_by_hand(self):
         self.full_setup()
-        ease = {"models": {"gpt-4o": {"score": 5}, "mistral-large-4": {"score": 1}}}
+        ease = {"models": {"gpt-4o": {"score": 5}, "deepseek-flash": {"score": 1}}}
         with mock.patch("pathlib.Path.read_text", self._ease_reader(ease)):
             report = run_judging.build_report()
         rows = {r["model"]: r for r in report["rows"]}
         # gpt-4o: partial on all core points = coverage 0.5 -> Accuracy 3 -> 0.5; rel/cla 3 -> 0.5; alignment 3, valid citation -> 0.5;
         # faithfulness 0.5; time 1.0; cost 0.0; ease 1.0.
         expected_gpt = .25 * .5 + .15 * .5 + .15 * .5 + .10 * .5 + .10 * .5 + .10 * 1.0 + .10 * 0.0 + .05 * 1.0
-        # mistral: 1.0 everywhere except time 0.0 and ease 0.0.
-        expected_mistral = .25 + .15 + .15 + .10 + .10 + 0.0 + .10 + 0.0
+        # deepseek-flash: 1.0 everywhere except time 0.0 and ease 0.0.
+        expected_second = .25 + .15 + .15 + .10 + .10 + 0.0 + .10 + 0.0
         self.assertAlmostEqual(rows["gpt-4o"]["total"], expected_gpt)
-        self.assertAlmostEqual(rows["mistral-large-4"]["total"], expected_mistral)
-        self.assertEqual(report["main"]["winner"], "mistral-large-4")
-        self.assertEqual(report["all_points"]["winner"], "mistral-large-4", "uniform marks: the two measures agree here")
+        self.assertAlmostEqual(rows["deepseek-flash"]["total"], expected_second)
+        self.assertEqual(report["main"]["winner"], "deepseek-flash")
+        self.assertEqual(report["all_points"]["winner"], "deepseek-flash", "uniform marks: the two measures agree here")
         self.assertEqual({r["no_reachable_core"] for r in report["rows"]}, {6}, "the six named questions")
         without_time, without_cost = report["sensitivity"]
         self.assertAlmostEqual(without_time["totals"]["gpt-4o"], (expected_gpt - .10) / .90)
-        self.assertAlmostEqual(without_cost["totals"]["mistral-large-4"], (expected_mistral - .10) / .90)
-        print(f"\n  [report by hand] gpt-4o {expected_gpt:.4f}, mistral {expected_mistral:.4f}, winner {report['main']['winner']}")
+        self.assertAlmostEqual(without_cost["totals"]["deepseek-flash"], (expected_second - .10) / .90)
+        print(f"\n  [report by hand] gpt-4o {expected_gpt:.4f}, deepseek {expected_second:.4f}, winner {report['main']['winner']}")
 
     def _ease_reader(self, ease):
         real = Path.read_text
@@ -808,28 +814,28 @@ class Report(JudgingTestCase):
         entry = INPUTS["key"]["Q08"]
         flags = run_judging.reachable_core_flags(entry, INPUTS["by_id"]["Q08"])
         write_answer_cache(self.raw, "gpt-4o", ids={"Q08"}, latency=3.0, cost=0.0)
-        write_answer_cache(self.raw, "mistral-large-4", ids={"Q08"}, latency=3.0, cost=0.0)
+        write_answer_cache(self.raw, "deepseek-flash", ids={"Q08"}, latency=3.0, cost=0.0)
         a = rubric_record("gpt-4o", "Q08", mark="missing")
         a["judgement"]["points"][flags.index(True)]["mark"] = "covered"
-        b = rubric_record("mistral-large-4", "Q08", mark="covered")
+        b = rubric_record("deepseek-flash", "Q08", mark="covered")
         b["judgement"]["points"][flags.index(True)]["mark"] = "missing"
         run_generation.save_cache(self.judge_dir / "rubric_gpt-5.4.json", {
             "run_settings": {}, "spend": {"list_usd_total": 0.0, "billed_calls": 0},
-            "results": {"gpt-4o|Q08": a, "mistral-large-4|Q08": b}})
-        faith = {f"{m}|Q08": {"model": m, "id": "Q08", "error": None, "faithfulness": 1.0} for m in ("gpt-4o", "mistral-large-4")}
+            "results": {"gpt-4o|Q08": a, "deepseek-flash|Q08": b}})
+        faith = {f"{m}|Q08": {"model": m, "id": "Q08", "error": None, "faithfulness": 1.0} for m in ("gpt-4o", "deepseek-flash")}
         run_generation.save_cache(self.judge_dir / "ragas_gpt-5.4-mini.json",
                                   {"run_settings": {}, "spend": {"list_usd_total": 0.0, "billed_calls": 0}, "results": faith})
-        ease = {"models": {"gpt-4o": {"score": 5}, "mistral-large-4": {"score": 5}}}
+        ease = {"models": {"gpt-4o": {"score": 5}, "deepseek-flash": {"score": 5}}}
         with mock.patch("pathlib.Path.read_text", self._ease_reader(ease)):
             report = run_judging.build_report()
         rows = {r["model"]: r for r in report["rows"]}
-        self.assertGreater(rows["mistral-large-4"]["accuracy_all"], rows["gpt-4o"]["accuracy_all"])
+        self.assertGreater(rows["deepseek-flash"]["accuracy_all"], rows["gpt-4o"]["accuracy_all"])
         self.assertEqual(report["main"]["winner"], "gpt-4o", "the reachable-points winner is the decision")
-        self.assertEqual(report["all_points"]["winner"], "mistral-large-4", "the other winner is reported, and changes nothing")
+        self.assertEqual(report["all_points"]["winner"], "deepseek-flash", "the other winner is reported, and changes nothing")
         with mock.patch("pathlib.Path.read_text", self._ease_reader(ease)):
             _, out = self.run_main("--report")
         self.assertIn("Winner under the decision rule (reachable-points Accuracy): gpt-4o", out)
-        self.assertIn("(for transparency; it cannot change the decision): mistral-large-4 (DIFFERENT: a result to disclose", out)
+        self.assertIn("(for transparency; it cannot change the decision): deepseek-flash (DIFFERENT: a result to disclose", out)
 
     def test_undefined_faithfulness_left_out_of_mean_and_counted(self):
         write_answer_cache(self.raw, "gpt-4o", ids={"Q01", "Q02"})
@@ -914,6 +920,63 @@ class Report(JudgingTestCase):
         code, out = self.run_main("--report")
         self.assertEqual(code, 0)
         self.assertIn("Winner under the decision rule (reachable-points Accuracy): None", out)
+
+
+class ResponseTimeSource(JudgingTestCase):
+    """Pre-registration (a): Gemini's Response Time uses its paid-tier re-measure of the first 20 questions once that is complete;
+    otherwise (and always for Gemma, which has no paid tier) the generation latency, labelled with its tiers."""
+
+    def write_remeasure(self, model, latency=4.0, tier="paid", n=None):
+        n = settings.NB04_REMEASURE_QUESTIONS if n is None else n
+        questions = [i for i in INPUTS["items"] if i["kind"] == "question"][:n]
+        results = {i["id"]: {"id": i["id"], "kind": "question", "error": None, "access_tier": tier, "latency_seconds": latency}
+                   for i in questions}
+        run_generation.save_cache(run_generation.remeasure_dir() / f"{model}.json",
+                                  {"run_settings": {}, "spend": {"list_usd_total": 0.05, "billed_calls": n}, "results": results})
+
+    def row(self, model):
+        return next(r for r in run_judging.build_report()["rows"] if r["model"] == model)
+
+    def test_a_complete_paid_remeasure_replaces_geminis_mean(self):
+        write_answer_cache(self.raw, "gemini-3.8-flash", latency=50.0)
+        self.write_remeasure("gemini-3.8-flash", latency=4.0)
+        row = self.row("gemini-3.8-flash")
+        self.assertEqual((row["mean_seconds"], row["p95_seconds"], row["generation_mean_seconds"]), (4.0, 4.0, 50.0))
+        self.assertIn("paid-tier re-measure, first 20 frozen questions", row["response_time_source"])
+        self.assertEqual(run_judging.remeasured_latencies("gemini-3.8-flash"), [4.0] * 20)
+
+    def test_a_free_or_incomplete_remeasure_is_not_used(self):
+        write_answer_cache(self.raw, "gemini-3.8-flash", latency=50.0)
+        for tier, n in (("free", None), ("paid", 19)):
+            self.write_remeasure("gemini-3.8-flash", tier=tier, n=n)
+            row = self.row("gemini-3.8-flash")
+            self.assertEqual(row["mean_seconds"], 50.0, (tier, n))
+            self.assertTrue(row["response_time_source"].startswith("generation, "), row["response_time_source"])
+
+    def test_gemma_never_uses_a_remeasure(self):
+        write_answer_cache(self.raw, "gemma-4-31b-it", latency=40.0)
+        self.write_remeasure("gemma-4-31b-it", latency=4.0)
+        row = self.row("gemma-4-31b-it")
+        self.assertEqual(row["mean_seconds"], 40.0)
+        self.assertEqual(row["response_time_source"], "generation, 130 free tier")
+
+    def test_tiers_are_read_per_answer(self):
+        write_answer_cache(self.raw, "gemini-3.8-flash")
+        path = self.raw / "gemini-3.8-flash.json"
+        cache = json.loads(path.read_text(encoding="utf-8"))
+        cache["run_settings"]["free_tier"] = True          # as in the real cache: the run started on the free tier
+        for key in list(cache["results"])[5:]:
+            cache["results"][key]["access_tier"] = "paid"
+        run_generation.save_cache(path, cache)
+        row = self.row("gemini-3.8-flash")
+        self.assertEqual(row["access_tiers"], {"free": 5, "paid": 125})
+        self.assertTrue(row["free_tier"])
+        self.assertEqual(row["response_time_source"], "generation, 5 free tier / 125 paid tier")
+
+    def test_remeasure_spend_counts_towards_the_total_but_is_never_an_answer_cache(self):
+        self.write_remeasure("gemini-3.8-flash")
+        self.assertAlmostEqual(run_generation.total_spend_usd(), 0.05)
+        self.assertEqual(run_judging.load_answer_caches(), {})
 
 
 if __name__ == "__main__":

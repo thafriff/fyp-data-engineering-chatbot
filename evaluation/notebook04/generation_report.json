@@ -1,0 +1,183 @@
+{
+ "truncation": [
+  {
+   "model": "claude-sonnet-5-5",
+   "answers": 130,
+   "length_cap": 0,
+   "reasoning_budget_exhausted": 0,
+   "unresolved_timeouts": 0,
+   "truncation_rate": 0.0,
+   "mean_reasoning_tokens": 0,
+   "reasoning_allowance_tokens": 0,
+   "flagged": false
+  },
+  {
+   "model": "deepseek-flash",
+   "answers": 130,
+   "length_cap": 0,
+   "reasoning_budget_exhausted": 0,
+   "unresolved_timeouts": 0,
+   "truncation_rate": 0.0,
+   "mean_reasoning_tokens": 0,
+   "reasoning_allowance_tokens": 0,
+   "flagged": false
+  },
+  {
+   "model": "gemini-3.8-flash",
+   "answers": 130,
+   "length_cap": 0,
+   "reasoning_budget_exhausted": 0,
+   "unresolved_timeouts": 0,
+   "truncation_rate": 0.0,
+   "mean_reasoning_tokens": 0,
+   "reasoning_allowance_tokens": 1200,
+   "flagged": false
+  },
+  {
+   "model": "gemma-4-31b-it",
+   "answers": 130,
+   "length_cap": 0,
+   "reasoning_budget_exhausted": 0,
+   "unresolved_timeouts": 0,
+   "truncation_rate": 0.0,
+   "mean_reasoning_tokens": 0,
+   "reasoning_allowance_tokens": 0,
+   "flagged": false
+  },
+  {
+   "model": "gpt-4o",
+   "answers": 130,
+   "length_cap": 0,
+   "reasoning_budget_exhausted": 0,
+   "unresolved_timeouts": 0,
+   "truncation_rate": 0.0,
+   "mean_reasoning_tokens": 0,
+   "reasoning_allowance_tokens": 0,
+   "flagged": false
+  }
+ ],
+ "timing_question_answers": [
+  {
+   "model": "claude-sonnet-5-5",
+   "question_answers": 100,
+   "latency_mean_seconds": 4.49,
+   "latency_p95_seconds": 6.92,
+   "timed_out_attempts": 0,
+   "timed_out_seconds": 0,
+   "successful_request_seconds": 449.37,
+   "total_seconds_including_abandoned": 449.37,
+   "true_elapsed_seconds": 449.37,
+   "failed_attempt_seconds": 0,
+   "rate_limit_retries": 0,
+   "rate_limit_wait_seconds": 0,
+   "temporary_failure_retries": 0,
+   "temporary_failure_wait_seconds": 0,
+   "retries_exhausted": 0
+  },
+  {
+   "model": "deepseek-flash",
+   "question_answers": 100,
+   "latency_mean_seconds": 2.01,
+   "latency_p95_seconds": 2.91,
+   "timed_out_attempts": 0,
+   "timed_out_seconds": 0,
+   "successful_request_seconds": 200.72,
+   "total_seconds_including_abandoned": 200.72,
+   "true_elapsed_seconds": 200.72,
+   "failed_attempt_seconds": 0,
+   "rate_limit_retries": 0,
+   "rate_limit_wait_seconds": 0,
+   "temporary_failure_retries": 0,
+   "temporary_failure_wait_seconds": 0,
+   "retries_exhausted": 0
+  },
+  {
+   "model": "gemini-3.8-flash",
+   "question_answers": 100,
+   "latency_mean_seconds": 7.07,
+   "latency_p95_seconds": 6.73,
+   "timed_out_attempts": 0,
+   "timed_out_seconds": 0,
+   "successful_request_seconds": 706.69,
+   "total_seconds_including_abandoned": 706.69,
+   "true_elapsed_seconds": 1555.18,
+   "failed_attempt_seconds": 423.46,
+   "rate_limit_retries": 0,
+   "rate_limit_wait_seconds": 0,
+   "temporary_failure_retries": 17,
+   "temporary_failure_wait_seconds": 425.0,
+   "retries_exhausted": 0
+  },
+  {
+   "model": "gemma-4-31b-it",
+   "question_answers": 100,
+   "latency_mean_seconds": 42.62,
+   "latency_p95_seconds": 75.56,
+   "timed_out_attempts": 0,
+   "timed_out_seconds": 0,
+   "successful_request_seconds": 4261.61,
+   "total_seconds_including_abandoned": 4261.61,
+   "true_elapsed_seconds": 30091.47,
+   "failed_attempt_seconds": 4509.83,
+   "rate_limit_retries": 0,
+   "rate_limit_wait_seconds": 0,
+   "temporary_failure_retries": 417,
+   "temporary_failure_wait_seconds": 21320.0,
+   "retries_exhausted": 14
+  },
+  {
+   "model": "gpt-4o",
+   "question_answers": 100,
+   "latency_mean_seconds": 2.13,
+   "latency_p95_seconds": 2.58,
+   "timed_out_attempts": 0,
+   "timed_out_seconds": 0,
+   "successful_request_seconds": 213.14,
+   "total_seconds_including_abandoned": 213.14,
+   "true_elapsed_seconds": 213.14,
+   "failed_attempt_seconds": 0,
+   "rate_limit_retries": 0,
+   "rate_limit_wait_seconds": 0,
+   "temporary_failure_retries": 0,
+   "temporary_failure_wait_seconds": 0,
+   "retries_exhausted": 0
+  }
+ ],
+ "run_window_all_calls": [
+  {
+   "model": "claude-sonnet-5-5",
+   "calls_timestamped": 130,
+   "first_call_utc": "2026-11-27T15:33:26+00:00",
+   "last_call_utc": "2026-11-27T15:43:38+00:00",
+   "results_without_timestamps": 0
+  },
+  {
+   "model": "deepseek-flash",
+   "calls_timestamped": 130,
+   "first_call_utc": "2026-11-27T15:33:26+00:00",
+   "last_call_utc": "2026-11-27T15:38:02+00:00",
+   "results_without_timestamps": 0
+  },
+  {
+   "model": "gemini-3.8-flash",
+   "calls_timestamped": 147,
+   "first_call_utc": "2026-11-24T01:55:17+00:00",
+   "last_call_utc": "2026-11-28T05:11:08+00:00",
+   "results_without_timestamps": 0
+  },
+  {
+   "model": "gemma-4-31b-it",
+   "calls_timestamped": 635,
+   "first_call_utc": "2026-11-24T01:59:53+00:00",
+   "last_call_utc": "2026-11-28T03:48:28+00:00",
+   "results_without_timestamps": 0
+  },
+  {
+   "model": "gpt-4o",
+   "calls_timestamped": 130,
+   "first_call_utc": "2026-11-27T15:33:26+00:00",
+   "last_call_utc": "2026-11-27T15:38:01+00:00",
+   "results_without_timestamps": 0
+  }
+ ]
+}

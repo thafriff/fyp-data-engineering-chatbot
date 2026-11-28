@@ -731,6 +731,22 @@ def score_rubric_record(key: str, record: dict, inputs: dict, answer: str, revie
             "citations": citations, "flagged": flagged, "reviewed": review is not None}
 
 
+def remeasured_latencies(model: str) -> list[float] | None:
+    """Pre-registration (a): the paid-tier latencies of the first NB04_REMEASURE_QUESTIONS questions, for a model in
+    NB04_RESPONSE_TIME_FROM_REMEASURE, once its re-measure file holds all of them without an error and on the paid tier.
+    Otherwise None, and Response Time uses the generation latency, labelled with its tiers."""
+    if model not in settings.NB04_RESPONSE_TIME_FROM_REMEASURE:
+        return None
+    path = run_generation.remeasure_dir() / f"{model}.json"
+    if not path.exists():
+        return None
+    records = [r for r in json.loads(path.read_text(encoding="utf-8"))["results"].values() if r["kind"] == "question"]
+    good = [r for r in records if not r["error"] and r.get("access_tier") == "paid" and r.get("latency_seconds") is not None]
+    if len(good) < settings.NB04_REMEASURE_QUESTIONS:
+        return None
+    return [r["latency_seconds"] for r in good]
+
+
 def model_metrics(model: str, cache: dict, rubric: dict, ragas: dict, inputs: dict, reviews: dict, ease: dict) -> dict:
     """All eight criteria for one candidate, from its question answers only."""
     answers = {k: r for k, r in cache["results"].items() if r["kind"] == "question" and not r["error"]}
@@ -739,9 +755,20 @@ def model_metrics(model: str, cache: dict, rubric: dict, ragas: dict, inputs: di
     faith = [ragas[f"{model}|{k}"] for k in answers if f"{model}|{k}" in ragas]
     faith_values = [r["faithfulness"] for r in faith if r["faithfulness"] is not None]
     seconds = [r["latency_seconds"] for r in answers.values() if r.get("latency_seconds") is not None]
+    generation_seconds = seconds
+    original = "free" if cache["run_settings"].get("free_tier") else "paid"
+    tiers = Counter(r.get("access_tier", original) for r in cache["results"].values() if not r["error"])
+    remeasured = remeasured_latencies(model)
+    if remeasured is not None:          # pre-registration (a): paid-tier re-measure on the first questions replaces the mean
+        seconds = remeasured
+        time_source = f"paid-tier re-measure, first {len(remeasured)} frozen questions (pre-registration a)"
+    else:
+        time_source = "generation, " + " / ".join(f"{n} {tier} tier" for tier, n in sorted(tiers.items()))
     costs = [r["cost_usd_list"] for r in answers.values() if r.get("cost_usd_list") is not None]
     timing = run_generation.timing_summary(cache)
-    row = {"model": model, "slot": cache["run_settings"]["slot"], "free_tier": cache["run_settings"]["free_tier"],
+    row = {"model": model, "slot": cache["run_settings"]["slot"], "free_tier": tiers.get("free", 0) > 0,
+           "access_tiers": dict(tiers), "response_time_source": time_source,
+           "generation_mean_seconds": _mean(generation_seconds),
            "answers": len(answers), "rubric_judged": len(scored), "ragas_judged": len(faith),
            "faithfulness_undefined": len(faith) - len(faith_values),
            "contradictions_flagged": sum(s["flagged"] for s in scored),
@@ -880,7 +907,9 @@ def print_report(report: dict) -> None:
               f"{r['rate_limit_retries']:>6}{r['timed_out_attempts']:>5}{_fmt(r['total_seconds_including_abandoned'], 1):>9}"
               f"{_fmt(r['true_elapsed_seconds'], 1):>9}"
               f"{_fmt(r['usd_per_100'], 3):>8}{_fmt(myr, 2):>8}"
-              f"{'yes' if r['free_tier'] else 'no':>6}{_fmt(r['ease'], 0):>6}")
+              f"{('part' if len(r['access_tiers']) > 1 else 'yes') if r['free_tier'] else 'no':>6}{_fmt(r['ease'], 0):>6}")
+    for r in report["rows"]:
+        print(f"  {r['model']}: Response Time from {r['response_time_source']}; answers by tier {r['access_tiers']}")
     print("Acc = primary Accuracy, over reachable core points; it is the one in the ranking. AccAll = secondary, over all core points.")
     print("noR = questions with no reachable core point, left out of Acc only.")
     print("mean s and p95 s = successful requests only, which is what Response Time scores. t/o = every timed-out attempt on the "
