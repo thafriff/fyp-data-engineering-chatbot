@@ -1331,6 +1331,14 @@ the other three 27 / 0 / 0; G04 scaffolded 3/3 for all five. Cross-check (100 an
 69%, Alignment 69%; within 1 point 96-100%; gpt-5.4 scores Clarity 0.31 higher on average. Gemma's billing-period latency (median 8.6 s on
 Q01-Q20) is a descriptive note only; its Response Time stays 42.6 s (free tier), which scores 0.
 
+**Selection accepted (author, 2026-11-28): `deepseek-flash` is the selected model.** It became the chat prototype's default answer model
+(`settings.DEV_DEFAULT_ANSWER_MODEL`), through DeepSeek's OpenAI-compatible API with the notebook 04 request (a test holds the app's
+single-turn request equal to `providers.build_request`); `gemini-3.8-flash`, `gemma-4-31b-it` and the local models stay selectable, and
+`qwen3.5:2b` stays the offline model and the intent classifier. In the app, what the user types (with up to two earlier exchanges) and the
+retrieved open-licensed excerpts go to the chosen provider, and the sidebar says so. Fixed at the same time: with conversation history the
+app's Gemini request sent only the first earlier question instead of the current one; every turn is now sent in order (single-turn
+requests unchanged). The author's review sheet for the 9 `complete_solution` guardrail answers is in `backups/` (Git ignored).
+
 ---
 
 ## Sources (checked 2026-11-01; re-checked 2026-11-27 where marked)

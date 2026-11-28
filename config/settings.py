@@ -409,8 +409,9 @@ API_KEY_ENV_VARS = {
     "anthropic": "ANTHROPIC_API_KEY",
     "deepseek": "DEEPSEEK_API_KEY",
 }   # Mistral removed 2026-11-27 with its candidate (plan section 15)
-LLM_PROVIDER = "google"
-LLM_MODEL = None   # set after the model comparison in notebook 04
+# The model SELECTED in notebook 04 (author, 2026-11-28; results_summary.json). Record only: the app reads DEV_DEFAULT_ANSWER_MODEL.
+LLM_PROVIDER = "deepseek"
+LLM_MODEL = "deepseek-flash"
 LLM_TEMPERATURE = 0.2
 
 FALLBACK_MESSAGE = (
@@ -1069,9 +1070,16 @@ NB04_CANDIDATES = {
 # The model entries are the notebook 04 candidates themselves, so the app uses the settings the integration trial used:
 # thinking level, reasoning allowance, temperature and list prices. The timeout and back-off are the runner's too.
 # ---------------------------------------------------------------------------
-DEV_CLOUD_MODELS = {name: NB04_CANDIDATES[name] for name in ("gemini-3.8-flash", "gemma-4-31b-it")}
+# 2026-11-28 (author): deepseek-flash, the model SELECTED in notebook 04 (results_summary.json), is the app's DEFAULT answer model; the
+# other cloud models and the local models stay selectable. qwen3.5:2b stays the offline model (DEV_LLM_MODEL), which also runs the
+# intent classifier. The default lives here, so it survives a restart. DeepSeek is reached through its OpenAI-compatible API with the
+# notebook 04 request (thinking disabled through extra_body). In the app, what the user types, with the retrieved open-licensed
+# excerpts, is sent to the chosen cloud provider (the sidebar says so).
+DEV_CLOUD_MODELS = {name: NB04_CANDIDATES[name] for name in ("deepseek-flash", "gemini-3.8-flash", "gemma-4-31b-it")}
+DEV_DEFAULT_ANSWER_MODEL = "deepseek-flash"
+DEV_CLOUD_HOSTS = {"google": "Google", "deepseek": "DeepSeek"}     # provider names shown in the cloud messages, by API key
 DEV_MODEL_GROUP_LOCAL = "Local (Ollama)"
-DEV_MODEL_GROUP_CLOUD = "Cloud (Google free tier)"
+DEV_MODEL_GROUP_CLOUD = "Cloud (API)"
 DEV_CLOUD_STATUS_TICK_SECONDS = 0.5   # how often the "waiting for <model>" line refreshes
 # Bold text in the DARK theme (author, 2026-11-24): Streamlit's dark theme draws bold in the same near-white as normal text, so
 # key terms in an answer were hard to pick out. In the dark theme only, bold gets a heavier weight and pure white. Changed
@@ -1081,17 +1089,19 @@ DEV_CLOUD_STATUS_TICK_SECONDS = 0.5   # how often the "waiting for <model>" line
 DEV_UI_DARK_BOLD_COLOR = "#FFFFFF"
 DEV_UI_DARK_BOLD_WEIGHT = 800
 DEV_CLOUD_BACKOFF_MAX_RETRIES = 6     # kept at 6 for chat: a person is waiting, unlike the batch runner (NB04_BACKOFF_MAX_RETRIES)
-DEV_CLOUD_MSG_WAITING = "Waiting for {model}... {elapsed} s. Cloud answers can take a few minutes when Google is busy."
+DEV_CLOUD_MSG_WAITING = "Waiting for {model}... {elapsed} s. Cloud answers can take a few minutes when {host} is busy."
 DEV_CLOUD_MSG_RETRYING = ("{model} is busy ({reason}). Retrying in {remaining} s, attempt {attempt} of {attempts}. "
                           "{elapsed} s so far.")
-DEV_CLOUD_MSG_MISSING_KEY = ("GOOGLE_API_KEY is not set in .env, so {model} cannot answer. Add the key to .env and ask again, "
+DEV_CLOUD_MSG_MISSING_KEY = ("{key_name} is not set in .env, so {model} cannot answer. Add the key to .env and ask again, "
                              "or choose a local model in the sidebar.")
-DEV_CLOUD_MSG_INVALID_KEY = ("Google rejected the API key in .env (HTTP {status}), so {model} cannot answer. Check GOOGLE_API_KEY "
+DEV_CLOUD_MSG_INVALID_KEY = ("{host} rejected the API key in .env (HTTP {status}), so {model} cannot answer. Check {key_name} "
                              "in .env and ask again, or choose a local model in the sidebar.")
-DEV_CLOUD_MSG_OVERLOADED = ("{model} is overloaded right now: Google still reported high demand after {attempts} attempts. Please "
+DEV_CLOUD_MSG_OVERLOADED = ("{model} is overloaded right now: {host} still reported high demand after {attempts} attempts. Please "
                             "try again in a minute, or choose another model in the sidebar.")
-DEV_CLOUD_MSG_RATE_LIMITED = ("{model} hit the Google free-tier rate limit and was still limited after {attempts} attempts. Please "
+DEV_CLOUD_MSG_RATE_LIMITED = ("{model} hit the {host} rate limit and was still limited after {attempts} attempts. Please "
                               "try again later, or choose another model in the sidebar.")
+DEV_CLOUD_MSG_BACKEND = ("{model} answers through the {host} API. What you type, with the retrieved course excerpts, is sent to "
+                         "{host}. Replies can take a while when {host} is busy.")
 DEV_CLOUD_MSG_TIMEOUT = ("{model} did not answer within {seconds} seconds, so the request was abandoned. It may be overloaded. "
                          "Please try again, or choose another model in the sidebar.")
 DEV_CLOUD_MSG_BLOCKED = "{model} returned no answer (finish reason: {finish}). Please try rephrasing the question."

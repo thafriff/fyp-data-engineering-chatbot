@@ -6,8 +6,10 @@ DEV PROTOTYPE: the default model is a small local model served by Ollama (settin
 see the chatbot working end to end. The formal LLM is chosen in notebook 04 and will replace this backend;
 the prompt-building part stays the same.
 
-Two cloud models (settings.DEV_CLOUD_MODELS) can also be picked in the sidebar for casual viewing. They get exactly the
-same prompt from build_messages(), through cloud_generate() below, and nothing they do touches the notebook 04 caches.
+Cloud models (settings.DEV_CLOUD_MODELS) can be picked in the sidebar: deepseek-flash, the model selected in notebook 04 and the
+app's default (settings.DEV_DEFAULT_ANSWER_MODEL, 2026-11-28), through DeepSeek's OpenAI-compatible API, and gemini-3.8-flash and
+gemma-4-31b-it through the Google Gemini API. They get exactly the same prompt from build_messages(), through cloud_generate()
+below, with the notebook 04 request settings, and nothing they do touches the notebook 04 caches.
 """
 
 import json
@@ -128,7 +130,7 @@ def complete(messages: list[dict], max_tokens: int, timeout: float, temperature:
 
 
 # ---------------------------------------------------------------------------
-# Cloud generation (Google Gemini API), for the two free models in the sidebar
+# Cloud generation: DeepSeek (OpenAI-compatible API) and the Google Gemini API
 # ---------------------------------------------------------------------------
 
 @dataclass
@@ -159,17 +161,41 @@ class _Reply:
 
 
 _google_clients: dict[str, object] = {}
+_openai_clients: dict[tuple[str, str], object] = {}
 
 
 def is_cloud_model(model: str | None) -> bool:
-    """True for the models served by the Google API rather than by Ollama."""
+    """True for the models served by a cloud API rather than by Ollama."""
     return model in settings.DEV_CLOUD_MODELS
 
 
-def _google_api_key() -> str | None:
-    """The key from .env, read each time so that a key added while the app runs is picked up. Never logged or displayed."""
-    name = settings.API_KEY_ENV_VARS["google"]
+def _provider(model: str) -> str:
+    """The API key name in settings.API_KEY_ENV_VARS that this cloud model uses, e.g. "google" or "deepseek"."""
+    return settings.DEV_CLOUD_MODELS[model]["key"]
+
+
+def _host(model: str) -> str:
+    return settings.DEV_CLOUD_HOSTS[_provider(model)]
+
+
+def _key_name(model: str) -> str:
+    return settings.API_KEY_ENV_VARS[_provider(model)]
+
+
+def _api_key(provider: str) -> str | None:
+    """A key from .env, read each time so that a key added while the app runs is picked up. Never logged or displayed."""
+    name = settings.API_KEY_ENV_VARS[provider]
     return dotenv_values(settings.PROJECT_ROOT / ".env").get(name) or os.environ.get(name) or None
+
+
+def _google_api_key() -> str | None:
+    return _api_key("google")
+
+
+def _key_for(model: str) -> str | None:
+    """The key this cloud model needs (the Google one through _google_api_key, which the tests replace)."""
+    provider = _provider(model)
+    return _google_api_key() if provider == "google" else _api_key(provider)
 
 
 def _google_client(key: str):
@@ -181,13 +207,33 @@ def _google_client(key: str):
     return _google_clients[key]
 
 
+def _google_contents(messages: list[dict]):
+    """The Gemini "contents" for everything after the system message. A single message stays a plain string, exactly as in the
+    notebook 04 request; with conversation history every turn is sent in order (assistant turns as "model"), so the CURRENT
+    question, which is last, is the one answered. (Before 2026-11-28 only messages[1] was sent: on a follow-up that was the
+    first earlier question.)"""
+    turns = messages[1:]
+    if len(turns) == 1:
+        return turns[0]["content"]
+    return [{"role": "model" if m["role"] == "assistant" else "user", "parts": [{"text": m["content"]}]} for m in turns]
+
+
 def _cloud_request(model: str, messages: list[dict]) -> dict:
-    """The SDK call's arguments, built the same way as in the notebook 04 integration trial. A model that cannot turn thinking
-    off gets a reasoning allowance on top of the answer cap, so that reasoning cannot take answer tokens."""
+    """The SDK call's arguments, built the same way as notebook 04's (providers.build_request; a test holds them equal for a
+    single-turn prompt). A model that cannot turn thinking off gets a reasoning allowance on top of the answer cap, so that
+    reasoning cannot take answer tokens."""
     config = settings.DEV_CLOUD_MODELS[model]
-    return {"model": config["model_id"], "contents": messages[1]["content"],
+    budget = settings.DEV_LLM_MAX_ANSWER_TOKENS + config["reasoning_allowance_tokens"]
+    if config["api"] == "openai_compatible":
+        request = {"model": config["model_id"], "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
+                   config["max_tokens_param"]: budget}
+        if config["temperature"] is not None:
+            request["temperature"] = config["temperature"]
+        request.update(config["request_options"])          # DeepSeek: extra_body {"thinking": {"type": "disabled"}}
+        return request
+    return {"model": config["model_id"], "contents": _google_contents(messages),
             "config": {"system_instruction": messages[0]["content"], "temperature": config["temperature"],
-                       "max_output_tokens": settings.DEV_LLM_MAX_ANSWER_TOKENS + config["reasoning_allowance_tokens"],
+                       "max_output_tokens": budget,
                        "thinking_config": {"thinking_level": config["request_options"]["thinking_level"]}}}
 
 
@@ -199,6 +245,33 @@ def _send_google(key: str, request: dict) -> _Reply:
     finish = response.candidates[0].finish_reason.name if response.candidates else "NO_CANDIDATES"
     return _Reply(text=response.text or "", input_tokens=usage.prompt_token_count or 0,
                   output_tokens=(usage.candidates_token_count or 0) + thoughts, reasoning_tokens=thoughts, finish=finish)
+
+
+_OPENAI_FINISH = {"stop": "STOP", "length": "MAX_TOKENS", "content_filter": "SAFETY"}
+
+
+def _send_openai(model: str, key: str, request: dict) -> _Reply:
+    """Make one call to an OpenAI-compatible API (DeepSeek). The SDK's own retries stay off, as in the notebook 04 runner."""
+    config = settings.DEV_CLOUD_MODELS[model]
+    client_key = (key, config["base_url"])
+    if client_key not in _openai_clients:
+        from openai import OpenAI
+        _openai_clients[client_key] = OpenAI(api_key=key, base_url=config["base_url"], max_retries=0,
+                                             timeout=settings.NB04_REQUEST_TIMEOUT_SECONDS)
+    response = _openai_clients[client_key].chat.completions.create(**request)
+    choice, usage = response.choices[0], response.usage
+    details = getattr(usage, "completion_tokens_details", None)
+    reasoning = getattr(details, "reasoning_tokens", 0) or 0
+    return _Reply(text=choice.message.content or "", input_tokens=usage.prompt_tokens or 0,
+                  output_tokens=usage.completion_tokens or 0, reasoning_tokens=reasoning,
+                  finish=_OPENAI_FINISH.get(choice.finish_reason, str(choice.finish_reason).upper()))
+
+
+def _send(model: str, key: str, request: dict) -> _Reply:
+    """One call to the model's own API."""
+    if settings.DEV_CLOUD_MODELS[model]["api"] == "openai_compatible":
+        return _send_openai(model, key, request)
+    return _send_google(key, request)
 
 
 def _classify_error(error: Exception) -> tuple[str, int | None, float | None]:
@@ -258,13 +331,13 @@ def _call_with_retries(model: str, key: str, request: dict, on_status: Callable[
         return int(time.perf_counter() - begun)
 
     def show_waiting() -> None:
-        on_status(settings.DEV_CLOUD_MSG_WAITING.format(model=model, elapsed=elapsed()))
+        on_status(settings.DEV_CLOUD_MSG_WAITING.format(model=model, elapsed=elapsed(), host=_host(model)))
 
     for attempt in range(total):
         show_waiting()
         start = time.perf_counter()
         try:
-            reply = _wait_for_call(lambda: _send_google(key, request), settings.NB04_REQUEST_TIMEOUT_SECONDS, show_waiting)
+            reply = _wait_for_call(lambda: _send(model, key, request), settings.NB04_REQUEST_TIMEOUT_SECONDS, show_waiting)
             return reply, time.perf_counter() - start, attempt, waited
         except RequestTimedOut:
             raise CloudError(settings.DEV_CLOUD_MSG_TIMEOUT.format(
@@ -274,7 +347,8 @@ def _call_with_retries(model: str, key: str, request: dict, on_status: Callable[
         except Exception as error:
             kind, status, retry_after = _classify_error(error)
         if kind == "invalid_key":
-            raise CloudError(settings.DEV_CLOUD_MSG_INVALID_KEY.format(model=model, status=status)) from None
+            raise CloudError(settings.DEV_CLOUD_MSG_INVALID_KEY.format(model=model, status=status, host=_host(model),
+                                                                      key_name=_key_name(model))) from None
         if kind == "timeout":
             raise CloudError(settings.DEV_CLOUD_MSG_TIMEOUT.format(
                 model=model, seconds=settings.NB04_REQUEST_TIMEOUT_SECONDS)) from None
@@ -283,10 +357,10 @@ def _call_with_retries(model: str, key: str, request: dict, on_status: Callable[
             raise CloudError(settings.DEV_CLOUD_MSG_OTHER.format(model=model, detail=detail)) from None
         if attempt == total - 1:
             message = settings.DEV_CLOUD_MSG_RATE_LIMITED if kind == "rate_limited" else settings.DEV_CLOUD_MSG_OVERLOADED
-            raise CloudError(message.format(model=model, attempts=total)) from None
+            raise CloudError(message.format(model=model, attempts=total, host=_host(model))) from None
         wait = retry_after if retry_after is not None else min(settings.NB04_BACKOFF_BASE_SECONDS * 2 ** attempt,
                                                                settings.NB04_BACKOFF_MAX_SECONDS)
-        reason = "free-tier rate limit" if kind == "rate_limited" else "high demand"
+        reason = "rate limit" if kind == "rate_limited" else "high demand"
         wait_start = time.perf_counter()
         while (remaining := wait - (time.perf_counter() - wait_start)) > 0:
             on_status(settings.DEV_CLOUD_MSG_RETRYING.format(model=model, reason=reason, remaining=int(remaining) + 1,
@@ -333,9 +407,9 @@ def cloud_generate(question: str, chunks: list[RetrievedChunk], model: str,
     """Answer with a cloud model, from the same prompt as a local answer. on_status(text) is called on the calling thread
     about twice a second with a line for the student (waiting, or retrying), so a slow reply does not look like a hang.
     Raises CloudError, whose text can be shown as it is, for a missing or rejected key, overload, timeout or an empty reply."""
-    key = _google_api_key()
+    key = _key_for(model)
     if not key:
-        raise CloudError(settings.DEV_CLOUD_MSG_MISSING_KEY.format(model=model))
+        raise CloudError(settings.DEV_CLOUD_MSG_MISSING_KEY.format(model=model, key_name=_key_name(model)))
     messages = build_messages(question, chunks, corrections=corrections)
     request = _cloud_request(model, transform(messages) if transform else messages)
     reply, latency, retries, waited = _call_with_retries(model, key, request, on_status or (lambda text: None))
@@ -354,9 +428,9 @@ def check_backend(model: str | None = None) -> tuple[bool, str]:
     settings.DEV_LLM_MODEL) and the intent classifier's model (settings.DEV_LLM_MODEL) downloaded."""
     model = model or settings.DEV_LLM_MODEL
     if is_cloud_model(model):
-        if _google_api_key():
-            return True, f"{model} answers through the Google Gemini API. Replies can take a few minutes when Google is busy."
-        return False, settings.DEV_CLOUD_MSG_MISSING_KEY.format(model=model)
+        if _key_for(model):
+            return True, settings.DEV_CLOUD_MSG_BACKEND.format(model=model, host=_host(model))
+        return False, settings.DEV_CLOUD_MSG_MISSING_KEY.format(model=model, key_name=_key_name(model))
     try:
         tags = requests.get(f"{settings.OLLAMA_BASE_URL}/api/tags", timeout=5).json()
     except requests.RequestException:

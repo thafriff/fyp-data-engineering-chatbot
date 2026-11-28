@@ -116,10 +116,14 @@ class Interface(unittest.TestCase):
             for i in range(0, len(text), 7):
                 yield text[i:i + 7]
         for p in (mock.patch.object(llm, "stream_generate", fake_stream),
-                  mock.patch.object(llm, "check_backend", lambda model: (True, "fake backend"))):
+                  mock.patch.object(llm, "check_backend", lambda model: (True, "fake backend")),
+                  mock.patch.object(llm, "_send_openai", side_effect=AssertionError("no cloud call in this test")),
+                  mock.patch.object(llm, "_send_google", side_effect=AssertionError("no cloud call in this test"))):
             p.start()
             self.addCleanup(p.stop)
         self.at = AppTest.from_file(APP, default_timeout=180).run()
+        # The app's default is a cloud model since 2026-11-28 (deepseek-flash); these tests fake the LOCAL stream, so pick it.
+        self.at.selectbox[0].set_value(settings.DEV_LLM_MODEL).run()
 
     def ask(self, question, template=""):
         self.template = template

@@ -1,7 +1,9 @@
 """
-Offline tests of the chat prototype's cloud path (gemini-3.8-flash and gemma-4-31b-it through the Google Gemini API).
+Offline tests of the chat prototype's cloud path: deepseek-flash (the app's default since 2026-11-28, DeepSeek's OpenAI-compatible
+API) and gemini-3.8-flash and gemma-4-31b-it (Google Gemini API).
 
-The Google call (llm._send_google) is always faked: no network, no real key, and no notebook 04 file is read for writing.
+The API calls (llm._send_google, llm._send_openai) are always faked: no network, no real key, and no notebook 04 file is read for
+writing.
 The interface tests drive the real Streamlit page with streamlit.testing (AppTest) and the real retrieval, which loads the
 embedding model from the local cache.
 
@@ -78,8 +80,10 @@ class CloudGeneration(unittest.TestCase):
         for name in settings.DEV_CLOUD_MODELS:
             self.assertEqual(llm._cloud_request(name, messages),
                              providers.build_request(settings.NB04_CANDIDATES[name], messages), name)
-            self.assertEqual(llm._cloud_request(name, messages)["config"]["thinking_config"],
-                             {"thinking_level": settings.NB04_CANDIDATES[name]["request_options"]["thinking_level"]})
+            if settings.DEV_CLOUD_MODELS[name]["api"] == "gemini":
+                self.assertEqual(llm._cloud_request(name, messages)["config"]["thinking_config"],
+                                 {"thinking_level": settings.NB04_CANDIDATES[name]["request_options"]["thinking_level"]})
+        self.assertEqual(llm._cloud_request("deepseek-flash", messages)["extra_body"], {"thinking": {"type": "disabled"}})
 
     def test_request_with_a_spelling_hint_is_identical_too(self):
         messages = llm.build_messages("what is olpa", [CHUNK], corrections=[("olpa", "olap")])
@@ -108,12 +112,12 @@ class CloudGeneration(unittest.TestCase):
         self.assertIsInstance(error, llm.CloudError)
         self.assertEqual(calls, settings.DEV_CLOUD_BACKOFF_MAX_RETRIES + 1)
         self.assertEqual(str(error), settings.DEV_CLOUD_MSG_OVERLOADED.format(
-            model="gemini-3.8-flash", attempts=settings.DEV_CLOUD_BACKOFF_MAX_RETRIES + 1))
+            model="gemini-3.8-flash", attempts=settings.DEV_CLOUD_BACKOFF_MAX_RETRIES + 1, host="Google"))
         self.assertNotIn("secret detail", str(error))
 
     def test_429_message(self):
         error, _, _ = self.run_with(*[ApiError(429) for _ in range(settings.DEV_CLOUD_BACKOFF_MAX_RETRIES + 1)])
-        self.assertIn("free-tier rate limit", str(error))
+        self.assertIn("hit the Google rate limit", str(error))
 
     def test_invalid_key_not_retried(self):
         error, _, calls = self.run_with(ApiError(400, "API_KEY_INVALID"), GOOD)
@@ -197,10 +201,12 @@ class CloudGeneration(unittest.TestCase):
 
 
 class Interface(unittest.TestCase):
-    """The real page with the Google call faked."""
+    """The real page with the API calls faked (DeepSeek's fails the test unless a test replaces it)."""
 
     def setUp(self):
-        for p in (patched(), mock.patch.object(llm, "_google_api_key", lambda: "fake-key-not-real")):
+        for p in (patched(), mock.patch.object(llm, "_google_api_key", lambda: "fake-key-not-real"),
+                  mock.patch.object(llm, "_api_key", lambda provider: "fake-key-not-real"),
+                  mock.patch.object(llm, "_send_openai", side_effect=AssertionError("DeepSeek must not be called here"))):
             p.start()
             self.addCleanup(p.stop)
 
@@ -217,7 +223,8 @@ class Interface(unittest.TestCase):
 
     def test_default_and_grouping(self):
         at = self.app()
-        self.assertEqual(at.selectbox[0].value, settings.DEV_LLM_MODEL)
+        self.assertEqual(at.selectbox[0].value, settings.DEV_DEFAULT_ANSWER_MODEL)
+        self.assertEqual(settings.DEV_DEFAULT_ANSWER_MODEL, "deepseek-flash")
         self.assertEqual(at.selectbox[0].options,
                          [f"{settings.DEV_MODEL_GROUP_LOCAL} · {m}" for m in settings.DEV_LLM_MODEL_OPTIONS]
                          + [f"{settings.DEV_MODEL_GROUP_CLOUD} · {m}" for m in settings.DEV_CLOUD_MODELS])
@@ -259,6 +266,88 @@ class Interface(unittest.TestCase):
         with mock.patch.object(llm, "_send_google", side_effect=AssertionError("must not be called")):
             message = self.ask(self.app(), "gemini-3.8-flash", "What is the capital of France?")
         self.assertEqual(message.markdown[0].value, settings.FALLBACK_MESSAGE)
+
+
+class DeepSeekAndHistory(unittest.TestCase):
+    """deepseek-flash in the app (author, 2026-11-28) and conversation history on both cloud APIs."""
+
+    def setUp(self):
+        for p in (patched(), mock.patch.object(llm, "_api_key", lambda provider: f"fake-{provider}-key"),
+                  mock.patch.object(llm, "_google_api_key", lambda: "fake-google-key")):
+            p.start()
+            self.addCleanup(p.stop)
+
+    def test_deepseek_answer_and_cost(self):
+        sent = []
+
+        def fake(model, key, request):
+            sent.append((model, key, request))
+            return GOOD
+        with mock.patch.object(llm, "_send_openai", fake), \
+                mock.patch.object(llm, "_send_google", side_effect=AssertionError("DeepSeek never calls Google")):
+            answer = llm.cloud_generate("what is OLAP?", [CHUNK], "deepseek-flash")
+        model, key, request = sent[0]
+        self.assertEqual((model, key, request["model"]), ("deepseek-flash", "fake-deepseek-key", "deepseek-flash"))
+        config = settings.DEV_CLOUD_MODELS["deepseek-flash"]
+        self.assertAlmostEqual(answer.cost_usd_list, (1100 * config["input_usd_per_m"] + 300 * config["output_usd_per_m"]) / 1e6)
+
+    def test_deepseek_missing_key_names_its_own_key(self):
+        with mock.patch.object(llm, "_api_key", lambda provider: None), \
+                mock.patch.object(llm, "_send_openai", side_effect=AssertionError("must not be called")):
+            with self.assertRaises(llm.CloudError) as raised:
+                llm.cloud_generate("what is OLAP?", [CHUNK], "deepseek-flash")
+            ok, message = llm.check_backend("deepseek-flash")
+        self.assertIn("DEEPSEEK_API_KEY is not set", str(raised.exception))
+        self.assertFalse(ok)
+        self.assertIn("DEEPSEEK_API_KEY", message)
+
+    def test_the_backend_line_says_what_is_sent(self):
+        ok, message = llm.check_backend("deepseek-flash")
+        self.assertTrue(ok)
+        self.assertIn("sent to DeepSeek", message)
+
+    def test_openai_reply_is_read_like_the_runner(self):
+        usage = SimpleNamespace(prompt_tokens=1200, completion_tokens=250, completion_tokens_details=None)
+        response = SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="An answer [S05-0138]."),
+                                                            finish_reason="length")], usage=usage)
+        client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **kw: response)))
+        cache_key = ("k", settings.DEV_CLOUD_MODELS["deepseek-flash"]["base_url"])
+        with mock.patch.dict(llm._openai_clients, {cache_key: client}):
+            reply = llm._send_openai("deepseek-flash", "k", {"model": "deepseek-flash"})
+        self.assertEqual((reply.text, reply.input_tokens, reply.output_tokens, reply.reasoning_tokens, reply.finish),
+                         ("An answer [S05-0138].", 1200, 250, 0, "MAX_TOKENS"))
+
+    def history_messages(self):
+        messages = llm.build_messages("and ELT?", [CHUNK])
+        return [messages[0], {"role": "user", "content": "what is ETL?"},
+                {"role": "assistant", "content": "ETL is extract, transform, load."}, messages[1]]
+
+    def test_gemini_with_history_answers_the_current_question(self):
+        """Before 2026-11-28 the Gemini request sent only messages[1]: on a follow-up, the FIRST earlier question."""
+        messages = self.history_messages()
+        contents = llm._cloud_request("gemini-3.8-flash", messages)["contents"]
+        self.assertEqual([c["role"] for c in contents], ["user", "model", "user"])
+        self.assertEqual(contents[-1]["parts"][0]["text"], messages[-1]["content"])
+        self.assertEqual(contents[0]["parts"][0]["text"], "what is ETL?")
+
+    def test_deepseek_with_history_sends_every_turn_in_order(self):
+        messages = self.history_messages()
+        sent = llm._cloud_request("deepseek-flash", messages)["messages"]
+        self.assertEqual([m["role"] for m in sent], ["system", "user", "assistant", "user"])
+        self.assertEqual(sent[-1]["content"], messages[-1]["content"])
+
+    def test_single_turn_gemini_request_is_unchanged(self):
+        messages = llm.build_messages("what is OLAP?", [CHUNK])
+        self.assertEqual(llm._cloud_request("gemma-4-31b-it", messages)["contents"], messages[1]["content"])
+
+    def test_interface_default_answers_with_deepseek(self):
+        with mock.patch.object(llm, "_send_openai", lambda model, key, request: GOOD), \
+                mock.patch.object(llm, "_send_google", side_effect=AssertionError("the default is not a Google model")):
+            at = AppTest.from_file(APP, default_timeout=180).run()
+            at.chat_input[0].set_value("what is OLAP?").run()
+        self.assertFalse(at.exception, at.exception)
+        captions = [c.value for c in at.chat_message[-1].caption]
+        self.assertIn("Generated by deepseek-flash", captions)
 
 
 class Frozen(unittest.TestCase):
