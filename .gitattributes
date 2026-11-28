@@ -7,3 +7,6 @@ evaluation/intent_classifier_cases.json -text
 evaluation/multiturn_cases.json -text
 evaluation/multiturn_cases_holdout2.json -text
 evaluation/multiturn_cases_v3.json -text
+# The quiz test sets are checked against recorded SHA-256 files (evaluation/quiz_cases*.sha256); written before the quiz code.
+evaluation/quiz_cases.json -text
+evaluation/quiz_cases_holdout.json -text

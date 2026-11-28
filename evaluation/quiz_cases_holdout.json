@@ -1,0 +1,20 @@
+{
+ "meta": {
+  "purpose": "HELD-OUT cases for the 'Quiz me' feature (feature B). Written and hashed on 2026-11-28 BEFORE ANY QUIZ CODE, together with evaluation/quiz_cases.json, and never used to shape the rules or the prompt: they are run only in the final evaluation and reported apart.",
+  "written": "2026-11-28",
+  "coverage_check": "window functions 10 chunks, Spark DataFrames (dataframe 69, spark 212), data lake 55, partition 131, joins 15 (plain text search of the chunks).",
+  "scoring": "same as evaluation/quiz_cases.json: in_scope expects a quiz that passes the per-quiz checks; off_topic expects the fallback; not_quiz expects no quiz route"
+ },
+ "in_scope": [
+  {"id": "QH01", "text": "can you test me on window functions", "concept": "window functions"},
+  {"id": "QH02", "text": "quiz me on Spark DataFrames", "concept": "Spark DataFrames"},
+  {"id": "QH03", "text": "give me practice questions about partitioning", "concept": "partitioning"},
+  {"id": "QH04", "text": "hey quiz me on inner and left joins pls", "concept": "joins (informal, greeting)"}
+ ],
+ "off_topic": [
+  {"id": "QH05", "text": "quiz me on world capitals"}
+ ],
+ "not_quiz": [
+  {"id": "QH06", "text": "how are dbt tests different from data quality checks?"}
+ ]
+}

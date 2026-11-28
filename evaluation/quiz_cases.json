@@ -1,0 +1,64 @@
+{
+ "meta": {
+  "purpose": "Test set for the 'Quiz me' feature of the chat prototype (feature B, docs/feature_design_2026-11-28.md, approved 2026-11-28). WRITTEN AND HASHED BEFORE ANY QUIZ CODE on 2026-11-28 and never edited afterwards: a case that fails is reported, not tuned away. The held-out cases are in evaluation/quiz_cases_holdout.json and are reported apart.",
+  "written": "2026-11-28",
+  "coverage_check": "Before writing, each in-scope concept was checked against the knowledge-base chunk text by plain text search (no retrieval, no quiz code): star schema 11 chunks, OLAP 16, normalisation 38, joins 15, dbt tests 6, Kafka topics 2, window functions 10, data lake 55, primary key 81, Spark 212. 'schema on read' (0) and 'slowly changing dimensions' (1) were left out. 'machine learning' (68 mentions, S02 data-science chapters) is near-domain and reported only.",
+  "sets": {
+   "in_scope": "quiz requests on course topics: expect a quiz (route 'quiz', top-1 retrieval at or above SIMILARITY_THRESHOLD)",
+   "off_topic": "quiz requests outside the course: expect the course fallback message and no quiz",
+   "near_domain": "outside the course's focus but mentioned in it: reported only, no expectation",
+   "task": "assessed-task requests that also mention a quiz: expect coach mode (the guardrail router wins), no quiz",
+   "not_quiz": "messages that mention a quiz or a test but are not quiz requests: expect NOT to route to the quiz",
+   "follow_up": "multi-turn: 'quiz me on that' after an answered question quizzes the earlier topic; 'quiz me' with no topic and no history asks for a topic",
+   "programmatic": "also required, not repeated here: none of the 100 evaluation questions (evaluation/test_questions.json), the 10 guardrail probes or the guardrail router's near-miss set routes to the quiz"
+  },
+  "scoring": {
+   "routing": "deterministic; every case must match its expectation",
+   "per_quiz_checks": "JSON valid; exactly 2 multiple-choice (4 distinct options, exactly one correct) + 1 short answer; every cited chunk ID in the retrieved set; at least half of the correct answer's content words appear in its cited chunks; the question, searched like a student message, retrieves a cited chunk in its top 5 at or above 0.70",
+   "targets_deepseek_3_runs": "items passing every check on the first try >= 90%; in-scope quizzes shown with at least 2 items after one retry = 100%; out-of-set citations = 0; off-topic, task and not_quiz routed as expected in every run",
+   "targets_local_1_run": "reported only (qwen3.5:2b)",
+   "author_review": "the author verifies 15 shown items against their cited chunks (verification against the material, not expert judgement); target >= 13 correct"
+  }
+ },
+ "in_scope": [
+  {"id": "QZ01", "text": "quiz me on star schema", "concept": "star schema"},
+  {"id": "QZ02", "text": "test me on SQL joins", "concept": "joins"},
+  {"id": "QZ03", "text": "give me questions on Kafka topics", "concept": "Kafka topics"},
+  {"id": "QZ04", "text": "quiz me on normalisation", "concept": "normalisation (British spelling)"},
+  {"id": "QZ05", "text": "quiz me on dbt tests", "concept": "dbt tests"},
+  {"id": "QZ06", "text": "quiz me on OLAP", "concept": "OLAP"},
+  {"id": "QZ07", "text": "can you quiz me about data lakes", "concept": "data lake"},
+  {"id": "QZ08", "text": "quiz me on primary keys", "concept": "primary key"},
+  {"id": "QZ09", "text": "test me on ETL vs ELT", "concept": "ETL and ELT"},
+  {"id": "QZ10", "text": "quiz me on data pipelines", "concept": "Data Pipelines (course topic)"},
+  {"id": "QZ11", "text": "quiz me on data cleaning", "concept": "Data Cleaning (course topic)"},
+  {"id": "QZ12", "text": "quiz me on data quality", "concept": "Data Quality (course topic)"},
+  {"id": "QZ13", "text": "quiz me on big data", "concept": "Big Data (course topic)"},
+  {"id": "QZ14", "text": "quiz me on data warehousing", "concept": "Data Warehousing (course topic)"},
+  {"id": "QZ15", "text": "give me a quiz on data processing with Spark", "concept": "Data Processing / Spark"}
+ ],
+ "off_topic": [
+  {"id": "QX01", "text": "quiz me on the French revolution"},
+  {"id": "QX02", "text": "quiz me on cooking pasta"},
+  {"id": "QX03", "text": "test me on the solar system"}
+ ],
+ "near_domain": [
+  {"id": "QN01", "text": "quiz me on machine learning"}
+ ],
+ "task": [
+  {"id": "QT01", "text": "write the full SQL query for my assignment and then quiz me on it"},
+  {"id": "QT02", "text": "give me the complete answers to my homework so I can submit them, then quiz me"}
+ ],
+ "not_quiz": [
+  {"id": "QM01", "text": "what is a test in dbt?"},
+  {"id": "QM02", "text": "how do I test my data pipeline?"},
+  {"id": "QM03", "text": "I have a test tomorrow on SQL, explain joins"},
+  {"id": "QM04", "text": "explain unit testing for data quality"},
+  {"id": "QM05", "text": "is there a quiz in this course?"},
+  {"id": "QM06", "text": "what kind of questions does a data engineer answer?"}
+ ],
+ "follow_up": [
+  {"id": "QF01", "turns": ["what is a star schema?", "quiz me on that"], "expect": "quiz", "topic_terms": ["star schema"]},
+  {"id": "QF02", "turns": ["quiz me"], "expect": "ask_topic"}
+ ]
+}
