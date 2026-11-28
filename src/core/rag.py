@@ -12,7 +12,7 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 
 from config import settings
-from src.core import answer_format, intent, llm, quiz
+from src.core import answer_format, intent, llm, quiz, study_plan
 from src.core import conversation as conversation_rules
 from src.core import course_terms
 from src.core.conversation import Conversation
@@ -45,6 +45,8 @@ class RagResult:
     # Quiz me (feature B): call quiz_call(on_status) to write and check the quiz (quiz.make_quiz); quiz_topic is what it is about.
     quiz_call: Callable[..., dict] | None = None
     quiz_topic: str | None = None
+    # Study plan (feature A): call plan_call(on_status) to write the goals and questions (study_plan.write_session_text).
+    plan_call: Callable[..., dict] | None = None
 
 
 class RagPipeline:
@@ -100,6 +102,8 @@ class RagPipeline:
         routed = routed or intent.route(asked, top_score=self._top_score, clean=self.search_text)
         if routed.kind == "quiz":
             return self._quiz(routed.quiz_topic, model, conversation if multi else None, routed)
+        if routed.kind == "study_plan":
+            return self.plan_for(routed.plan_request, model, routed)
         if routed.kind != "question":
             return RagResult(chunks=[], answer_stream=iter([routed.reply]), used_fallback=False,
                              intent=routed.kind, routing=routed)
@@ -168,6 +172,47 @@ class RagPipeline:
     def quiz_for_topic(self, topic: str, model: str | None = None) -> RagResult:
         """A quiz on a named topic, without the chat router (the Quiz page and the study plan's checkpoints)."""
         return self._quiz(topic, model, None, Intent("quiz", path="quiz", quiz_topic=topic))
+
+    def quiz_for_chunks(self, topic: str, chunk_ids: list[str], model: str | None = None) -> RagResult:
+        """A quiz on given chunks (a study plan's checkpoint: the sessions just covered), without a new search."""
+        chunks = [self._chunk(i) for i in chunk_ids[:settings.TOP_K]]
+        model = model or settings.DEV_LLM_MODEL
+        routed = Intent("quiz", path="quiz", quiz_topic=topic)
+        return RagResult(chunks=chunks, answer_stream=iter(()), used_fallback=False, model=model, intent="quiz", routing=routed,
+                         quiz_topic=topic, quiz_call=lambda on_status=None: quiz.make_quiz(topic, chunks, model, self.quiz_search,
+                                                                                         on_status))
+
+    def _chunk(self, chunk_id: str) -> RetrievedChunk:
+        c = self.retriever.chunks[chunk_id]
+        return RetrievedChunk(chunk_id=c["chunk_id"], score=1.0, text=c["text"], source_id=c["source_id"],
+                              source_name=c["source_name"], source_type=c["source_type"], section=c["section"],
+                              page=c.get("page"), file=c.get("file"), topic=c.get("topic"))
+
+    def plan_search(self, query: str) -> list[RetrievedChunk]:
+        """A study plan's searches: the same cleaned text as a question, with more results (PLAN_RETRIEVE_TOP_K)."""
+        return self.retriever.retrieve(self.search_text(query), top_k=settings.PLAN_RETRIEVE_TOP_K)
+
+    def plan_for(self, request, model: str | None = None, routed: Intent | None = None) -> RagResult:
+        """Feature A: a fixed reply for a missing topic or time, a budget outside the limits or the whole field; otherwise search,
+        apply the in-scope rule (declined below it), build the structure by code, and return a plan_call that writes the goals and
+        suggested questions. Plans are not added to the conversation history."""
+        routed = routed or Intent("study_plan", path="study_plan", plan_request=request)
+        fixed = study_plan.problem(request)
+        if fixed:
+            return RagResult(chunks=[], answer_stream=iter([fixed[1]]), used_fallback=False, intent=f"plan_{fixed[0]}",
+                             routing=routed)
+        chunks = study_plan.gather(request.topic, self.plan_search)
+        if not study_plan.in_scope(chunks):
+            message = settings.PLAN_DECLINE.format(topic=request.topic, topics=", ".join(settings.TOPIC_DESCRIPTIONS))
+            return RagResult(chunks=[], answer_stream=iter([message]), used_fallback=True, intent="plan_declined", routing=routed)
+        plan = study_plan.build(request, chunks, lambda cid: self.retriever.chunks[cid]["difficulty"])
+        used = {i for s in plan["sessions"] for item in s["items"] for i in item["chunk_ids"]}
+        shown = [c for c in chunks if c.chunk_id in used]
+        model = model or settings.DEV_LLM_MODEL
+        return RagResult(chunks=shown, answer_stream=iter(()), used_fallback=False, model=model, intent="study_plan",
+                         routing=routed, search_query=request.topic,
+                         plan_call=lambda on_status=None: study_plan.write_session_text(
+                             plan, model, self.quiz_search, lambda cid: self.retriever.chunks[cid]["text"], on_status))
 
     def _quiz(self, topic: str, model: str | None, conversation: Conversation | None, routed: Intent) -> RagResult:
         """Feature B: resolve the topic (the earlier one for "quiz me on that"), retrieve as for a question, apply the same threshold,

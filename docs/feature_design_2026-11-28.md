@@ -379,3 +379,45 @@ out-of-set citations, so none reached a student. Off-topic 4/4.
 
 **Pending: the author's check** of 15 shown items against their cited chunks (`evaluation/features/runs/quiz_review_sheet.md`, Git
 ignored; target at least 13 correct). Aggregate numbers: `evaluation/features/quiz_eval_summary.json`.
+
+### A) Study plan: built and evaluated (2026-11-28)
+
+**Test set first.** `evaluation/study_plan_cases.json` (SHA-256 a6d3e2e3...) was written, hashed and committed (75f6e26) before any
+study-plan code and not edited afterwards. **The author's 6 held-out cases are still to be written** (design section A); when they exist
+they go in `evaluation/study_plan_cases_holdout.json`, hashed the same way, and `evaluation/study_plan_eval.py` runs and reports them apart.
+
+**What was built.** `src/core/study_plan.py`: detection and parsing (minutes, hours, days, weeks, "N hours a day", and the Malay jam /
+minit / hari / untuk), the in-scope rule, sub-topics named after real section titles, the order, the time boxing, the checkpoints, and
+the one model call that writes goals and suggested questions with the grounding check. Also the `study_plan` route in `intent.route` (after
+the quiz), `RagPipeline.plan_for` / `quiz_for_chunks` (checkpoint quizzes on the sessions just covered), the plan card
+(`src/app/plan_view.py`) in chat and on a new **Study plan** page (`src/app/pages/1_Study_plan.py`); a suggested question is sent to the
+chat. Plans are not added to the conversation history. Tests: `tests/test_study_plan.py` (21).
+
+**Fixes made on the design cases before the final round (each is in the record and the tests):**
+- the planner reads the message with greetings removed but **not spelling-corrected**, because the corrector turned the Malay "untuk"
+  into "untuck" (the topic became "untuck SQL");
+- a sub-topic needs at most one session (45 minutes): a 24-chunk section had otherwise taken the whole 3-hour data warehousing plan;
+- a gap under 10 minutes at the end of a session goes to the sub-topic before it, so nothing is cut into 3-4 minute pieces;
+- the goal/question reply parser accepts a single session object and "Session 2" numbers; template questions drop section numbering;
+- **DeepSeek's JSON mode sometimes returned invalid JSON**: a stray "}" after a question list (..."q3"}]}]} for ..."q3"]}]}), for some
+  prompts twice in a row. The parser now drops a closer that does not match its bracket (text inside strings untouched), and an
+  unusable reply is asked for once more.
+
+| deepseek-flash, 3 runs x 9 plans | Round 1 | Round 2 | Round 3 | **Round 4 (current)** |
+|---|---|---|---|---|
+| Routing and fixed replies as expected (21 cases) | 21/21 | 21/21 | 21/21 | **21/21** |
+| Plans passing every deterministic check | 27/27 | 27/27 | 27/27 | **27/27** |
+| Suggested questions grounded before replacement (target >= 90%) | 93.7% | 96.7% | 94.9% | **96.0% (311/324)** |
+| Sessions left with template questions only | 7 | 8 | 3 | **0** |
+| Cost at list price | $0.025 | $0.025 | $0.026 | $0.025 |
+
+The deterministic checks: the plan uses its budget within 10% (every plan used it exactly); every sub-topic is a real section title;
+every citation is in the retrieved set and in its own section; difficulty never decreases from one session to the next; a checkpoint
+ends the plan. Off-topic requests ("machine learning": 1 chunk at 0.704 from 1 section; "React"; "driving test") are declined in every
+run; too broad, too short, a missing time and a missing topic get their fixed replies; the Malay-English case gets its 2-hour plan.
+
+**Local mode (qwen3.5:2b, 1 run, report only):** 21/21 routing, 9/9 plans pass the deterministic checks, 88% of suggested questions
+grounded before replacement (shown questions are grounded or templates, by construction), median 31.5 s to write the goals and questions.
+
+**Pending: the author's read-through** of 5 plans against their source sections (`evaluation/features/runs/study_plan_review_sheet.md`,
+Git ignored) and the 6 held-out cases. Aggregate numbers: `evaluation/features/study_plan_eval_summary.json`.

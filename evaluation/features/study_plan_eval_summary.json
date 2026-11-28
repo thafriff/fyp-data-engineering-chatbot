@@ -1,0 +1,149 @@
+{
+ "meta": {
+  "feature": "A Study plan",
+  "generated": "2026-11-28T13:09:02+00:00",
+  "contents": "aggregate numbers only (no plan text)"
+ },
+ "runs": {
+  "deepseek-flash": {
+   "model": "deepseek-flash",
+   "round": "round1",
+   "routing": {
+    "cases": 21,
+    "as_expected": 21,
+    "misses": []
+   },
+   "plans": 27,
+   "plan_errors": 0,
+   "deterministic_all_pass": 27,
+   "deterministic_failures": {
+    "budget_ok": 0,
+    "titles_real": 0,
+    "citations_ok": 0,
+    "difficulty_ok": 0,
+    "checkpoint_at_end": 0
+   },
+   "questions_generated": 303,
+   "questions_grounded_before_replacement": 284,
+   "grounding_rate": 0.937,
+   "questions_replaced": 16,
+   "questions_dropped": 3,
+   "sessions_with_template_questions_only": 7,
+   "write_errors": 0,
+   "seconds_median": 1.8,
+   "cost_usd_list_total": 0.025469
+  },
+  "deepseek-flash_v2": {
+   "model": "deepseek-flash",
+   "round": "v2",
+   "routing": {
+    "cases": 21,
+    "as_expected": 21,
+    "misses": []
+   },
+   "plans": 27,
+   "plan_errors": 0,
+   "deterministic_all_pass": 27,
+   "deterministic_failures": {
+    "budget_ok": 0,
+    "titles_real": 0,
+    "citations_ok": 0,
+    "difficulty_ok": 0,
+    "checkpoint_at_end": 0
+   },
+   "questions_generated": 300,
+   "questions_grounded_before_replacement": 290,
+   "grounding_rate": 0.967,
+   "questions_replaced": 7,
+   "questions_dropped": 3,
+   "sessions_with_template_questions_only": 8,
+   "write_errors": 0,
+   "seconds_median": 2.3,
+   "cost_usd_list_total": 0.025416
+  },
+  "deepseek-flash_v3": {
+   "model": "deepseek-flash",
+   "round": "v3",
+   "routing": {
+    "cases": 21,
+    "as_expected": 21,
+    "misses": []
+   },
+   "plans": 27,
+   "plan_errors": 0,
+   "deterministic_all_pass": 27,
+   "deterministic_failures": {
+    "budget_ok": 0,
+    "titles_real": 0,
+    "citations_ok": 0,
+    "difficulty_ok": 0,
+    "checkpoint_at_end": 0
+   },
+   "questions_generated": 315,
+   "questions_grounded_before_replacement": 299,
+   "grounding_rate": 0.949,
+   "questions_replaced": 11,
+   "questions_dropped": 5,
+   "sessions_with_template_questions_only": 3,
+   "write_errors": 5,
+   "seconds_median": 2.1,
+   "cost_usd_list_total": 0.026151
+  },
+  "deepseek-flash_v4": {
+   "model": "deepseek-flash",
+   "round": "v4",
+   "routing": {
+    "cases": 21,
+    "as_expected": 21,
+    "misses": []
+   },
+   "plans": 27,
+   "plan_errors": 0,
+   "deterministic_all_pass": 27,
+   "deterministic_failures": {
+    "budget_ok": 0,
+    "titles_real": 0,
+    "citations_ok": 0,
+    "difficulty_ok": 0,
+    "checkpoint_at_end": 0
+   },
+   "questions_generated": 324,
+   "questions_grounded_before_replacement": 311,
+   "grounding_rate": 0.96,
+   "questions_replaced": 11,
+   "questions_dropped": 2,
+   "sessions_with_template_questions_only": 0,
+   "write_errors": 0,
+   "seconds_median": 1.8,
+   "cost_usd_list_total": 0.02526
+  },
+  "qwen3.5_2b_v4": {
+   "model": "qwen3.5:2b",
+   "round": "v4",
+   "routing": {
+    "cases": 21,
+    "as_expected": 21,
+    "misses": []
+   },
+   "plans": 9,
+   "plan_errors": 0,
+   "deterministic_all_pass": 9,
+   "deterministic_failures": {
+    "budget_ok": 0,
+    "titles_real": 0,
+    "citations_ok": 0,
+    "difficulty_ok": 0,
+    "checkpoint_at_end": 0
+   },
+   "questions_generated": 108,
+   "questions_grounded_before_replacement": 95,
+   "grounding_rate": 0.88,
+   "questions_replaced": 12,
+   "questions_dropped": 1,
+   "sessions_with_template_questions_only": 0,
+   "write_errors": 0,
+   "seconds_median": 31.5,
+   "cost_usd_list_total": 0
+  }
+ }
+}

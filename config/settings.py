@@ -1401,3 +1401,83 @@ QUIZ_CHECK_LABEL = "Check answers"
 QUIZ_SELF_MARK_LABELS = ("I had this", "Not yet")
 QUIZ_WAITING_LOCAL = "Writing a quiz with the offline model (this can take a minute)..."
 QUIZ_PAGE_TITLE = "Quiz"
+
+# ---------------------------------------------------------------------------
+# STUDY PLAN (feature A; docs/feature_design_2026-11-28.md, approved by the author 2026-11-28; suggested by the author's lecturer).
+# APP LAYER ONLY: SYSTEM_PROMPT, the notebook 04 runners and single-turn chat are untouched. Design test set written and hashed before
+# this code: evaluation/study_plan_cases.json (a6d3e2e3...). Defaults approved by the author: 45-minute sessions, a 10-minute break,
+# 2 hours a day in days mode, limits 20 minutes to 14 days or 40 hours.
+# ---------------------------------------------------------------------------
+PLAN_ENABLED = True
+PLAN_SESSION_MINUTES = 45
+PLAN_BREAK_MINUTES = 10
+PLAN_MIN_SESSION_MINUTES = 20          # the shortest session (a final short session, or the whole plan)
+PLAN_HOURS_PER_DAY = 2                 # days mode, unless the student says otherwise ("3 hours a day")
+PLAN_MIN_MINUTES = 20
+PLAN_MAX_DAYS = 14
+PLAN_MAX_HOURS = 40
+PLAN_MIN_SUBTOPIC_MINUTES = 10
+PLAN_MAX_SUBTOPIC_MINUTES = 45          # no sub-topic needs more than one session (a 24-chunk section would otherwise take a whole plan)
+PLAN_MINUTES_PER_CHUNK = 8             # time a sub-topic needs per chunk of material (read it, ask the suggested questions)
+PLAN_RETRIEVE_TOP_K = 60               # chunks retrieved per search when building a plan
+PLAN_MAX_EXPANSION_QUERIES = 4         # extra searches from the named course topic's TOPIC_DESCRIPTIONS phrases
+PLAN_MIN_CHUNKS = 3                    # in-scope rule: at least this many chunks at or above SIMILARITY_THRESHOLD ...
+PLAN_MIN_SECTIONS = 2                  # ... from at least this many sections ("machine learning": 1 chunk at 0.704 -> declined)
+PLAN_QUIZ_EVERY_SESSIONS = 2           # hours mode: a quiz checkpoint after every 2 sessions (days mode: at the end of each day)
+PLAN_QUESTIONS_PER_SESSION = 3         # suggested questions asked for; a question is kept only if it passes the grounding check
+PLAN_MAX_OUTPUT_TOKENS = 2500
+PLAN_UNUSABLE_REPLY_RETRIES = 1        # a reply that is not usable JSON is asked for once more (DeepSeek JSON mode is not always valid)
+PLAN_LOCAL_SESSIONS_PER_CALL = 4       # local mode: the goals and questions are written for at most 4 sessions per call (4,096 context)
+PLAN_CHUNK_CHARS_IN_PROMPT = 500       # each sub-topic's best chunk, cut to this length, goes into the goal/question prompt
+# A plan request: a planning phrase AND a duration, or an explicit "study plan" request (then the time is asked for). A message that
+# starts with a question word is a plan request only if it says "plan" ("how do I schedule a dbt job every 3 days?" is a question).
+PLAN_EXPLICIT_PATTERNS = [r"\bstudy plan\b", r"\b(?:make|give|create|build|write|prepare) (?:me )?(?:a )?(?:study |revision )?plan\b",
+                          r"^plan\b"]
+PLAN_REQUEST_WORDS = r"\b(?:plan|planning|study|studying|revise|revising|revision|learn|learning|prepare|schedule)\b"
+PLAN_QUESTION_START = r"^(?:how|what|why|when|which|who|where|is|are|does|do|can|could|should|explain|describe|define|tell)\b"
+PLAN_NUMBER_WORDS = {"a": 1, "an": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
+                     "nine": 9, "ten": 10, "satu": 1, "dua": 2, "tiga": 3, "empat": 4, "lima": 5}
+PLAN_UNITS = {"minute": 1, "minutes": 1, "min": 1, "mins": 1, "minit": 1, "hour": 60, "hours": 60, "hr": 60, "hrs": 60, "h": 60,
+              "jam": 60, "day": 1440, "days": 1440, "hari": 1440, "week": 10080, "weeks": 10080, "minggu": 10080}
+PLAN_PER_DAY_PATTERN = r"(?P<n>\d+(?:\.\d+)?|a|an|one|two|three|four|five|six)\s*(?:hours?|hrs?|jam)\s*(?:a|per|each|every)\s*day\b"
+# Words removed from the message to leave the topic (planning words, fillers and connectors; Malay "untuk" = for).
+PLAN_FILLER_WORDS = ["i have", "i've got", "i want to", "i would like to", "i'd like to", "i need to", "help me", "can you", "could you",
+                     "please", "pls", "make me", "give me", "make", "create", "build", "write", "prepare", "a study plan",
+                     "study plan", "revision plan", "a plan", "plan", "planning", "studying", "study", "revising", "revise",
+                     "revision", "learn", "schedule", "for", "on", "to", "of", "about", "in", "within", "untuk", "me", "my", "the",
+                     "next", "only", "just", "and then", "a", "an"]
+# A request for the whole field gets an overview of the 8 course topics instead of a plan.
+PLAN_BROAD_PATTERNS = [r"\ball\b", r"\beverything\b", r"\bwhole course\b", r"\bentire course\b", r"^data engineering$",
+                       r"\ball (?:of )?(?:the )?topics\b"]
+PLAN_ASK_TIME = 'How much time do you have? For example: "plan 3 hours for SQL" or "plan 3 days for data warehousing".'
+PLAN_ASK_TOPIC = 'Which topic should the plan cover? For example: "I have 3 hours to study data warehousing".'
+PLAN_TOO_SHORT = ("{minutes} minutes is too short for a plan. Start with one session on {topic}: ask \"What is {topic}?\" and then "
+                  "\"quiz me on {topic}\".")
+PLAN_TOO_LONG = ("Plans go up to {max_days} days or {max_hours} hours. Plan the first week instead, for example: "
+                 "\"plan 7 days for {topic}\".")
+PLAN_DECLINE = ("I could not find enough on \"{topic}\" in the course materials to build a study plan. The course covers: {topics}. "
+                "Try one of these, for example \"plan 3 hours for SQL\".")
+PLAN_BROAD = ("That covers the whole course, which is too much for one plan. The course has eight topics: pick one, for example "
+              "\"plan {minutes} minutes for SQL\".\n\n{overview}")
+PLAN_SYSTEM_PROMPT = (
+    "You help undergraduate data engineering students study. For each study session you are given its sub-topics and course "
+    "excerpts. Use ONLY those excerpts. Write in simple English. Reply with JSON only."
+)
+PLAN_INSTRUCTION = (
+    "For every session above, write a one-sentence goal and {n} questions the student can ask a course chatbot to learn that "
+    "session's sub-topics. Each question must make sense on its own, as a student would ask it: name the concept, and never refer "
+    "to the excerpts, the text or a session. Every question must be answerable from that session's excerpts.\n"
+    "Reply with one JSON object with a single key \"sessions\", a list with one object per session in the same order, each with the "
+    "keys \"session\" (its number), \"goal\" and \"questions\" (a list of strings)."
+)
+PLAN_JSON_SCHEMA = {
+    "type": "object",
+    "properties": {"sessions": {"type": "array", "items": {
+        "type": "object",
+        "properties": {"session": {"type": "integer"}, "goal": {"type": "string"},
+                       "questions": {"type": "array", "items": {"type": "string"}}},
+        "required": ["session", "goal", "questions"]}}},
+    "required": ["sessions"],
+}
+PLAN_WAITING_LOCAL = "Writing the plan's goals and questions with the offline model (this can take a minute or two)..."
+PLAN_PAGE_TITLE = "Study plan"

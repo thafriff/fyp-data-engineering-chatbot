@@ -89,3 +89,21 @@ def usage_caption(usage: dict) -> str:
     retries = f" · {usage['retries']} {plural}, {usage['retry_wait_seconds']:.0f} s waiting" if usage["retries"] else ""
     return (f"Input {usage['input_tokens']:,} tokens · output {usage['output_tokens']:,} tokens{reasoning} · "
             f"${usage['cost_usd_list']:.6f} at list price · {usage['latency_seconds']:.1f} s{retries}")
+
+
+def checkpoint_quiz_maker(model: str):
+    """For a study plan's checkpoint: a function (titles, chunk_ids) -> {"quiz", "sources"} or {"error"}, quizzing those chunks."""
+    def make(titles: str, chunk_ids: list[str]) -> dict:
+        from src.core import llm, quiz
+        result = load_pipeline().quiz_for_chunks(titles, chunk_ids, model=model)
+        try:
+            made = result.quiz_call()
+        except (llm.CloudError, quiz.QuizError) as error:
+            return {"error": str(error)}
+        return {"quiz": made, "sources": sources_of(result.chunks)}
+    return make
+
+
+def ask_in_chat(question: str) -> None:
+    """A study plan's suggested question: the chat page sends it as if the student had typed it."""
+    st.session_state["pending_question"] = question

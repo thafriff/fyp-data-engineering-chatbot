@@ -19,9 +19,9 @@ if str(PROJECT_ROOT) not in sys.path:
 import streamlit as st
 
 from config import settings
-from src.app import quiz_view, styles
-from src.app.shared import (load_pipeline, reply_caption, show_cited_sources, show_retrieved,
-                             sources_of, usage_caption)
+from src.app import plan_view, quiz_view, styles
+from src.app.shared import (ask_in_chat, checkpoint_quiz_maker, load_pipeline, reply_caption, show_cited_sources,
+                             show_retrieved, sources_of, usage_caption)
 from src.core import citations, guardrail, llm, quiz
 from src.core.conversation import Conversation
 
@@ -83,6 +83,13 @@ if "conversation" not in st.session_state:     # multi-turn memory for this brow
 # ---------------------------------------------------------------- history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
+        if message.get("plan"):                       # a study plan card (feature A): rendered from its saved state
+            plan_view.render(message["plan"], message["sources"], message["plan_key"],
+                             checkpoint_quiz_maker(message.get("model") or selected_model), ask_in_chat)
+            st.caption(reply_caption(message.get("model"), False))
+            if message.get("usage"):
+                st.caption(usage_caption(message["usage"]))
+            continue
         if message.get("quiz"):                       # a quiz card (feature B): rendered from its saved state
             quiz_view.render(message["quiz"], message["sources"], message["quiz_key"])
             st.caption(reply_caption(message.get("model"), False))
@@ -111,6 +118,8 @@ for message in st.session_state.messages:
 
 # ---------------------------------------------------------------- new question
 question = st.chat_input("Type your question...")
+pending = st.session_state.pop("pending_question", None)     # a study plan's suggested question, sent as if typed
+question = question or pending
 if llm.is_cloud_model(selected_model):        # privacy note under the input, in cloud mode only (author, 2026-11-28)
     st.bottom.caption(settings.DEV_CLOUD_PRIVACY_NOTE.format(host=llm.cloud_host(selected_model)))
 if question:
@@ -142,6 +151,23 @@ if question:
                         "quiz_key": f"quiz_{len(st.session_state.messages)}", "sources": sources_of(result.chunks),
                         "model": result.model, "usage": made["usage"], "used_fallback": False})
                 st.rerun()                    # shown from the history, so the card keeps its state; quizzes are not in the history
+            if result.plan_call:              # Study plan (feature A): the structure is built; write the goals and questions
+                try:
+                    if llm.is_cloud_model(result.model):
+                        plan = result.plan_call(answer_slot.info)
+                    else:
+                        with st.spinner(settings.PLAN_WAITING_LOCAL):
+                            plan = result.plan_call()
+                except Exception as error:     # write_session_text falls back to template questions; this is a last resort
+                    st.session_state.messages.append({"role": "assistant", "content": f"Could not write the plan: {error}",
+                                                      "failed": True})
+                else:
+                    st.session_state.messages.append({
+                        "role": "assistant", "content": f"Study plan: {plan['topic']}", "plan": plan,
+                        "plan_key": f"plan_{len(st.session_state.messages)}", "sources": sources_of(result.chunks),
+                        "model": result.model, "usage": plan.get("usage") and {**plan["usage"], "reasoning_tokens": 0, "retries": 0,
+                                                                               "retry_wait_seconds": 0}})
+                st.rerun()                    # shown from the history; plans are not in the conversation history
             if result.cloud_call:             # a cloud answer is not streamed: show the waiting state until it is ready
                 try:
                     cloud = result.cloud_call(answer_slot.info)
