@@ -29,7 +29,11 @@
    ],
    "trial_errors": [],
    "access_blockers": [],
-   "score": null
+   "score": 5,
+   "score_reason": "Standard OpenAI client; no special handling (temperature and max_completion_tokens are standard parameters); 0 trial errors.",
+   "evidence_note": "This entry was not filled during integration (plan section 2.8 says the log is never reconstructed afterwards), so the evidence is what was recorded at the time elsewhere: the frozen request settings in config/settings.py, the 27 Nov pre-flight key check (key_check.json) and the 0-error generation run (130 of 130). Stated as a limitation in Chapter 4.",
+   "scored_by": "author, 2026-11-28: accepted Claude Code's application of the plan section 2.8 rule to the logged evidence, before any scoring was run and before any result was seen",
+   "scored_at": "2026-11-28T07:29:47+00:00"
   },
   "gemini-3.8-flash": {
    "logged_at": "2026-11-07T15:03:15+00:00",
@@ -55,7 +59,7 @@
    ],
    "trial_errors": [],
    "access_blockers": [],
-   "score": null,
+   "score": 3,
    "pre_trial_checks": [
     [
      {
@@ -150,7 +154,10 @@
      "rate_limit_retries": 0,
      "timed_out_attempts": 0
     }
-   ]
+   ],
+   "score_reason": "Three special-handling items: thinking cannot be disabled (thinking_level LOW); a 1,200-token reasoning allowance on top of the 800-token answer cap; thinking tokens reported apart and added to output. 0 trial errors. Google's 503s and the free-tier quota are not counted as trial errors (host load, nothing to fix); counting them would not change the score.",
+   "scored_by": "author, 2026-11-28: accepted Claude Code's application of the plan section 2.8 rule to the logged evidence, before any scoring was run and before any result was seen",
+   "scored_at": "2026-11-28T07:29:47+00:00"
   },
   "claude-sonnet-5-5": {
    "logged_at": null,
@@ -168,7 +175,11 @@
    ],
    "trial_errors": [],
    "access_blockers": [],
-   "score": null
+   "score": 3,
+   "score_reason": "Two special-handling items: a non-default temperature returns a 400, so temperature is omitted; thinking cannot be set to 'disabled' (400), so it is set to 'between_tools'. 0 trial errors.",
+   "evidence_note": "This entry was not filled during integration (plan section 2.8 says the log is never reconstructed afterwards), so the evidence is what was recorded at the time elsewhere: the frozen request settings in config/settings.py, the 27 Nov pre-flight key check (key_check.json) and the 0-error generation run (130 of 130). Stated as a limitation in Chapter 4.",
+   "scored_by": "author, 2026-11-28: accepted Claude Code's application of the plan section 2.8 rule to the logged evidence, before any scoring was run and before any result was seen",
+   "scored_at": "2026-11-28T07:29:47+00:00"
   },
   "llama-3.3-70b-groq": {
    "logged_at": null,
@@ -229,7 +240,10 @@
    ],
    "trial_errors": [],
    "access_blockers": [],
-   "score": null
+   "score": 4,
+   "score_reason": "One special-handling item: thinking is on by default and is turned off through extra_body {'thinking': {'type': 'disabled'}}. 0 trial errors. The 401 at the pre-flight was the author's wrong key value, logged as not a host difficulty.",
+   "scored_by": "author, 2026-11-28: accepted Claude Code's application of the plan section 2.8 rule to the logged evidence, before any scoring was run and before any result was seen",
+   "scored_at": "2026-11-28T07:29:47+00:00"
   },
   "gemma-4-31b-it": {
    "logged_at": "2026-11-07T15:11:40+00:00",
@@ -254,7 +268,7 @@
    ],
    "trial_errors": [],
    "access_blockers": [],
-   "score": null,
+   "score": 3,
    "pre_trial_checks": [
     [
      {
@@ -345,7 +359,10 @@
      "rate_limit_retries": 0,
      "timed_out_attempts": 0
     }
-   ]
+   ],
+   "score_reason": "Two special-handling items: thinking_level MINIMAL taken from a Gemma-on-Gemini-API docs page marked deprecated; reasoning allowance 0 on the assumption, confirmed in the trial, that minimal thinking returns no reasoning tokens. 0 trial errors. Google's 503s are not counted as trial errors (host load, nothing to fix).",
+   "scored_by": "author, 2026-11-28: accepted Claude Code's application of the plan section 2.8 rule to the logged evidence, before any scoring was run and before any result was seen",
+   "scored_at": "2026-11-28T07:29:47+00:00"
   },
   "mistral-large-4": {
    "logged_at": null,

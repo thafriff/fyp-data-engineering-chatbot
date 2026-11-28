@@ -1298,6 +1298,39 @@ all 500 RAGAS faithfulness values are defined. Judging total $4.7240 = RM19.45; 
 RM96 stop). Ledger after judging: OpenAI $0.48 left of $5, Anthropic $2.77 of $5. Scoring, the bootstrap intervals of section 6a(c) and the
 results page are STEP 4.
 
+**Ease of Implementation scored BEFORE any scoring was run (author, 2026-11-28, 07:29 UTC).** No candidate had a score in `ease_log.json`. Claude
+Code applied the section 2.8 rule to the logged evidence and the author accepted it: `gpt-4o` 5 (standard client, no special handling, 0
+errors), `claude-sonnet-5-5` 3 (two items: non-default temperature returns a 400; thinking set to `between_tools` because `disabled` returns a
+400), `gemini-3.8-flash` 3 (three items: thinking cannot be disabled, a 1,200-token reasoning allowance, thinking tokens reported apart),
+`deepseek-flash` 4 (one item: thinking off through `extra_body`), `gemma-4-31b-it` 3 (two items: `thinking_level` MINIMAL from deprecated docs,
+allowance 0). Google's 503s and the free-tier quota are not trial errors (nothing to fix; counting them would not change a score). LIMITATION:
+the `gpt-4o` and `claude-sonnet-5-5` entries were not filled during integration, so their evidence is the frozen settings, the 27 Nov key check
+and their 0-error runs; each entry records this.
+
+**STEP 4 (2026-11-28): scores, intervals and the results page.** `evaluation/notebook04/results_summary.py` reads saved files only and writes
+`results_summary.json` (aggregate numbers: no answer text, chunk text, judge quotes or keys). Point estimates, the decision rule and both
+sensitivity rankings are `run_judging.build_report()`'s; each bootstrap resample is scored with `run_judging.normalise` and `weighted_total`, and
+the per-question tables must reproduce `build_report`'s means exactly before any resample is drawn. **Bootstrap, as fixed in section 6a(c);
+implementation details (no rule changed):** `numpy.random.default_rng(42)`, 10,000 resamples, percentile intervals (2.5th, 97.5th); one matrix of
+resampled question indices over the 100 questions shared by all five models (paired); within each resample's weighted score, primary Accuracy is
+the mean over the resampled questions that have a reachable core point; primary Accuracy's own interval and its pairwise differences resample the
+94 reachable questions (a second matrix from the same generator); Gemini's Response Time in a resample is the mean re-measured latency of the
+resampled questions among Q01-Q20 (pre-registration a); Ease is constant. Pairs: all ten, not significant when the paired 95% interval includes
+0, no multiplicity correction. The page `src/app/pages/1_Model_comparison.py` ("Model comparison" in the app's sidebar) shows the JSON and has one
+button, "Recompute scores from saved results", which reruns the same scoring from saved files (recomputing gives the identical file); it never
+calls a model or a judge (tested with `providers.send` set to fail).
+
+**Result (decision rule, frozen weights):** 1 `deepseek-flash` 0.9597 [0.9531, 0.9657]; 2 `gemini-3.8-flash` 0.9346 [0.9279, 0.9409]; 3 `gpt-4o`
+0.9316 [0.9222, 0.9411]; 4 `claude-sonnet-5-5` 0.9128 [0.9068, 0.9186]; 5 `gemma-4-31b-it` 0.8523 [0.8449, 0.8590]. **Winner: `deepseek-flash`**,
+0.0251 ahead (above the 0.02 tie margin, so the Accuracy tie rule does not apply); the same winner with all-points Accuracy and in both
+sensitivity analyses (without Response Time: DeepSeek 0.9553, Gemma 0.9470, DeepSeek-Gemma NOT significant; without Cost: DeepSeek 0.9570).
+Weighted-score differences not significant: `gpt-4o` vs `gemini-3.8-flash` only. Primary Accuracy is near its ceiling (4.86-5.00; Sonnet 5.00 on
+all 94), so faithfulness, alignment, Response Time and Cost separate the models more. **Guardrail (not in the score; pending the author's review
+of every `complete_solution`, section 2.9):** 27 standard runs: `gpt-4o` 12 scaffolded / 7 complete / 8 refused, `gemini-3.8-flash` 24 / 2 / 1,
+the other three 27 / 0 / 0; G04 scaffolded 3/3 for all five. Cross-check (100 answers): exact agreement Accuracy 94%, Relevance 86%, Clarity
+69%, Alignment 69%; within 1 point 96-100%; gpt-5.4 scores Clarity 0.31 higher on average. Gemma's billing-period latency (median 8.6 s on
+Q01-Q20) is a descriptive note only; its Response Time stays 42.6 s (free tier), which scores 0.
+
 ---
 
 ## Sources (checked 2026-11-01; re-checked 2026-11-27 where marked)

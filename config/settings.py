@@ -1180,6 +1180,27 @@ NB04_BATCH_MIN_REQUESTS = 10
 NB04_CREDIT_EXHAUSTED_MARKERS = ("insufficient_quota", "billing_hard_limit", "credit balance is too low",
                                  "exceeded your current quota", "billing_not_active")
 
+# STEP 4 results (author, 2026-11-28). evaluation/notebook04/results_summary.py scores the saved caches with run_judging.py's own
+# functions and writes this file: aggregate numbers only (no answer text, no chunk text, no judge quotes, no keys). Committable.
+NB04_RESULTS_SUMMARY_FILE = NB04_DIR / "results_summary.json"
+# Pre-registration (c), plan section 6a, FIXED by the author on 2026-11-27 before any result: question resamples with replacement,
+# 10,000 resamples, seed 42, percentile intervals, paired differences (not significant when the 95% interval includes 0).
+NB04_BOOTSTRAP_RESAMPLES = 10_000
+NB04_BOOTSTRAP_SEED = 42
+NB04_BOOTSTRAP_INTERVAL = 0.95
+# One colour per candidate on the "Model comparison" page, in line-up order and never by rank: slots 1-5 of the dataviz reference
+# palette, light and dark steps. Validated 2026-11-28 (validate_palette.js): light on #ffffff and dark on #0e1117 (Streamlit's
+# surfaces) pass every hard check (worst adjacent CVD dE 11.8 / 11.1); four light hues are below 3:1 on white, so the page always
+# names the models on the axis and gives a table view.
+MODEL_COMPARISON_PAGE_TITLE = "Model comparison"
+MODEL_COMPARISON_RECOMPUTE_LABEL = "Recompute scores from saved results"   # the page's only button (author, 2026-11-27)
+NB04_MODEL_COLOURS = {
+    "light": {"gpt-4o": "#257de0", "gemini-3.8-flash": "#f47230", "claude-sonnet-5-5": "#00b894", "deepseek-flash": "#f2a600",
+              "gemma-4-31b-it": "#ee7fac"},
+    "dark": {"gpt-4o": "#338ced", "gemini-3.8-flash": "#e76624", "claude-sonnet-5-5": "#00a888", "deepseek-flash": "#d28e05",
+             "gemma-4-31b-it": "#e24d8b"},
+}
+
 # Frozen weights and anchors (plan section 3). They must not change after any result is seen.
 NB04_WEIGHTS = {"accuracy": 0.25, "alignment": 0.15, "faithfulness": 0.15, "relevance": 0.10, "clarity": 0.10,
                 "response_time": 0.10, "cost": 0.10, "ease": 0.05}
