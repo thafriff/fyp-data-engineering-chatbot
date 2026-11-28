@@ -10,3 +10,5 @@ evaluation/multiturn_cases_v3.json -text
 # The quiz test sets are checked against recorded SHA-256 files (evaluation/quiz_cases*.sha256); written before the quiz code.
 evaluation/quiz_cases.json -text
 evaluation/quiz_cases_holdout.json -text
+# The study-plan test set is checked against its recorded SHA-256; written before the study-plan code.
+evaluation/study_plan_cases.json -text

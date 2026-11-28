@@ -1,0 +1,57 @@
+{
+ "meta": {
+  "purpose": "DESIGN test set for the study plan (feature A, docs/feature_design_2026-11-28.md, approved 2026-11-28; suggested by the author's lecturer). WRITTEN AND HASHED BEFORE ANY STUDY-PLAN CODE on 2026-11-28 and never edited afterwards: a case that fails is reported, not tuned away. Design cases may shape the rules; the author's 6 held-out cases are kept in a separate file and reported apart.",
+  "written": "2026-11-28",
+  "defaults": "approved by the author: 45-minute sessions with a 10-minute break, 2 hours a day in days mode unless the student says otherwise, limits 20 minutes to 14 days or 40 hours",
+  "sets": {
+   "in_scope": "one per course topic, mixing minutes, hours and days: expect a plan with budget_minutes as given",
+   "off_topic": "outside the course: expect a decline (the course's fallback wording and the 8 course topics), no plan",
+   "too_broad": "the whole field in a short time: expect an overview of the 8 course topics that asks the student to pick one",
+   "too_short": "under the 20-minute limit: expect the fixed message, no plan",
+   "missing": "a plan request without a time or without a topic: expect the fixed question back, no plan",
+   "malay": "Malay-English mix (jam = hours, untuk = for): expect a plan",
+   "not_plan": "messages that mention time, schedules or plans but are not study-plan requests: expect NOT to route to the study plan",
+   "programmatic": "also required, not repeated here: none of the 100 evaluation questions, the 10 guardrail probes, the guardrail router's sets or the quiz sets routes to the study plan"
+  },
+  "scoring": {
+   "deterministic_every_run": "the session minutes add up to the budget within 10%; every sub-topic name is a real section title of the knowledge base; every citation is in the retrieved set and belongs to its session's section; difficulty never decreases from one session to the next; off-topic requests are declined; missing input gets the fixed question and no plan",
+   "model_checks": "3 runs on deepseek-flash, 1 on qwen3.5:2b: at least 90% of suggested questions pass the grounding check before replacement (their top 5 contains one of their session's chunks at or above 0.70)",
+   "author_review": "the author reads 5 plans against their source sections (verification against the material, not expert judgement)"
+  }
+ },
+ "in_scope": [
+  {"id": "SP01", "text": "I have 3 hours to study data warehousing", "budget_minutes": 180, "topic": "data warehousing"},
+  {"id": "SP02", "text": "plan 3 days for SQL", "budget_minutes": 360, "topic": "SQL"},
+  {"id": "SP03", "text": "make me a study plan for 45 minutes on data quality", "budget_minutes": 45, "topic": "data quality"},
+  {"id": "SP04", "text": "plan a week to study big data", "budget_minutes": 840, "topic": "big data"},
+  {"id": "SP05", "text": "study plan for ETL and ELT, 2 hours", "budget_minutes": 120, "topic": "ETL and ELT"},
+  {"id": "SP06", "text": "I want to revise data pipelines in 1 day", "budget_minutes": 120, "topic": "data pipelines"},
+  {"id": "SP07", "text": "help me study data cleaning for 90 minutes", "budget_minutes": 90, "topic": "data cleaning"},
+  {"id": "SP08", "text": "plan 4 hours of data processing study", "budget_minutes": 240, "topic": "data processing"}
+ ],
+ "off_topic": [
+  {"id": "SX01", "text": "plan 3 days for machine learning"},
+  {"id": "SX02", "text": "I have 2 hours to study React"},
+  {"id": "SX03", "text": "make a study plan for my driving test in 3 days"}
+ ],
+ "too_broad": [
+  {"id": "SB01", "text": "plan 1 hour for all of data engineering"}
+ ],
+ "too_short": [
+  {"id": "SS01", "text": "plan 10 minutes on SQL"}
+ ],
+ "missing": [
+  {"id": "SM01", "text": "make me a study plan for SQL", "missing": "time"},
+  {"id": "SM02", "text": "plan 3 hours", "missing": "topic"}
+ ],
+ "malay": [
+  {"id": "SL01", "text": "plan 2 jam untuk SQL", "budget_minutes": 120, "topic": "SQL"}
+ ],
+ "not_plan": [
+  {"id": "SN01", "text": "how do I schedule a dbt job every 3 days?"},
+  {"id": "SN02", "text": "explain query execution plans in SQL"},
+  {"id": "SN03", "text": "how long does it take to learn SQL?"},
+  {"id": "SN04", "text": "my exam is in 3 days, what is normalization?"},
+  {"id": "SN05", "text": "what does a data engineer do in a typical day?"}
+ ]
+}
