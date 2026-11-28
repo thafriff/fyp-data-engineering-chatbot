@@ -652,13 +652,14 @@ COMPARISON_PATTERNS = [
 # (2-3 sentences in 9 of 9 runs). The answer now opens with an "In simple terms:" line and one plain-English bullet per item.
 # Wording v2b (same day): v2a gave the bullets inline ("In simple terms: **OLTP** is ..., while **OLAP** is ...") in 5 of 6
 # runs, so the layout is now shown line by line.
+# 2026-11-28 (author): step 1 is now described in WORDS, like the opening rule (2026-11-27). Its layout template had angle-bracket
+# placeholders ("- **<first item>** is for <what it is used for ...>"), the same kind qwen3.5:2b copied literally from the opening
+# rule ("<fact>...</fact> [<S05-0097>]"). Steps 2 and 3 are unchanged. App layer only: SYSTEM_PROMPT and notebook 04 untouched.
 COMPARISON_FORMAT_INSTRUCTION = (
     "Format for this comparison question, in this order:\n"
-    "1. Start with exactly this layout, each bullet on its own line, one bullet per item being compared:\n"
-    "In simple terms:\n"
-    "- **<first item>** is for <what it is used for, in one short line of plain English a beginner understands>.\n"
-    "- **<second item>** is for <what it is used for, in one short line>.\n"
-    "Each bullet is one short line of at most 20 words; do not write anything else before the table.\n"
+    "1. Start with the line \"In simple terms:\" on its own, then one bullet per item being compared, each bullet on its own "
+    "line. Each bullet gives the item's name in bold and then what it is used for, in one short line of plain English a "
+    "beginner understands, of at most 20 words; do not write anything else before the table.\n"
     "2. Then give a markdown table with one column per item and one row per aspect, 3 to 5 rows, with the aspect names in the "
     "first column, and put the chunk ID in square brackets inside every table cell that takes its content from an excerpt.\n"
     "3. After the table, write at most 1 sentence. Do not add any other sections."

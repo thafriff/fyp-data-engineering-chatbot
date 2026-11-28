@@ -83,7 +83,8 @@ class Instruction(unittest.TestCase):
     def test_instruction_asks_for_the_layout(self):
         """2026-11-26 v2: an "In simple terms:" line with one plain-English bullet per item replaces the one-sentence opening."""
         text = settings.COMPARISON_FORMAT_INSTRUCTION
-        for phrase in ("\nIn simple terms:\n", "each bullet on its own line, one bullet per item being compared",
+        for phrase in ('Start with the line "In simple terms:" on its own', "one bullet per item being compared",
+                       "each bullet on its own line", "the item's name in bold", "what it is used for",
                        "a beginner understands", "at most 20 words", "do not write anything else before the table",
                        "markdown table", "one column per item", "one row per aspect", "3 to 5 rows",
                        "chunk ID in square brackets inside every table cell", "at most 1 sentence"):
@@ -100,6 +101,14 @@ class Instruction(unittest.TestCase):
         """The comparison layout shows only neutral placeholders, so the model cannot copy one example's content."""
         for term in ("OLTP", "OLAP", "ETL", "warehouse", "normalized", "S06-", "S05-", "S04-"):
             self.assertNotIn(term, settings.COMPARISON_FORMAT_INSTRUCTION)
+
+    def test_comparison_layout_has_no_template_to_copy(self):
+        """2026-11-28 (author): like the opening rule, the layout is in words only: the old template's angle-bracket
+        placeholders ("- **<first item>** is for <...>") are gone, and so is the literal bold markup a model could copy."""
+        text = settings.COMPARISON_FORMAT_INSTRUCTION
+        self.assertNotRegex(text, r"<[^<>]*>")
+        self.assertNotIn("**", text)
+        self.assertNotIn("\n- ", text)
 
     def test_opening_rule_has_no_example_or_template_to_copy(self):
         """2026-11-26 (author): the concrete v2b example "OLTP databases are normalized [S06-0205]" appeared in 13 of 69
