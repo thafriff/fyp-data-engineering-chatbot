@@ -127,6 +127,7 @@ def judge_rows() -> list[dict]:
         rows.append({"job": job, "judge": entry["judge"], "judge_cfg": judge, "calls_planned": entry["calls"], "estimate_usd": estimate,
                      "batch_prices": (batch_in, batch_out), "batch_estimate_usd": batch_estimate,
                      "spent": cache["spend"] if cache else None,
+                     "judged": sum(1 for r in cache["results"].values() if not r["error"]) if cache else 0,
                      "route": cache["run_settings"].get("pricing_route", "standard") if cache else None})
     return rows
 
@@ -140,6 +141,15 @@ def key_check_usd() -> tuple[float, float, int]:
     free = {name for name, c in settings.NB04_CANDIDATES.items() if c["key"] == "google"}
     listed = sum(c.get("cost_usd_list", 0.0) for c in calls)
     return listed, sum(c.get("cost_usd_list", 0.0) for c in calls if c["name"] not in free), len(calls)
+
+
+def judging_status(judges: list[dict]) -> str:
+    """'not run yet', 'COMPLETE (...)' when every job has all its planned judgements without an error, or 'IN PROGRESS (...)'."""
+    if all(j["spent"] is None for j in judges):
+        return "not run yet"
+    counts = ", ".join(f"{j['job']} {j['judged']}/{j['calls_planned']}" for j in judges)
+    done = all(j["judged"] >= j["calls_planned"] for j in judges)
+    return f"{'COMPLETE' if done else 'IN PROGRESS'} ({counts})"
 
 
 def money(usd: float) -> str:
@@ -156,7 +166,7 @@ def render() -> str:
            f"Generated {now} by `evaluation/notebook04/cost_summary.py` from the saved caches (numbers only: no answer text, chunk text or keys).",
            f"Status: generation {'COMPLETE' if complete else 'IN PROGRESS'} for the {len(rows)} candidates "
            f"({settings.NB04_ANSWERS_PER_MODEL} answers each: 100 questions + 10 probes x 3); judging "
-           f"{'not run yet' if all(j['spent'] is None for j in judges) else 'partly or fully run'}.",
+           f"{judging_status(judges)}.",
            "",
            f"- Exchange rate: USD 1 = RM {RM} ({settings.NB04_USD_TO_MYR_SOURCE}).",
            f"- List prices read on {settings.NB04_PRICES_CHECKED} from each provider's own pricing page (sources below).",
@@ -238,7 +248,7 @@ def render() -> str:
             "|---|---|---|",
             f"| Generation | {money(gen_list)} | {money(gen_charged)} |",
             f"| Latency re-measure | {money(remeasure_list)} | {money(remeasure_charged)} |",
-            f"| Judging | {money(judge_spent)} | {money(judge_spent)} (paid judges: no free tier; batch discounts appear here once used) |",
+            f"| Judging | {money(judge_spent)} | {money(judge_spent)} (paid judges, no free tier; a batch job is billed at its batch price) |",
             f"| Pre-flight checks | {money(key_list)} | {money(key_charged)} |",
             f"| **All** | **{money(total_list)}** | **{money(gen_charged + remeasure_charged + judge_spent + key_charged)}** |",
             "",

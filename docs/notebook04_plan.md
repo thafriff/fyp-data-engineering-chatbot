@@ -1289,6 +1289,15 @@ partly measures provider load) and is why the ranking without Response Time is r
 (more are sent in parts, one after another); after an enqueued-token rejection the job's later batches are half the size, down to 10, and a
 rejection at that size, or any other whole-batch rejection, stops the run with the provider's message.
 
+**STEP 3 judging RUN AND COMPLETE (author's instruction of 2026-11-28; batch route, no top-up).** Submitted 05:52 UTC, all ended by 06:35 UTC; no
+batch was rejected, split or cut by the credit check. Rubric (`gpt-5.4`) 500 of 500, $1.8402 at batch price (estimate $2.69); RAGAS
+(`gpt-5.4-mini`, two rounds, 1,000 requests) 500 of 500, $1.4919 ($1.52); guardrail (`gpt-5.4`) 150 of 150, $0.3965 ($0.57); cross-check
+(`claude-opus-5-5`) 100 of 100, $0.9955 ($1.10). Every job: 0 errors and 0 malformed-output retries. Per candidate: 100 rubric, 100 RAGAS, 30
+guardrail and 20 cross-check judgements. The rubric judge flagged **no** contradiction, so no answer awaits the author's contradiction review;
+all 500 RAGAS faithfulness values are defined. Judging total $4.7240 = RM19.45; everything so far $7.2171 = RM29.72 at list price (30.9% of the
+RM96 stop). Ledger after judging: OpenAI $0.48 left of $5, Anthropic $2.77 of $5. Scoring, the bootstrap intervals of section 6a(c) and the
+results page are STEP 4.
+
 ---
 
 ## Sources (checked 2026-11-01; re-checked 2026-11-27 where marked)

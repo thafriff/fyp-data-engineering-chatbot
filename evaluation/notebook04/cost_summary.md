@@ -1,7 +1,7 @@
 # Notebook 04 cost summary
 
-Generated 2026-11-28T05:28+00:00 by `evaluation/notebook04/cost_summary.py` from the saved caches (numbers only: no answer text, chunk text or keys).
-Status: generation COMPLETE for the 5 candidates (130 answers each: 100 questions + 10 probes x 3); judging not run yet.
+Generated 2026-11-28T06:36+00:00 by `evaluation/notebook04/cost_summary.py` from the saved caches (numbers only: no answer text, chunk text or keys).
+Status: generation COMPLETE for the 5 candidates (130 answers each: 100 questions + 10 probes x 3); judging COMPLETE (rubric 500/500, ragas 500/500, guardrail 150/150, crosscheck 100/100).
 
 - Exchange rate: USD 1 = RM 4.1179 (BNM Kuala Lumpur USD/MYR reference rate, 27 Nov 2026).
 - List prices read on 2026-11-27 from each provider's own pricing page (sources below).
@@ -35,10 +35,10 @@ The first 20 frozen questions sent again on the paid tier for Response Time (`ra
 
 | Job | Judge | Standard price in / out per 1M | Batch price in / out per 1M | Calls planned | Estimate at standard price | Estimate at batch price | Spent (route) |
 |---|---|---|---|---|---|---|---|
-| rubric | `gpt-5.4` | $2.50 / $15.00 | $1.250 / $7.50 | 500 | $5.3750 (RM22.13) | $2.6875 (RM11.07) | not run |
-| ragas | `gpt-5.4-mini` | $0.75 / $4.50 | $0.375 / $2.25 | 500 | $3.0375 (RM12.51) | $1.5188 (RM6.25) | not run |
-| guardrail | `gpt-5.4` | $2.50 / $15.00 | $1.250 / $7.50 | 150 | $1.1325 (RM4.66) | $0.5663 (RM2.33) | not run |
-| crosscheck | `claude-opus-5-5` | $4.00 / $20.00 | $2.000 / $10.00 | 100 | $2.1920 (RM9.03) | $1.0960 (RM4.51) | not run |
+| rubric | `gpt-5.4` | $2.50 / $15.00 | $1.250 / $7.50 | 500 | $5.3750 (RM22.13) | $2.6875 (RM11.07) | $1.8402 (RM7.58), 500 calls (batch) |
+| ragas | `gpt-5.4-mini` | $0.75 / $4.50 | $0.375 / $2.25 | 500 | $3.0375 (RM12.51) | $1.5188 (RM6.25) | $1.4919 (RM6.14), 1000 calls (batch) |
+| guardrail | `gpt-5.4` | $2.50 / $15.00 | $1.250 / $7.50 | 150 | $1.1325 (RM4.66) | $0.5663 (RM2.33) | $0.3965 (RM1.63), 150 calls (batch) |
+| crosscheck | `claude-opus-5-5` | $4.00 / $20.00 | $2.000 / $10.00 | 100 | $2.1920 (RM9.03) | $1.0960 (RM4.51) | $0.9955 (RM4.10), 100 calls (batch) |
 
 ## Pre-flight key checks (not part of the run)
 
@@ -50,18 +50,18 @@ The first 20 frozen questions sent again on the paid tier for Response Time (`ra
 |---|---|---|
 | Generation | $2.4408 (RM10.05) | $2.3296 (RM9.59) |
 | Latency re-measure | $0.0452 (RM0.19) | $0.0452 (RM0.19) |
-| Judging | $0.0000 (RM0.00) | $0.0000 (RM0.00) (paid judges: no free tier; batch discounts appear here once used) |
+| Judging | $4.7240 (RM19.45) | $4.7240 (RM19.45) (paid judges, no free tier; a batch job is billed at its batch price) |
 | Pre-flight checks | $0.0071 (RM0.03) | $0.0071 (RM0.03) |
-| **All** | **$2.4931 (RM10.27)** | **$2.3819 (RM9.81)** |
+| **All** | **$7.2171 (RM29.72)** | **$7.1059 (RM29.26)** |
 
-Hard stop: RM96 (USD 23.31), counted at list price on generation, re-measures and judging. Used so far: RM10.24 (10.7%).
+Hard stop: RM96 (USD 23.31), counted at list price on generation, re-measures and judging. Used so far: RM29.69 (30.9%).
 
 ## Prepaid credit (ledger)
 
 No provider reports a prepaid key's balance through its API, so this is a ledger: the credit stated on 2026-11-27 minus every cost recorded since, at list (or batch list) price, an upper bound on the bill. The billing pages are the authority.
 
-- openai: credit $5.00 - recorded $0.7901 (generation $0.7896, key_checks $0.0005) = $4.2099 left (ledger at list price, an upper bound on the bill)
-- anthropic: credit $5.00 - recorded $1.2374 (generation $1.2308, key_checks $0.0066) = $3.7626 left (ledger at list price, an upper bound on the bill)
+- openai: credit $5.00 - recorded $4.5187 (generation $0.7896, judging $3.7286, key_checks $0.0005) = $0.4813 left (ledger at list price, an upper bound on the bill)
+- anthropic: credit $5.00 - recorded $2.2329 (generation $1.2308, judging $0.9955, key_checks $0.0066) = $2.7671 left (ledger at list price, an upper bound on the bill)
 - deepseek: credit $2.00 - recorded $0.1052 (generation $0.1051, key_checks $0.0000) = $1.8948 left (ledger at list price, an upper bound on the bill)
 
 ## Sources
